@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Codigos locales/">
+    <File Path="FarmaciaPOS/Views/Productos.xaml.cs" />
+  </Folder>
+  <Project Path="FarmaciaAPI/FarmaciaAPI.csproj" />
+  <Project Path="FarmaciaPOS/FarmaciaPOS.csproj" />
+  <Project Path="FarmaciaWeb/FarmaciaWeb.csproj" />
+</Solution>

@@ -1,0 +1,104 @@
+﻿<Window x:Class="FarmaciaPOS.Views.PedidosWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pedidos Online"
+        Height="750"
+        Width="1300"
+        WindowStartupLocation="CenterScreen"
+        Background="#F3F4F6">
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+
+        <Border Background="White"
+                CornerRadius="10"
+                Padding="20"
+                Margin="0,0,0,15">
+
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Pedidos de Tienda Online"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+
+                <ComboBox x:Name="cbEstado"
+                          Grid.Column="1"
+                          Height="40"
+                          FontSize="16"
+                          SelectionChanged="cbEstado_SelectionChanged">
+
+                    <ComboBoxItem Content="Todos"/>
+                    <ComboBoxItem Content="Pendiente"/>
+                    <ComboBoxItem Content="Preparando"/>
+                    <ComboBoxItem Content="Entregado"/>
+                    <ComboBoxItem Content="Cancelado"/>
+
+                </ComboBox>
+
+            </Grid>
+
+        </Border>
+
+        <!-- TABLA -->
+
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="10"
+                Padding="15">
+
+            <DataGrid x:Name="dgPedidos"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      FontSize="15">
+
+                <DataGrid.Columns>
+
+                    <DataGridTextColumn Header="Pedido"
+                        Binding="{Binding NumeroPedido}"
+                        Width="140"/>
+
+                    <DataGridTextColumn Header="Cliente"
+                        Binding="{Binding ClienteNombre}"
+                        Width="220"/>
+
+                    <DataGridTextColumn Header="Fecha"
+                        Binding="{Binding FechaPedido}"
+                        Width="180"/>
+
+                    <DataGridTextColumn Header="Total"
+                        Binding="{Binding Total}"
+                        Width="120"/>
+
+                    <DataGridTextColumn Header="Estado"
+                        Binding="{Binding EstadoPedido}"
+                        Width="140"/>
+
+                    <DataGridTextColumn Header="Hora Recogida"
+                        Binding="{Binding HoraRecogida}"
+                        Width="150"/>
+
+                    <DataGridTextColumn Header="Observaciones"
+                        Binding="{Binding Observaciones}"
+                        Width="300"/>
+
+                </DataGrid.Columns>
+
+            </DataGrid>
+
+        </Border>
+
+    </Grid>
+
+</Window>

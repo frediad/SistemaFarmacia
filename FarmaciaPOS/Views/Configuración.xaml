@@ -1,0 +1,93 @@
+﻿<Window x:Class="FarmaciaPOS.Views.ConfiguracionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Configuración"
+        Height="650"
+        Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F7FA">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+
+            <RowDefinition Height="80"/>
+
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+
+        <!-- TITULO -->
+
+        <TextBlock Text="Configuración del Sistema"
+                   FontSize="30"
+                   FontWeight="Bold"
+                   VerticalAlignment="Center"/>
+
+        <!-- BOTONES -->
+
+        <UniformGrid Grid.Row="1"
+                     Columns="2"
+                     Rows="4"
+                     Margin="0,20,0,0">
+
+            <!-- TICKET -->
+
+            <Button Content="🎫 Configuración Ticket"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnTicket_Click"/>
+
+            <!-- PERIFERICOS -->
+
+            <Button Content="🖨️ Periféricos"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnPerifericos_Click"/>
+
+            <!-- USUARIOS -->
+
+            <Button Content="👤 Usuarios y Roles"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnUsuarios_Click"/>
+            <!-- POS -->
+
+            <Button Content="💳 Configuración POS"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnPOS_Click"/>
+
+            <!-- FARMACIA -->
+
+            <Button Content="💊 Configuración Farmacia"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnFarmacia_Click"/>
+
+            <!-- NEGOCIO -->
+
+            <Button Content="🏪 Información Negocio"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnNegocio_Click"/>
+
+            <!-- ACERCA -->
+
+            <Button Content="ℹ️ Acerca del Sistema"
+                    Margin="10"
+                    FontSize="18"
+                    Height="120"
+                    Click="BtnAcerca_Click"/>
+
+        </UniformGrid>
+
+    </Grid>
+
+</Window>
