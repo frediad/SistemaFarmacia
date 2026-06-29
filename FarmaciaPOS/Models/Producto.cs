@@ -4,9 +4,11 @@
     {
         public int Id { get; set; }
 
-        public string CodigoBarras { get; set; } = "";
+        public string CodigoBarras { get; set; } =
+            string.Empty;
 
-        public string Nombre { get; set; } = "";
+        public string Nombre { get; set; } =
+            string.Empty;
 
         public string Descripcion { get; set; } = "";
 

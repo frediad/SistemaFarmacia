@@ -84,6 +84,20 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
+        // PROVEEDORES
+        // =====================================
+
+        private void BtnProveedor_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            ProveedoresWindow proveedor =
+                new ProveedoresWindow();
+
+            proveedor.ShowDialog();
+        }
+
+        // =====================================
         // ACERCA
         // =====================================
 

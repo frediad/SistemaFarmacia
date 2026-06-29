@@ -36,7 +36,7 @@
             <Button Content="🎫 Configuración Ticket"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnTicket_Click"/>
 
             <!-- PERIFERICOS -->
@@ -44,7 +44,7 @@
             <Button Content="🖨️ Periféricos"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnPerifericos_Click"/>
 
             <!-- USUARIOS -->
@@ -52,14 +52,14 @@
             <Button Content="👤 Usuarios y Roles"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnUsuarios_Click"/>
             <!-- POS -->
 
             <Button Content="💳 Configuración POS"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnPOS_Click"/>
 
             <!-- FARMACIA -->
@@ -67,7 +67,7 @@
             <Button Content="💊 Configuración Farmacia"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnFarmacia_Click"/>
 
             <!-- NEGOCIO -->
@@ -75,15 +75,23 @@
             <Button Content="🏪 Información Negocio"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnNegocio_Click"/>
+
+            <!-- PROVEEDORES -->
+
+            <Button Content=" Proveedores"
+                    Margin="10"
+                    FontSize="18"
+                    Height="100"
+                    Click="BtnProveedor_Click"/>
 
             <!-- ACERCA -->
 
             <Button Content="ℹ️ Acerca del Sistema"
                     Margin="10"
                     FontSize="18"
-                    Height="120"
+                    Height="100"
                     Click="BtnAcerca_Click"/>
 
         </UniformGrid>

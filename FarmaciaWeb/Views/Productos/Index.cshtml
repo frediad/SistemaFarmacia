@@ -1,0 +1,88 @@
+﻿@model List<FarmaciaAPI.Models.Producto>
+
+@{
+    ViewData["Title"] = "Farmacia Yatzil";
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<h1 class="titulo">
+    Farmacia Yatzil
+</h1>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="mensaje-exito">
+        @TempData["Exito"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="mensaje-error">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="contenedor-productos">
+
+    @foreach (var producto in Model)
+    {
+        <div class="producto-card">
+
+            <h3>@producto.Nombre</h3>
+
+            <p>@producto.Descripcion</p>
+
+            <p class="precio">
+                $@producto.PrecioVenta
+            </p>
+
+            <p>
+                Existencia:
+                @producto.Stock
+            </p>
+
+            <form asp-action="Comprar"
+                  method="post">
+
+                <input type="hidden"
+                       name="productoId"
+                       value="@producto.Id" />
+
+                <input type="text"
+                       name="nombre"
+                       placeholder="Nombre"
+                       required />
+
+                <input type="text"
+                       name="telefono"
+                       placeholder="Teléfono"
+                       required />
+
+                <input type="email"
+                       name="correo"
+                       placeholder="Correo"
+                       required />
+
+                <input type="text"
+                       name="direccion"
+                       placeholder="Dirección"
+                       required />
+
+                <input type="number"
+                       name="cantidad"
+                       value="1"
+                       min="1"
+                       required />
+
+                <button type="submit">
+                    Comprar
+                </button>
+
+            </form>
+
+        </div>
+    }
+
+</div>

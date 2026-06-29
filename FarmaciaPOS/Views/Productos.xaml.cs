@@ -1,4 +1,5 @@
 ﻿using FarmaciaPOS.Models;
+using FarmaciaPOS.Helpers;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,7 @@ namespace FarmaciaPOS.Views
 {
     public partial class ProductosWindow : Window
     {
-        string connectionString =
-            @"Server=.\SQLEXPRESS;
-              Database=FarmaciaDB;
-              Trusted_Connection=True;
-              TrustServerCertificate=True;";
-
+        
         int productoId = 0;
 
         public ProductosWindow()
@@ -35,7 +31,7 @@ namespace FarmaciaPOS.Views
                 new List<Producto>();
 
             using SqlConnection conn =
-                new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
             conn.Open();
 
@@ -126,7 +122,7 @@ namespace FarmaciaPOS.Views
                 new List<Categoria>();
 
             using SqlConnection conn =
-                new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
             conn.Open();
 
@@ -174,7 +170,7 @@ namespace FarmaciaPOS.Views
             try
             {
                 using SqlConnection conn =
-                    new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
                 conn.Open();
 
@@ -477,7 +473,7 @@ namespace FarmaciaPOS.Views
                 }
 
                 using SqlConnection conn =
-                    new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
                 conn.Open();
 

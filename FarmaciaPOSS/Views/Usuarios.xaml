@@ -1,0 +1,282 @@
+﻿<Window x:Class="FarmaciaPOS.Views.UsuariosWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Usuarios y Roles"
+        Height="700"
+        Width="1100"
+        Icon="/logo-icono.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="#EEF2F7">
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="95"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+
+        <Border Background="White"
+                CornerRadius="10"
+                Padding="20"
+                Margin="0,0,0,15">
+
+            <TextBlock Text="Gestión de Usuarios y Roles"
+                       FontSize="30"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+
+        </Border>
+
+        <!-- CONTENIDO -->
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===================================== -->
+            <!-- FORMULARIO USUARIO -->
+            <!-- ===================================== -->
+
+            <Border Background="White"
+                    CornerRadius="10"
+                    Padding="20"
+                    Margin="0,0,15,0">
+
+                <ScrollViewer>
+
+                    <StackPanel>
+
+                        <TextBlock Text="Datos del Usuario"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Nombre"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <TextBox x:Name="txtNombre"
+                                 Height="38"
+                                 FontSize="15"
+                                 Margin="0,5,0,12"/>
+
+                        <TextBlock Text="Apellido"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <TextBox x:Name="txtApellido"
+                                 Height="38"
+                                 FontSize="15"
+                                 Margin="0,5,0,12"/>
+
+                        <TextBlock Text="Usuario (Login)"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <TextBox x:Name="txtUsuarioLogin"
+                                 Height="38"
+                                 FontSize="15"
+                                 Margin="0,5,0,12"/>
+
+                        <TextBlock Text="Correo"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <TextBox x:Name="txtCorreo"
+                                 Height="38"
+                                 FontSize="15"
+                                 Margin="0,5,0,12"/>
+
+                        <TextBlock Text="Teléfono"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <TextBox x:Name="txtTelefono"
+                                 Height="38"
+                                 FontSize="15"
+                                 Margin="0,5,0,12"/>
+
+                        <TextBlock Text="Contraseña"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <Grid Margin="0,5,0,5">
+
+                            <PasswordBox x:Name="txtPassword"
+                                         Height="38"
+                                         FontSize="15"
+                                         PasswordChanged="TxtPassword_PasswordChanged"/>
+
+                            <TextBlock x:Name="txtPlaceholderPassword"
+                                       Text="•••••••• (ya hay una contraseña guardada)"
+                                       FontSize="13"
+                                       Foreground="Gray"
+                                       IsHitTestVisible="False"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0"
+                                       Visibility="Collapsed"/>
+
+                        </Grid>
+
+                        <TextBlock Text="Rol"
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
+
+                        <ComboBox x:Name="cbRoles"
+                                  Height="38"
+                                  FontSize="15"
+                                  DisplayMemberPath="Nombre"
+                                  SelectedValuePath="Id"
+                                  Margin="0,5,0,12"/>
+
+                        <CheckBox x:Name="chkActivo"
+                                  Content="Usuario Activo"
+                                  FontSize="15"
+                                  IsChecked="True"
+                                  Margin="0,5,0,20"/>
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Content="🆕 Nuevo"
+                                    Height="44"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Background="#9CA3AF"
+                                    Foreground="White"
+                                    Click="BtnNuevo_Click"/>
+
+                            <Button Grid.Column="2"
+                                    Content="💾 Guardar"
+                                    Height="44"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnGuardar_Click"/>
+
+                        </Grid>
+
+                        <Button Content="🗑️ Eliminar"
+                                Height="44"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Background="#DC2626"
+                                Foreground="White"
+                                Margin="0,10,0,0"
+                                Click="BtnEliminar_Click"/>
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
+            </Border>
+
+            <!-- ===================================== -->
+            <!-- ✅ CHECKLIST DE MÓDULOS -->
+            <!-- ===================================== -->
+
+            <Border Grid.Column="1"
+                    Background="White"
+                    CornerRadius="10"
+                    Padding="20"
+                    Margin="0,0,15,0">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Módulos con Acceso"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Margin="0,0,0,12"/>
+
+                    <ScrollViewer Grid.Row="1">
+
+                        <ItemsControl x:Name="icModulos">
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding NombreModulo}"
+                                              IsChecked="{Binding TieneAcceso, Mode=TwoWay}"
+                                              FontSize="16"
+                                              Margin="0,8"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </ScrollViewer>
+
+                </Grid>
+
+            </Border>
+
+            <!-- ===================================== -->
+            <!-- TABLA DE USUARIOS -->
+            <!-- ===================================== -->
+
+            <Border Grid.Column="2"
+                    Background="White"
+                    CornerRadius="10"
+                    Padding="15">
+
+                <DataGrid x:Name="dgUsuarios"
+                          AutoGenerateColumns="False"
+                          FontSize="15"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          SelectionChanged="DgUsuarios_SelectionChanged">
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn Header="Usuario"
+                            Binding="{Binding UsuarioLogin}"
+                            Width="140"/>
+
+                        <DataGridTextColumn Header="Nombre"
+                            Binding="{Binding Nombre}"
+                            Width="130"/>
+
+                        <DataGridTextColumn Header="Apellido"
+                            Binding="{Binding Apellido}"
+                            Width="130"/>
+
+                        <DataGridTextColumn Header="Correo"
+                            Binding="{Binding Correo}"
+                            Width="200"/>
+
+                        <DataGridTextColumn Header="Rol"
+                            Binding="{Binding Rol.Nombre}"
+                            Width="120"/>
+
+                        <DataGridCheckBoxColumn Header="Activo"
+                            Binding="{Binding Activo}"
+                            Width="80"/>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</Window>

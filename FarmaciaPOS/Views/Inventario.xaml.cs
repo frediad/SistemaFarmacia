@@ -1,4 +1,5 @@
-﻿using FarmaciaPOS.Models;
+﻿using FarmaciaPOS.Helpers;
+using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace FarmaciaPOS.Views
                 new();
 
             using SqlConnection conn =
-                new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
             conn.Open();
 
@@ -214,7 +215,7 @@ namespace FarmaciaPOS.Views
                 lista = new();
 
             using SqlConnection conn =
-                new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
             conn.Open();
 

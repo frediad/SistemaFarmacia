@@ -7,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Models\" />
     <Folder Include="Components\Shared\" />
     <Folder Include="Components\Services\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FarmaciaAPI\FarmaciaAPI.csproj" />
   </ItemGroup>
 
 </Project>

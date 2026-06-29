@@ -55,13 +55,13 @@ namespace FarmaciaPOS.Views
             if (reader.Read())
             {
                 Sesion.UsuarioId =
-                    (int)reader["Id"];
+                Convert.ToInt32(reader["Id"]);
 
-                Sesion.Nombre =
+                Sesion.NombreUsuario =
                     reader["Nombre"].ToString();
 
                 Sesion.RolId =
-                    (int)reader["RolId"];
+                    Convert.ToInt32(reader["RolId"]);
 
                 MainWindow main =
                     new MainWindow();

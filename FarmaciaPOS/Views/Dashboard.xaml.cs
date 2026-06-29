@@ -12,20 +12,11 @@ namespace FarmaciaPOS
 {
     public partial class MainWindow : Window
     {
-        string connectionString =
-            @"Server=.\SQLEXPRESS;
-              Database=FarmaciaDB;
-              Trusted_Connection=True;
-              TrustServerCertificate=True;";
+        
 
         List<Producto> productos =
             new();
 
-        // Carrito del POS Rápido (panel derecho)
-        List<VentaItem> carritoDashboard =
-            new();
-
-        // Carrito del área central de venta
         List<VentaItem> carritoCentral =
             new();
 
@@ -37,7 +28,10 @@ namespace FarmaciaPOS
         {
             InitializeComponent();
 
-            CargarProductosDashboard();
+            txtUsuarioSesion.Text =
+               Sesion.NombreUsuario;
+
+            CargarProductos();
 
             ValidarPermisos();
 
@@ -73,12 +67,12 @@ namespace FarmaciaPOS
         // CARGAR PRODUCTOS
         // =========================================
 
-        private void CargarProductosDashboard()
+        private void CargarProductos()
         {
             productos.Clear();
 
             using SqlConnection conn =
-                new SqlConnection(connectionString);
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
             conn.Open();
 
@@ -120,32 +114,11 @@ namespace FarmaciaPOS
 
         private void InicializarCarritoCentral()
         {
-            dgCarritoCentral.ItemsSource =
-                carritoCentral;
+            // Limpiar primero para evitar el conflicto
+            dgCarritoCentral.Items.Clear();
+            dgCarritoCentral.ItemsSource = carritoCentral;
 
             ActualizarCarritoCentral();
-        }
-
-        // =========================================
-        // ESCANEAR — POS RÁPIDO
-        // =========================================
-
-        private void txtEscaner_KeyDown(
-            object sender,
-            KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                string codigo =
-                    txtEscaner.Text.Trim();
-
-                AgregarAlCarrito(
-                    codigo,
-                    carritoDashboard,
-                    esCentral: false);
-
-                txtEscaner.Clear();
-            }
         }
 
         // =========================================
@@ -161,23 +134,17 @@ namespace FarmaciaPOS
                 string codigo =
                     txtCodigoProducto.Text.Trim();
 
-                AgregarAlCarrito(
-                    codigo,
-                    carritoCentral,
-                    esCentral: true);
+                AgregarAlCarrito(codigo);
 
                 txtCodigoProducto.Clear();
             }
         }
 
         // =========================================
-        // LÓGICA COMPARTIDA — AGREGAR AL CARRITO
+        // AGREGAR AL CARRITO
         // =========================================
 
-        private void AgregarAlCarrito(
-            string codigo,
-            List<VentaItem> carrito,
-            bool esCentral)
+        private void AgregarAlCarrito(string codigo)
         {
             if (string.IsNullOrEmpty(codigo))
                 return;
@@ -197,7 +164,7 @@ namespace FarmaciaPOS
             }
 
             var existente =
-                carrito.FirstOrDefault(
+                carritoCentral.FirstOrDefault(
                     x => x.ProductoId == producto.Id);
 
             if (existente != null)
@@ -206,7 +173,7 @@ namespace FarmaciaPOS
             }
             else
             {
-                carrito.Add(new VentaItem
+                carritoCentral.Add(new VentaItem
                 {
                     ProductoId = producto.Id,
                     Nombre = producto.Nombre,
@@ -215,26 +182,7 @@ namespace FarmaciaPOS
                 });
             }
 
-            if (esCentral)
-                ActualizarCarritoCentral();
-            else
-                ActualizarDashboardPOS();
-        }
-
-        // =========================================
-        // ACTUALIZAR POS RÁPIDO
-        // =========================================
-
-        private void ActualizarDashboardPOS()
-        {
-            dgCarritoDashboard.ItemsSource = null;
-            dgCarritoDashboard.ItemsSource = carritoDashboard;
-
-            decimal total =
-                carritoDashboard.Sum(x => x.Subtotal);
-
-            txtTotalDashboard.Text =
-                total.ToString("C");
+            ActualizarCarritoCentral();
         }
 
         // =========================================
@@ -243,25 +191,15 @@ namespace FarmaciaPOS
 
         private void ActualizarCarritoCentral()
         {
-            dgCarritoCentral.ItemsSource = null;
-            dgCarritoCentral.ItemsSource = carritoCentral;
-
             decimal total =
                 carritoCentral.Sum(x => x.Subtotal);
 
-            // Total grande
             txtTotalCentral.Text =
                 total.ToString("C");
 
-            // Footer
-            txtFooterTotal.Text =
-                $"Total: {total:C}";
-
-            txtFooterPago.Text =
-                "Pago: $0.00";
-
-            txtFooterCambio.Text =
-                "Cambio: $0.00";
+            txtFooterTotal.Text = $"Total: {total:C}";
+            txtFooterPago.Text = "Pago: $0.00";
+            txtFooterCambio.Text = "Cambio: $0.00";
         }
 
         // =========================================
@@ -405,11 +343,8 @@ namespace FarmaciaPOS
                 return;
             }
 
-            // Tomar el primero y agregarlo
             AgregarAlCarrito(
-                resultado.First().CodigoBarras,
-                carritoCentral,
-                esCentral: true);
+                resultado.First().CodigoBarras);
         }
 
         private void BtnEliminar_Click(
@@ -435,12 +370,11 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            // Redirige al flujo de cobro central
             BtnCobrarCentral_Click(sender, e);
         }
 
         // =========================================
-        // COBRAR — ÁREA CENTRAL
+        // COBRAR
         // =========================================
 
         private void BtnCobrarCentral_Click(
@@ -476,7 +410,6 @@ namespace FarmaciaPOS
 
             decimal cambio = pago - total;
 
-            // Actualizar footer
             txtFooterTotal.Text = $"Total: {total:C}";
             txtFooterPago.Text = $"Pago: {pago:C}";
             txtFooterCambio.Text = $"Cambio: {cambio:C}";
@@ -487,36 +420,8 @@ namespace FarmaciaPOS
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            // Limpiar carrito
             carritoCentral.Clear();
             ActualizarCarritoCentral();
-        }
-
-        // =========================================
-        // COBRAR — POS RÁPIDO
-        // =========================================
-
-        private void BtnCobrarDashboard_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            if (carritoDashboard.Count == 0)
-            {
-                MessageBox.Show("No hay productos");
-                return;
-            }
-
-            decimal total =
-                carritoDashboard.Sum(x => x.Subtotal);
-
-            MessageBox.Show(
-                $"Venta realizada\nTotal: {total:C}",
-                "POS Rápido",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-
-            carritoDashboard.Clear();
-            ActualizarDashboardPOS();
         }
 
         // =========================================
@@ -557,18 +462,10 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            try
-            {
-                ReportesWindow reportes =
-                    new ReportesWindow();
+            ReportesWindow reporte =
+                new ReportesWindow();
 
-                reportes.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    ex.ToString());
-            }
+            reporte.ShowDialog();
         }
 
         private void BtnPedidos_Click(
@@ -591,6 +488,16 @@ namespace FarmaciaPOS
             config.ShowDialog();
         }
 
+        private void BtnCaja_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            CajaWindow caja =
+                new CajaWindow();
+
+            caja.ShowDialog();
+        }
+
         private void BtnSalir_Click(
             object sender,
             RoutedEventArgs e)
@@ -610,11 +517,14 @@ namespace FarmaciaPOS
             }
         }
 
-        private void txtEscaner_TextChanged(
-            object sender,
-            System.Windows.Controls.TextChangedEventArgs e)
+        private void dgCarritoCentral_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
+
         }
 
+        private void dgCarritoCentral_SelectionChanged_1(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

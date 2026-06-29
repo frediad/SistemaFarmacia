@@ -1,4 +1,5 @@
-﻿using FarmaciaPOS.Models;
+﻿using FarmaciaPOS.Helpers;
+using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -193,36 +194,261 @@ namespace FarmaciaPOS.Views
 
                 conn.Open();
 
-                foreach (var item in carrito)
+                SqlTransaction transaction =
+                    conn.BeginTransaction();
+
+                try
                 {
-                    string query =
-                    @"UPDATE Productos
-                      SET Stock = Stock - @Cantidad
-                      WHERE Id = @Id";
+                    // =========================================
+                    // VALIDAR INVENTARIO
+                    // =========================================
 
-                    SqlCommand cmd =
+                    foreach (var item in carrito)
+                    {
+                        string queryStock =
+                        @"SELECT Stock
+                          FROM Productos
+                          WHERE Id = @Id";
+
+                        SqlCommand cmdStock =
+                            new SqlCommand(
+                                queryStock,
+                                conn,
+                                transaction);
+
+                        cmdStock.Parameters.AddWithValue(
+                            "@Id",
+                            item.ProductoId);
+
+                        int stockActual =
+                            Convert.ToInt32(
+                                cmdStock.ExecuteScalar());
+
+                        if (stockActual < item.Cantidad)
+                        {
+                            MessageBox.Show(
+                                $"No hay suficiente stock para:\n\n{item.Nombre}\n\nStock disponible: {stockActual}");
+
+                            transaction.Rollback();
+
+                            return;
+                        }
+                    }
+
+                    // =========================================
+                    // TOTALES
+                    // =========================================
+
+                    decimal subtotal =
+                        carrito.Sum(
+                            x => x.Subtotal);
+
+                    decimal iva =
+                        subtotal * 0.16m;
+
+                    decimal total =
+                        subtotal + iva;
+
+                    string folio =
+                        $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
+
+                    // =========================================
+                    // INSERTAR VENTA
+                    // =========================================
+
+                    string insertarVenta =
+                    @"INSERT INTO Ventas
+                    (
+                    Folio,
+                    Fecha,
+                    Subtotal,
+                    IVA,
+                    Descuento,
+                    Total,
+                    MetodoPago,
+                    Estado,
+                    UsuarioId
+                    )
+                    VALUES
+                    (
+                    @Folio,
+                    GETDATE(),
+                    @Subtotal,
+                    @IVA,
+                    0,
+                    @Total,
+                    'Efectivo',
+                    'Completada',
+                    @UsuarioId
+                    );
+
+                    SELECT SCOPE_IDENTITY();";
+
+                    SqlCommand cmdVenta =
                         new SqlCommand(
-                            query,
-                            conn);
+                            insertarVenta,
+                            conn,
+                            transaction);
 
-                    cmd.Parameters.AddWithValue(
-                        "@Cantidad",
-                        item.Cantidad);
+                    cmdVenta.Parameters.AddWithValue(
+                        "@Folio",
+                        folio);
 
-                    cmd.Parameters.AddWithValue(
-                        "@Id",
-                        item.ProductoId);
+                    cmdVenta.Parameters.AddWithValue(
+                        "@Subtotal",
+                        subtotal);
 
-                    cmd.ExecuteNonQuery();
+                    cmdVenta.Parameters.AddWithValue(
+                        "@IVA",
+                        iva);
+
+                    cmdVenta.Parameters.AddWithValue(
+                        "@Total",
+                        total);
+
+                    cmdVenta.Parameters.AddWithValue(
+                        "@UsuarioId",
+                        Sesion.UsuarioId);
+
+                    int ventaId =
+                        Convert.ToInt32(
+                            cmdVenta.ExecuteScalar());
+
+                    // =========================================
+                    // GUARDAR DETALLE DE VENTA
+                    // =========================================
+
+                    foreach (var item in carrito)
+                    {
+                        string detalle =
+                        @"INSERT INTO DetalleVentas
+                        (
+                         VentaId,
+                         ProductoId,
+                         Cantidad,
+                         PrecioUnitario,
+                         Subtotal
+                        )
+                        VALUES
+                        (
+                        @VentaId,
+                        @ProductoId,
+                        @Cantidad,
+                        @Precio,
+                        @Subtotal
+                        )";
+
+                        SqlCommand cmdDetalle =
+                            new SqlCommand(
+                                detalle,
+                                conn,
+                                transaction);
+
+                        cmdDetalle.Parameters.AddWithValue(
+                            "@VentaId",
+                            ventaId);
+
+                        cmdDetalle.Parameters.AddWithValue(
+                            "@ProductoId",
+                            item.ProductoId);
+
+                        cmdDetalle.Parameters.AddWithValue(
+                            "@Cantidad",
+                            item.Cantidad);
+
+                        cmdDetalle.Parameters.AddWithValue(
+                            "@Precio",
+                            item.Precio);
+
+                        cmdDetalle.Parameters.AddWithValue(
+                            "@Subtotal",
+                            item.Subtotal);
+
+                        cmdDetalle.ExecuteNonQuery();
+                    }
+
+                    // =========================================
+                    // DESCONTAR INVENTARIO
+                    // =========================================
+
+                    foreach (var item in carrito)
+                    {
+                        string actualizarStock =
+                        @"UPDATE Productos
+                          SET Stock = Stock - @Cantidad
+                          WHERE Id = @Id";
+
+                        SqlCommand cmdStock =
+                            new SqlCommand(
+                                actualizarStock,
+                                conn,
+                                transaction);
+
+                        cmdStock.Parameters.AddWithValue(
+                            "@Cantidad",
+                            item.Cantidad);
+
+                        cmdStock.Parameters.AddWithValue(
+                            "@Id",
+                            item.ProductoId);
+
+                        cmdStock.ExecuteNonQuery();
+                    }
+
+                    // =========================================
+                    // CONFIRMAR TRANSACCIÓN
+                    // =========================================
+
+                    transaction.Commit();
+
+                    // =========================================
+                    // IMPRIMIR TICKET
+                    // =========================================
+
+                    TicketPrinter ticket =
+                        new TicketPrinter(
+                            carrito,
+                            total);
+
+                    ticket.Imprimir();
+
+                    MessageBox.Show(
+                        $"Venta registrada correctamente\n\nFolio: {folio}");
+
+                    carrito.Clear();
+
+                    ActualizarCarrito();
+
+                    CargarProductos();
                 }
+                catch
+                {
+                    transaction.Rollback();
 
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show(
-                    "Venta realizada");
+                    ex.Message);
+            }
+        }
 
-                // =====================================
-                // IMPRIMIR TICKET
-                // =====================================
+        private void BtnGenerarTicket_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (carrito.Count == 0)
+            {
+                MessageBox.Show(
+                    "No hay productos en el carrito");
 
+                return;
+            }
+
+            try
+            {
                 decimal total =
                     carrito.Sum(
                         x => x.Subtotal);
@@ -234,11 +460,8 @@ namespace FarmaciaPOS.Views
 
                 ticket.Imprimir();
 
-                carrito.Clear();
-
-                ActualizarCarrito();
-
-                CargarProductos();
+                MessageBox.Show(
+                    "Ticket generado correctamente");
             }
             catch (Exception ex)
             {
@@ -268,6 +491,43 @@ namespace FarmaciaPOS.Views
             RoutedEventArgs e)
         {
             carrito.Clear();
+
+            ActualizarCarrito();
+        }
+
+        // =========================================
+        // AGREGAR CANTIDAD
+        // =========================================
+
+        private void BtnAgregarCantidad_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (dgCarrito.SelectedItem is not VentaItem item)
+            {
+                MessageBox.Show(
+                    "Selecciona un producto del carrito");
+
+                return;
+            }
+
+            string input =
+                Microsoft.VisualBasic.Interaction
+                .InputBox(
+                    "Nueva cantidad:",
+                    "Modificar cantidad",
+                    item.Cantidad.ToString());
+
+            if (!int.TryParse(input, out int cantidad)
+                || cantidad <= 0)
+            {
+                MessageBox.Show(
+                    "Cantidad inválida");
+
+                return;
+            }
+
+            item.Cantidad = cantidad;
 
             ActualizarCarrito();
         }

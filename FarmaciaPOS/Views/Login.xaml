@@ -17,15 +17,21 @@
 
         <!-- PANEL IZQUIERDO -->
 
-        <Border Background="#111827">
+        <Border Background="#2A809C">
 
             <StackPanel VerticalAlignment="Center">
+
+               
 
                 <TextBlock Text="FarmaClick Yatzil"
                            Foreground="White"
                            FontSize="42"
                            FontWeight="Bold"
                            HorizontalAlignment="Center"/>
+
+                <Image Source="/Images/Logo.png"
+                       Width="180"
+                       Height="140"/>
 
                 <TextBlock Text="Tu sistema de ventas de confianza"
                            Foreground="#9CA3AF"
@@ -70,7 +76,7 @@
                         Height="50"
                         FontSize="18"
                         FontWeight="Bold"
-                        Background="#2563EB"
+                        Background="#182E99"
                         Foreground="White"
                         Click="BtnLogin_Click"/>
 

@@ -22,6 +22,8 @@
 
         public int StockMinimo { get; set; }
 
+        public int? SubCategoriaId { get; set; }
+
         public DateTime? Caducidad { get; set; }
 
         public string ImagenURL { get; set; } = string.Empty;

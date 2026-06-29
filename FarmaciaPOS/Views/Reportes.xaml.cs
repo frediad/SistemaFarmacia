@@ -17,7 +17,16 @@ namespace FarmaciaPOS.Views
         {
             InitializeComponent();
 
-            CargarVentas();
+            try
+            {
+                CargarVentas();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Error");
+            }
         }
 
         // =====================================
@@ -37,10 +46,13 @@ namespace FarmaciaPOS.Views
             string query =
             @"SELECT
                 Id,
-                FechaVenta,
-                Total
+                Folio,
+                Fecha,
+                Total,
+                MetodoPago,
+                Estado
               FROM Ventas
-              ORDER BY FechaVenta DESC";
+              ORDER BY Fecha DESC";
 
             SqlCommand cmd =
                 new SqlCommand(query, conn);
@@ -52,16 +64,24 @@ namespace FarmaciaPOS.Views
             {
                 lista.Add(new
                 {
-                    Id =
-                        reader["Id"],
+                    Id = reader["Id"],
+
+                    Folio =
+                        reader["Folio"]
+                        ?.ToString(),
 
                     Fecha =
                         Convert.ToDateTime(
-                            reader["FechaVenta"])
+                            reader["Fecha"])
                         .ToString("dd/MM/yyyy HH:mm"),
 
-                    Usuario =
-                        "Administrador",
+                    MetodoPago =
+                        reader["MetodoPago"]
+                        ?.ToString(),
+
+                    Estado =
+                        reader["Estado"]
+                        ?.ToString(),
 
                     Total =
                         Convert.ToDecimal(
@@ -82,73 +102,93 @@ namespace FarmaciaPOS.Views
             object sender,
             RoutedEventArgs e)
         {
-            if (dpInicio.SelectedDate == null ||
-                dpFin.SelectedDate == null)
+            try
+            {
+                if (dpInicio.SelectedDate == null ||
+                    dpFin.SelectedDate == null)
+                {
+                    MessageBox.Show(
+                        "Selecciona fechas");
+
+                    return;
+                }
+
+                List<dynamic> lista =
+                    new();
+
+                using SqlConnection conn =
+                    new SqlConnection(connectionString);
+
+                conn.Open();
+
+                string query =
+                @"SELECT
+                    Id,
+                    Folio,
+                    Fecha,
+                    Total,
+                    MetodoPago,
+                    Estado
+                  FROM Ventas
+                  WHERE Fecha
+                  BETWEEN @Inicio
+                  AND @Fin
+                  ORDER BY Fecha DESC";
+
+                SqlCommand cmd =
+                    new SqlCommand(query, conn);
+
+                cmd.Parameters.AddWithValue(
+                    "@Inicio",
+                    dpInicio.SelectedDate.Value);
+
+                cmd.Parameters.AddWithValue(
+                    "@Fin",
+                    dpFin.SelectedDate.Value
+                    .AddDays(1));
+
+                SqlDataReader reader =
+                    cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    lista.Add(new
+                    {
+                        Id = reader["Id"],
+
+                        Folio =
+                            reader["Folio"]
+                            ?.ToString(),
+
+                        Fecha =
+                            Convert.ToDateTime(
+                                reader["Fecha"])
+                            .ToString("dd/MM/yyyy HH:mm"),
+
+                        MetodoPago =
+                            reader["MetodoPago"]
+                            ?.ToString(),
+
+                        Estado =
+                            reader["Estado"]
+                            ?.ToString(),
+
+                        Total =
+                            Convert.ToDecimal(
+                                reader["Total"])
+                            .ToString("C")
+                    });
+                }
+
+                dgVentas.ItemsSource =
+                    lista;
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Selecciona fechas");
-
-                return;
+                    ex.Message,
+                    "Error");
             }
-
-            List<dynamic> lista =
-                new();
-
-            using SqlConnection conn =
-                new SqlConnection(connectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT
-                Id,
-                FechaVenta,
-                Total
-              FROM Ventas
-              WHERE FechaVenta
-              BETWEEN @Inicio
-              AND @Fin
-              ORDER BY FechaVenta DESC";
-
-            SqlCommand cmd =
-                new SqlCommand(query, conn);
-
-            cmd.Parameters.AddWithValue(
-                "@Inicio",
-                dpInicio.SelectedDate.Value);
-
-            cmd.Parameters.AddWithValue(
-                "@Fin",
-                dpFin.SelectedDate.Value
-                .AddDays(1));
-
-            SqlDataReader reader =
-                cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                lista.Add(new
-                {
-                    Id =
-                        reader["Id"],
-
-                    Fecha =
-                        Convert.ToDateTime(
-                            reader["FechaVenta"])
-                        .ToString("dd/MM/yyyy HH:mm"),
-
-                    Usuario =
-                        "Administrador",
-
-                    Total =
-                        Convert.ToDecimal(
-                            reader["Total"])
-                        .ToString("C")
-                });
-            }
-
-            dgVentas.ItemsSource =
-                lista;
         }
     }
 }

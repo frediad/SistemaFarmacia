@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FarmaciaAPI.Migrations;
 using FarmaciaAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FarmaciaAPI.Data
 {
@@ -25,6 +26,9 @@ namespace FarmaciaAPI.Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Venta> Ventas { get; set; }
+
+        public DbSet<SubCategoria> Subcategorias { get; set; }
+        public DbSet<LoteProducto> LotesProductos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -213,6 +217,9 @@ namespace FarmaciaAPI.Data
                 .WithMany()
                 .HasForeignKey(m => m.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ======================================================
+            
         }
 
 

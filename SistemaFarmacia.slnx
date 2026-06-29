@@ -3,6 +3,6 @@
     <File Path="FarmaciaPOS/Views/Productos.xaml.cs" />
   </Folder>
   <Project Path="FarmaciaAPI/FarmaciaAPI.csproj" />
-  <Project Path="FarmaciaPOS/FarmaciaPOS.csproj" />
+  <Project Path="FarmaciaPOSS/FarmaciaPOS.csproj" Id="7afb5852-e3bf-47b6-99de-56e0f0ff8a82" />
   <Project Path="FarmaciaWeb/FarmaciaWeb.csproj" />
 </Solution>

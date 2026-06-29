@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Punto de Venta"
-        Height="750"
-        Width="1300"
+        Height="650"
+        Width="900"
         WindowStartupLocation="CenterScreen"
         Background="#F5F7FA">
 
@@ -97,18 +97,23 @@
 
                 <Grid.RowDefinitions>
 
+                    <!-- CARRITO -->
                     <RowDefinition Height="*"/>
 
-                    <RowDefinition Height="120"/>
+                    <!-- TOTAL -->
+                    <RowDefinition Height="110"/>
 
-                    <RowDefinition Height="70"/>
+                    <!-- BOTONES -->
+                    <RowDefinition Height="140"/>
 
                 </Grid.RowDefinitions>
 
                 <!-- CARRITO -->
 
                 <DataGrid x:Name="dgCarrito"
-                          AutoGenerateColumns="False">
+                          AutoGenerateColumns="False"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow">
 
                     <DataGrid.Columns>
 
@@ -120,17 +125,17 @@
                         <DataGridTextColumn
                             Header="Cant."
                             Binding="{Binding Cantidad}"
-                            Width="80"/>
+                            Width="60"/>
 
                         <DataGridTextColumn
                             Header="Precio"
                             Binding="{Binding Precio}"
-                            Width="100"/>
+                            Width="60"/>
 
                         <DataGridTextColumn
                             Header="Subtotal"
                             Binding="{Binding Subtotal}"
-                            Width="120"/>
+                            Width="60"/>
 
                     </DataGrid.Columns>
 
@@ -163,25 +168,68 @@
 
                 <!-- BOTONES -->
 
-                <StackPanel Grid.Row="2"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Center">
+                <Grid Grid.Row="2"
+                      Margin="8">
 
-                    <Button Content="Cobrar"
-                            Width="150"
-                            Height="45"
-                            Margin="10"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- BOTÓN 1 -->
+
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="Agregar"
+                            Margin="5"
                             FontSize="16"
+                            Height="45"
+                            Background="#DDE32D"
+                            Foreground="White"
+                            Click="BtnAgregarCantidad_Click"/>
+
+                    <!-- BOTÓN 2 -->
+
+                    <Button Grid.Row="0"
+                            Grid.Column="1"
+                            Content="Cobrar"
+                            Margin="5"
+                            FontSize="16"
+                            Height="45"
+                            Background="#2563EB"
+                            Foreground="White"
                             Click="BtnCobrar_Click"/>
 
-                    <Button Content="Cancelar"
-                            Width="150"
-                            Height="45"
-                            Margin="10"
+                    <!-- BOTÓN 3 -->
+
+                    <Button Grid.Row="1"
+                            Grid.Column="0"
+                            Content="Cancelar"
+                            Margin="5"
                             FontSize="16"
+                            Height="45"
+                            Background="#DC2626"
+                            Foreground="White"
                             Click="BtnCancelar_Click"/>
 
-                </StackPanel>
+                    <!-- BOTÓN 4 -->
+
+                    <Button Grid.Row="1"
+                            Grid.Column="1"
+                            Content="Generar Ticket"
+                            Margin="5"
+                            FontSize="16"
+                            Height="45"
+                            Background="#16A34A"
+                            Foreground="White"
+                            Click="BtnGenerarTicket_Click"/>
+
+                </Grid>
 
             </Grid>
 
