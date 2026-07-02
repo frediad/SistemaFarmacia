@@ -12,7 +12,7 @@ namespace FarmaciaPOS.Views
 {
     public partial class VentasWindow : Window
     {
-       
+
 
 
         List<Producto> productos =
@@ -92,19 +92,44 @@ namespace FarmaciaPOS.Views
             object sender,
             TextChangedEventArgs e)
         {
-            string texto =
-                txtBuscar.Text.ToLower();
+            if (txtBuscar.Text == "Buscar producto...")
+                return;
 
-            dgProductos.ItemsSource =
-                productos.Where(p =>
-                    p.Nombre.ToLower()
-                    .Contains(texto)
+            string texto = txtBuscar.Text.Trim().ToLower();
 
-                    ||
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                dgProductos.ItemsSource = productos;
+                return;
+            }
 
-                    p.CodigoBarras.ToLower()
-                    .Contains(texto))
+            dgProductos.ItemsSource = productos
+                .Where(p =>
+                    p.Nombre.ToLower().Contains(texto) ||
+                    p.CodigoBarras.ToLower().Contains(texto))
                 .ToList();
+        }
+
+        // =========================================
+        // PLACEHOLDER
+        // =========================================
+
+        private void TxtBuscar_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (txtBuscar.Text == "Buscar producto...")
+            {
+                txtBuscar.Text = "";
+                txtBuscar.Foreground = System.Windows.Media.Brushes.Black;
+            }
+        }
+
+        private void TxtBuscar_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtBuscar.Text))
+            {
+                txtBuscar.Text = "Buscar producto...";
+                txtBuscar.Foreground = System.Windows.Media.Brushes.Gray;
+            }
         }
 
 
@@ -540,7 +565,7 @@ namespace FarmaciaPOS.Views
             object sender,
             System.Windows.Input.KeyEventArgs e)
         {
-            MessageBox.Show(e.Key.ToString());
+            
             switch (e.Key)
             {
                 case Key.F1:
@@ -565,7 +590,7 @@ namespace FarmaciaPOS.Views
             object sender,
             KeyEventArgs e)
         {
-            try
+            
             {
                 switch (e.Key)
                 {
@@ -573,7 +598,7 @@ namespace FarmaciaPOS.Views
                         BtnGenerarTicket_Click(this, new RoutedEventArgs());
                         break;
 
-                    case Key.F2:                       
+                    case Key.F2:
                         BtnCobrar_Click(this, new RoutedEventArgs());
                         break;
 
@@ -586,10 +611,8 @@ namespace FarmaciaPOS.Views
                         break;
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            
+            
         }
     }
 }
