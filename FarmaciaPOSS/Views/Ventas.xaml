@@ -45,9 +45,12 @@
                 <TextBox x:Name="txtBuscar"
                          Height="40"
                          FontSize="16"
+                         Text="Buscar producto..."
                          VerticalContentAlignment="Center"
                          TextChanged="txtBuscar_TextChanged"
-                         KeyDown="txtBuscar_KeyDown"/>
+                         KeyDown="txtBuscar_KeyDown"
+                         GotFocus="TxtBuscar_GotFocus"
+                         LostFocus="TxtBuscar_LostFocus"/>
 
                 <!-- PRODUCTOS -->
 

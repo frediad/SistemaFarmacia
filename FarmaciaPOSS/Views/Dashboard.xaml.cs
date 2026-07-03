@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Collections.ObjectModel;
 
 namespace FarmaciaPOS
 {
@@ -19,8 +20,7 @@ namespace FarmaciaPOS
         List<Producto> productos =
             new();
 
-        List<VentaItem> carritoCentral =
-            new();
+        ObservableCollection<VentaItem> carritoCentral = new();
 
         // =========================================
         // CONSTRUCTOR
@@ -119,10 +119,7 @@ namespace FarmaciaPOS
 
         private void InicializarCarritoCentral()
         {
-            // Limpiar primero para evitar el conflicto
-            dgCarritoCentral.Items.Clear();
             dgCarritoCentral.ItemsSource = carritoCentral;
-
             ActualizarCarritoCentral();
         }
 
