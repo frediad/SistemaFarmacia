@@ -1,36 +1,33 @@
 ﻿<Window x:Class="FarmaciaPOS.Views.ReportesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Reportes de Ventas"
+        Title="Reportes"
         Height="750"
         Width="1100"
-        Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
         Background="#EEF2F7">
 
     <Grid Margin="20">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="110"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-
         <Border Background="White"
                 CornerRadius="10"
                 Padding="20"
-                Margin="0,0,0,15">
+                Margin="0,0,0,15" Grid.RowSpan="2">
 
             <Grid>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Reportes de Ventas"
+                <TextBlock Text="Reportes"
                            FontSize="30"
                            FontWeight="Bold"
                            VerticalAlignment="Center"/>
@@ -43,213 +40,751 @@
                         Background="#DC2626"
                         Foreground="White"
                         Click="BtnExportarPDF_Click"/>
-
             </Grid>
 
         </Border>
 
-        <!-- BOTONES DE PERIODO -->
+        <!-- PESTAÑAS -->
+        <TabControl Grid.Row="2"
+                    Background="Transparent"
+                    BorderThickness="0">
 
-        <Border Grid.Row="1"
-                Background="White"
-                CornerRadius="10"
-                Padding="15"
-                Margin="0,0,0,15">
+            <!-- ===================================== -->
+            <!-- PESTAÑA 1 — VENTAS  -->
+            <!-- ===================================== -->
 
-            <UniformGrid Columns="4">
-
-                <Button x:Name="btnHoy"
-                        Content="📅 Hoy"
-                        Height="55"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Margin="5"
-                        Background="#2563EB"
-                        Foreground="White"
-                        Click="BtnHoy_Click"/>
-
-                <Button x:Name="btnSemana"
-                        Content="📆 Semana"
-                        Height="55"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Margin="5"
-                        Click="BtnSemana_Click"/>
-
-                <Button x:Name="btnMes"
-                        Content="🗓️ Mes"
-                        Height="55"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Margin="5"
-                        Click="BtnMes_Click"/>
-
-                <Button x:Name="btnAnio"
-                        Content="📊 Año"
-                        Height="55"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Margin="5"
-                        Click="BtnAnio_Click"/>
-
-            </UniformGrid>
-
-        </Border>
-
-        <!-- CONTENIDO -->
-
-        <Grid Grid.Row="2">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="380"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- RESUMEN + GRAFICA -->
-
-            <StackPanel Margin="0,0,15,0">
-
-                <!-- TOTALES -->
-
-                <Border Background="#1E293B"
-                        CornerRadius="10"
-                        Padding="20"
-                        Margin="0,0,0,15">
-
-                    <StackPanel>
-
-                        <TextBlock x:Name="txtPeriodoActual"
-                                   Text="Periodo: Hoy"
-                                   FontSize="16"
-                                   Foreground="#94A3B8"
-                                   HorizontalAlignment="Center"/>
-
-                        <TextBlock Text="Total Vendido"
-                                   FontSize="14"
-                                   Foreground="#94A3B8"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,15,0,0"/>
-
-                        <TextBlock x:Name="txtTotalVentas"
-                                   Text="$0.00"
-                                   FontSize="42"
-                                   FontWeight="Bold"
-                                   Foreground="#272AF5"
-                                   HorizontalAlignment="Center"/>
-
-                        <TextBlock x:Name="txtNumeroVentas"
-                                   Text="0 ventas"
-                                   FontSize="16"
-                                   Foreground="White"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,5,0,0"/>
-
-                    </StackPanel>
-
-                </Border>
-
-                <!-- GRAFICA -->
-
-                <Border Background="White"
-                        CornerRadius="10"
-                        Padding="15"
-                        Height="300">
-
-                    <Grid>
-
-                        <TextBlock Text="Ventas por día"
-                                   FontWeight="Bold"
-                                   FontSize="16"
-                                   VerticalAlignment="Top"/>
-
-                        <ItemsControl x:Name="icGrafica"
-                                      VerticalAlignment="Bottom"
-                                      Margin="0,30,0,30">
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"
-                                                HorizontalAlignment="Center"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Margin="6,0"
-                                                Width="40">
-
-                                        <Border Background="#2563EB"
-                                                Width="30"
-                                                Height="{Binding AlturaBarra}"
-                                                VerticalAlignment="Bottom"
-                                                CornerRadius="3"/>
-
-                                        <TextBlock Text="{Binding Etiqueta}"
-                                                   FontSize="10"
-                                                   HorizontalAlignment="Center"
-                                                   Margin="0,5,0,0"/>
-
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                        </ItemsControl>
-
-                    </Grid>
-
-                </Border>
-
-            </StackPanel>
-
-            <!-- TABLA DE PRODUCTOS -->
-
-            <Border Grid.Column="1"
-                    Background="White"
-                    CornerRadius="10"
-                    Padding="15">
+            <TabItem Header="📊 Ventas">
 
                 <Grid>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="110"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Productos Vendidos"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Margin="0,0,0,10"/>
+                    <!-- BOTONES DE PERIODO -->
+                    <Border Background="White"
+                            CornerRadius="10"
+                            Padding="15"
+                            Margin="0,0,0,15">
 
-                    <DataGrid x:Name="dgProductosVendidos"
-                              Grid.Row="1"
-                              AutoGenerateColumns="False"
-                              FontSize="16"
-                              CanUserAddRows="False"
-                              HeadersVisibility="Column">
+                        <UniformGrid Columns="4">
 
-                        <DataGrid.Columns>
+                            <Button x:Name="btnHoy"
+                                    Content="📅 Hoy"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnHoy_Click"/>
 
-                            <DataGridTextColumn Header="Producto"
-                                Binding="{Binding Producto}"
-                                Width="*"/>
+                            <Button x:Name="btnSemana"
+                                    Content="📆 Semana"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnSemana_Click"/>
 
-                            <DataGridTextColumn Header="Cantidad"
-                                Binding="{Binding Cantidad}"
-                                Width="120"/>
+                            <Button x:Name="btnMes"
+                                    Content="🗓️ Mes"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnMes_Click"/>
 
-                            <DataGridTextColumn Header="Total"
-                                Binding="{Binding Total, StringFormat=C}"
-                                Width="140"/>
+                            <Button x:Name="btnAnio"
+                                    Content="📊 Año"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnAnio_Click"/>
 
-                        </DataGrid.Columns>
+                        </UniformGrid>
 
-                    </DataGrid>
+                    </Border>
+
+                    <!-- CONTENIDO VENTAS -->
+                    <Grid Grid.Row="1">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="380"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- RESUMEN + GRAFICA -->
+                        <StackPanel Margin="0,0,15,0">
+
+                            <Border Background="#1E293B"
+                                    CornerRadius="10"
+                                    Padding="20"
+                                    Margin="0,0,0,15">
+
+                                <StackPanel>
+
+                                    <TextBlock x:Name="txtPeriodoActual"
+                                               Text="Periodo: Hoy"
+                                               FontSize="16"
+                                               Foreground="#94A3B8"
+                                               HorizontalAlignment="Center"/>
+
+                                    <TextBlock Text="TOTAL VENDIDO"
+                                               FontSize="14"
+                                               Foreground="#94A3B8"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,15,0,0"/>
+
+                                    <TextBlock x:Name="txtTotalVentas"
+                                               Text="$0.00"
+                                               FontSize="42"
+                                               FontWeight="Bold"
+                                               Foreground="#22C55E"
+                                               HorizontalAlignment="Center"/>
+
+                                    <TextBlock x:Name="txtNumeroVentas"
+                                               Text="0 ventas"
+                                               FontSize="16"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,5,0,0"/>
+
+                                </StackPanel>
+
+                            </Border>
+
+                            <!-- GRAFICA -->
+                            <Border Background="White"
+                                    CornerRadius="10"
+                                    Padding="15"
+                                    Height="300">
+
+                                <Grid>
+
+                                    <TextBlock Text="Ventas por día"
+                                               FontWeight="Bold"
+                                               FontSize="16"
+                                               VerticalAlignment="Top"/>
+
+                                    <ItemsControl x:Name="icGrafica"
+                                                  VerticalAlignment="Bottom"
+                                                  Margin="0,30,0,30">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="6,0" Width="40">
+                                                    <Border Background="#2563EB"
+                                                            Width="30"
+                                                            Height="{Binding AlturaBarra}"
+                                                            VerticalAlignment="Bottom"
+                                                            CornerRadius="3"/>
+                                                    <TextBlock Text="{Binding Etiqueta}"
+                                                               FontSize="10"
+                                                               HorizontalAlignment="Center"
+                                                               Margin="0,5,0,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
+
+                                </Grid>
+
+                            </Border>
+
+                        </StackPanel>
+
+                        <!-- TABLA PRODUCTOS VENDIDOS -->
+                        <Border Grid.Column="1"
+                                Background="White"
+                                CornerRadius="10"
+                                Padding="15">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Productos Vendidos"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10"/>
+
+                                <DataGrid x:Name="dgProductosVendidos"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          FontSize="16"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding Producto}"
+                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Cantidad"
+                                            Binding="{Binding Cantidad}"
+                                            Width="120"/>
+
+                                        <DataGridTextColumn Header="Total"
+                                            Binding="{Binding Total, StringFormat=C}"
+                                            Width="140"/>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
+
+                    </Grid>
 
                 </Grid>
 
-            </Border>
+            </TabItem>
 
-        </Grid>
+            <!-- ===================================== -->
+            <!-- PESTAÑA 2 — PRODUCTOS MÁS VENDIDOS   -->
+            <!-- ===================================== -->
+
+            <TabItem Header="🏆 Más Vendidos">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White"
+                            CornerRadius="10"
+                            Padding="15"
+                            Margin="0,0,0,15">
+
+                        <UniformGrid Columns="4">
+
+                            <Button Content="📅 Hoy"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnMasVendidosHoy_Click"/>
+
+                            <Button Content="📆 Semana"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnMasVendidosSemana_Click"/>
+
+                            <Button Content="🗓️ Mes"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnMasVendidosMes_Click"/>
+
+                            <Button Content="📊 Año"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnMasVendidosAnio_Click"/>
+
+                        </UniformGrid>
+
+                    </Border>
+
+                    <Grid Grid.Row="1">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- TOP 10 -->
+                        <Border Background="White"
+                                CornerRadius="10"
+                                Padding="15"
+                                Margin="0,0,10,0">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="🏆 Top 10 Productos Más Vendidos"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10"/>
+
+                                <DataGrid x:Name="dgMasVendidos"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          FontSize="16"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="#"
+                                            Binding="{Binding Posicion}"
+                                            Width="50"/>
+
+                                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding Producto}"
+                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Cantidad"
+                                            Binding="{Binding Cantidad}"
+                                            Width="100"/>
+
+                                        <DataGridTextColumn Header="Total"
+                                            Binding="{Binding Total, StringFormat=C}"
+                                            Width="120"/>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- MENOS VENDIDOS -->
+                        <Border Grid.Column="1"
+                                Background="White"
+                                CornerRadius="10"
+                                Padding="15"
+                                Margin="10,0,0,0">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="📉 Productos Sin Movimiento"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10"/>
+
+                                <DataGrid x:Name="dgSinMovimiento"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          FontSize="16"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding Nombre}"
+                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Stock"
+                                            Binding="{Binding Stock}"
+                                            Width="100"/>
+
+                                        <DataGridTextColumn Header="Stock Mín."
+                                            Binding="{Binding StockMinimo}"
+                                            Width="110"/>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
+
+                    </Grid>
+
+                </Grid>
+
+            </TabItem>
+
+            <!-- ===================================== -->
+            <!-- PESTAÑA 3 — GANANCIAS                 -->
+            <!-- ===================================== -->
+
+            <TabItem Header="💰 Ganancias">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="120"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White"
+                            CornerRadius="10"
+                            Padding="15"
+                            Margin="0,0,0,15">
+
+                        <UniformGrid Columns="4">
+
+                            <Button Content="📅 Hoy"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnGananciasHoy_Click"/>
+
+                            <Button Content="📆 Semana"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnGananciasSemana_Click"/>
+
+                            <Button Content="🗓️ Mes"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnGananciasMes_Click"/>
+
+                            <Button Content="📊 Año"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnGananciasAnio_Click"/>
+
+                        </UniformGrid>
+
+                    </Border>
+
+                    <!-- TARJETAS RESUMEN -->
+                    <Grid Grid.Row="1"
+                          Margin="0,0,0,15">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Background="#22C55E"
+                                CornerRadius="10"
+                                Margin="0,0,10,0"
+                                Padding="15">
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                <TextBlock Text="INGRESOS"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtIngresos"
+                                           Text="$0.00"
+                                           Foreground="White"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="#DC2626"
+                                CornerRadius="10"
+                                Margin="5,0"
+                                Padding="15">
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                <TextBlock Text="COSTO"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtCostos"
+                                           Text="$0.00"
+                                           Foreground="White"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="#2563EB"
+                                CornerRadius="10"
+                                Margin="10,0,0,0"
+                                Padding="15">
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                <TextBlock Text="GANANCIA NETA"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtGananciaNeta"
+                                           Text="$0.00"
+                                           Foreground="White"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- TABLA DETALLE GANANCIAS -->
+                    <Border Grid.Row="2"
+                            Background="White"
+                            CornerRadius="10"
+                            Padding="15">
+
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Detalle de Ganancias por Producto"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+
+                            <DataGrid x:Name="dgGanancias"
+                                      Grid.Row="1"
+                                      AutoGenerateColumns="False"
+                                      FontSize="16"
+                                      IsReadOnly="True"
+                                      CanUserAddRows="False">
+
+                                <DataGrid.Columns>
+
+                                    <DataGridTextColumn Header="Producto"
+                                        Binding="{Binding Producto}"
+                                        Width="*"/>
+
+                                    <DataGridTextColumn Header="Cantidad"
+                                        Binding="{Binding Cantidad}"
+                                        Width="100"/>
+
+                                    <DataGridTextColumn Header="Ingreso"
+                                        Binding="{Binding Ingreso, StringFormat=C}"
+                                        Width="130"/>
+
+                                    <DataGridTextColumn Header="Costo"
+                                        Binding="{Binding Costo, StringFormat=C}"
+                                        Width="130"/>
+
+                                    <DataGridTextColumn Header="Ganancia"
+                                        Binding="{Binding Ganancia, StringFormat=C}"
+                                        Width="130"/>
+
+                                    <DataGridTextColumn Header="% Margen"
+                                        Binding="{Binding Margen, StringFormat=N1}"
+                                        Width="110"/>
+
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Grid>
+
+                    </Border>
+
+                </Grid>
+
+            </TabItem>
+
+            <!-- ===================================== -->
+            <!-- PESTAÑA 4 — INVENTARIO                -->
+            <!-- ===================================== -->
+
+            <TabItem Header="📦 Inventario">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White"
+                            CornerRadius="10"
+                            Padding="15"
+                            Margin="0,0,0,15">
+
+                        <UniformGrid Columns="4">
+
+                            <Button Content="📅 Hoy"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnInventarioHoy_Click"/>
+
+                            <Button Content="📆 Semana"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnInventarioSemana_Click"/>
+
+                            <Button Content="🗓️ Mes"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnInventarioMes_Click"/>
+
+                            <Button Content="📊 Año"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnInventarioAnio_Click"/>
+
+                        </UniformGrid>
+
+                    </Border>
+
+                    <Grid Grid.Row="1">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="350"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- MOVIMIENTOS -->
+                        <Border Background="White"
+                                CornerRadius="10"
+                                Padding="15"
+                                Margin="0,0,10,0">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Movimientos de Inventario"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10"/>
+
+                                <DataGrid x:Name="dgMovimientosInventario"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          FontSize="15"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding ProductoNombre}"
+                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Tipo"
+                                            Binding="{Binding TipoMovimiento}"
+                                            Width="120"/>
+
+                                        <DataGridTextColumn Header="Cantidad"
+                                            Binding="{Binding Cantidad}"
+                                            Width="100"/>
+
+                                        <DataGridTextColumn Header="Fecha"
+                                            Binding="{Binding Fecha, StringFormat=dd/MM/yyyy}"
+                                            Width="120"/>
+
+                                        <DataGridTextColumn Header="Motivo"
+                                            Binding="{Binding Motivo}"
+                                            Width="200"/>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- ALERTAS STOCK -->
+                        <Border Grid.Column="1"
+                                Background="White"
+                                CornerRadius="10"
+                                Padding="15">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="⚠️ Alertas de Stock Bajo"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10"/>
+
+                                <DataGrid x:Name="dgStockBajo"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          FontSize="14"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding Nombre}"
+                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Stock"
+                                            Binding="{Binding Stock}"
+                                            Width="80"/>
+
+                                        <DataGridTextColumn Header="Mín."
+                                            Binding="{Binding StockMinimo}"
+                                            Width="80"/>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
+
+                    </Grid>
+
+                </Grid>
+
+            </TabItem>
+
+        </TabControl>
 
     </Grid>
 

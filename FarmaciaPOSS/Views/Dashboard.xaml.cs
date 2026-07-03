@@ -543,7 +543,7 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            if (!PermisosHelper.TieneAcceso("Configuracion"))
+            if (!PermisosHelper.TieneAcceso("Configuración"))
             {
                 PermisosHelper.MostrarAccesoDenegado();
                 return;

@@ -22,7 +22,7 @@ namespace FarmaciaPOS.Views
             "Productos",
             "Inventario",
             "Reportes",
-            "Configuracion",
+            "Configuración",
             "Caja",
             "Usuarios y Roles",
             "Proveedores",
