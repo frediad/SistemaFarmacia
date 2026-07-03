@@ -14,35 +14,26 @@ namespace FarmaciaPOS.Views
         // TICKET
         // =====================================
 
-        private void BtnTicket_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnTicket_Click(object sender, RoutedEventArgs e)
         {
-            TicketConfigWindow ticket =
-                new TicketConfigWindow();
-
+            TicketConfigWindow ticket = new TicketConfigWindow();
             ticket.ShowDialog();
         }
 
         // =====================================
-        // PERIFERICOS
+        // PERIFÉRICOS
         // =====================================
 
-        private void BtnPerifericos_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnPerifericos_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Configuración periféricos");
+            MessageBox.Show("Configuración de periféricos");
         }
 
         // =====================================
         // USUARIOS
         // =====================================
 
-        private void BtnUsuarios_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnUsuarios_Click(object sender, RoutedEventArgs e)
         {
             if (!PermisosHelper.TieneAcceso("Usuarios y Roles"))
             {
@@ -50,9 +41,7 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-            UsuariosWindow usuarios =
-                new UsuariosWindow();
-
+            UsuariosWindow usuarios = new UsuariosWindow();
             usuarios.ShowDialog();
         }
 
@@ -60,49 +49,38 @@ namespace FarmaciaPOS.Views
         // POS
         // =====================================
 
-        private void BtnPOS_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnPOS_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Configuración POS");
+            MessageBox.Show("Configuración POS");
         }
 
         // =====================================
         // FARMACIA
         // =====================================
 
-        private void BtnFarmacia_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnFarmacia_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Configuración farmacia");
+            Farma ventana = new Farma();
+
+            ventana.ShowDialog();
         }
 
         // =====================================
         // NEGOCIO
         // =====================================
 
-        private void BtnNegocio_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnNegocio_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Información negocio");
+            MessageBox.Show("Información del negocio");
         }
 
         // =====================================
         // PROVEEDORES
         // =====================================
 
-        private void BtnProveedor_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnProveedor_Click(object sender, RoutedEventArgs e)
         {
-            ProveedoresWindow proveedor =
-                new ProveedoresWindow();
-
+            ProveedoresWindow proveedor = new ProveedoresWindow();
             proveedor.ShowDialog();
         }
 
@@ -110,12 +88,9 @@ namespace FarmaciaPOS.Views
         // ACERCA
         // =====================================
 
-        private void BtnAcerca_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnAcerca_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "FarmaciaPOS v1.0");
+            MessageBox.Show("FarmaciaPOS v1.0");
         }
     }
 }

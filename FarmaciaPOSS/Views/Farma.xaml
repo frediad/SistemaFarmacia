@@ -1,0 +1,68 @@
+﻿<Window x:Class="FarmaciaPOS.Views.Farma"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Configuración Farmacia"
+        Height="550"
+        Width="900"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F4F6F9">
+
+    <Grid>
+
+        <!-- Encabezado -->
+        <Border Background="#1565C0"
+                Height="80"
+                VerticalAlignment="Top">
+
+            <TextBlock Text="Dashboard de ventas"
+                       Foreground="White"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+
+        </Border>
+
+        <!-- Botones -->
+        <StackPanel Margin="0,120,0,0"
+                    HorizontalAlignment="Center">
+
+            <Button x:Name="btnCaducidades"
+                    Width="400"
+                    Height="60"
+                    Margin="0,10"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Background="#43A047"
+                    Foreground="White"
+                    Click="btnCaducidades_Click"
+                    Content="📅 Productos por Caducar"/>
+
+            <Button x:Name="btnGraficas"
+                    Width="400"
+                    Height="60"
+                    Margin="0,10"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Background="#2196F3"
+                    Foreground="White"
+                    Click="btnGraficas_Click"
+                    Content="📊 Gráficas de Ventas"/>
+
+            <Button x:Name="btnRegresar"
+                    Width="400"
+                    Height="60"
+                    Margin="0,25"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Background="#757575"
+                    Foreground="White"
+                    Click="btnRegresar_Click"
+                    Content="⬅ Regresar"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

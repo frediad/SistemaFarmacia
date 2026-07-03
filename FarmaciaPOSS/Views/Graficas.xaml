@@ -1,0 +1,196 @@
+﻿<Window x:Class="FarmaciaPOS.Views.Graficas"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        Title="Dashboard de Ventas"
+        Height="700"
+        Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F6F9">
+    
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="140"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+
+                <TextBlock Text="Dashboard de Ventas"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="#2C3E50"/>
+
+                <TextBlock Text="Análisis de ventas de la farmacia"
+                   FontSize="15"
+                   Foreground="Gray"/>
+
+            </StackPanel>
+
+            <Button Grid.Column="1"
+            Content="← Regresar"
+            Width="120"
+            Height="40"
+            Click="btnRegresar_Click"
+            Background="#2563EB"
+            Foreground="White"
+            FontWeight="Bold"/>
+        </Grid>
+
+        <!-- TARJETAS -->
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="250"/>
+
+            </Grid.ColumnDefinitions>
+
+            <!-- TOTAL -->
+            <Border Grid.Column="0"
+                    Margin="5"
+                    CornerRadius="12"
+                    Background="White">
+
+                <StackPanel
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+
+                    <TextBlock Text="TOTAL VENDIDO"
+                               FontWeight="Bold"
+                               FontSize="14"/>
+
+                    <TextBlock x:Name="txtTotal"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="Green"/>
+
+                </StackPanel>
+                
+
+            </Border>
+
+            <!-- VENTAS -->
+            <Border Grid.Column="1"
+                    Margin="5"
+                    CornerRadius="12"
+                    Background="White">
+
+                <StackPanel
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+
+                    <TextBlock Text="VENTAS"
+                               FontWeight="Bold"/>
+
+                    <TextBlock x:Name="txtVentas"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="DodgerBlue"/>
+
+                </StackPanel>
+
+            </Border>
+            <Border Grid.Row="2"
+        Margin="5,10,5,5"
+        Background="White"
+        CornerRadius="12"
+        Padding="15">
+
+                <StackPanel>
+
+                    <TextBlock Text="Estado de productos vendidos"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="0,0,0,10"/>
+
+                    <lvc:PieChart x:Name="GraficaEstadoProductos"
+                      Height="200"/>
+
+                    <ListBox x:Name="lstProductos"
+                 Margin="0,10,0,0"
+                 Height="200"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- PROMEDIO -->
+            <Border Grid.Column="2"
+                    Margin="5"
+                    CornerRadius="12"
+                    Background="White">
+
+                <StackPanel
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+
+                    <TextBlock Text="PROMEDIO"
+                               FontWeight="Bold"/>
+
+                    <TextBlock x:Name="txtPromedio"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="DarkViolet"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- FILTRO -->
+            <Border Grid.Column="3"
+                    Margin="5"
+                    CornerRadius="12"
+                    Background="White">
+
+                <StackPanel
+                    Margin="15">
+
+                    <TextBlock Text="Mostrar por"
+                               FontWeight="Bold"/>
+
+                    <ComboBox x:Name="cmbPeriodo"
+                              Margin="0,10,0,0"
+                              Height="35"
+                              SelectionChanged="cmbPeriodo_SelectionChanged">
+
+                        <ComboBoxItem Content="Día"/>
+                        <ComboBoxItem Content="Semana"/>
+                        <ComboBoxItem Content="Mes"/>
+                        <ComboBoxItem Content="Año"/>
+
+                    </ComboBox>
+
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+
+        <!-- GRAFICA -->
+        <Border Grid.Row="2"
+                Margin="5,20,5,5"
+                Background="White"
+                CornerRadius="12"
+                Padding="15">
+
+            <lvc:CartesianChart
+                x:Name="GraficaVentas"/>
+
+        </Border>
+
+    </Grid>
+
+</Window>
