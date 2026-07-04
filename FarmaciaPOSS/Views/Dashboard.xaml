@@ -273,7 +273,7 @@
 
                     <StackPanel VerticalAlignment="Center">
 
-                        <TextBlock Text="FarmaClickYatzil"
+                        <TextBlock Text="FarmaClick Yatzil"
                                    FontSize="24"
                                    FontWeight="Bold"
                                    Foreground="White"/>
