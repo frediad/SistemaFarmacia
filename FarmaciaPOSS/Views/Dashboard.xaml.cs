@@ -4,12 +4,13 @@ using FarmaciaPOS.Views;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using System.Collections.ObjectModel;
 
 namespace FarmaciaPOS
 {
@@ -39,7 +40,10 @@ namespace FarmaciaPOS
 
             IniciarReloj();
 
-            
+            CargarCategoriasCatalogo();  
+            CargarCatalogo();
+
+
         }
 
         private DispatcherTimer relojTimer;
@@ -656,6 +660,87 @@ namespace FarmaciaPOS
             }
         }
 
+        // =========================================
+        // ✅ COMANDO PARA AGREGAR PRODUCTO DESDE CARD
+        // =========================================
+
+        public static readonly ICommand AgregarProductoCommand =
+            new RelayCommand<Producto>(p =>
+            {
+                // Buscar la instancia actual del MainWindow
+                var main = Application.Current.MainWindow as MainWindow;
+                main?.AgregarAlCarrito(p.CodigoBarras);
+            });
+
+        // =========================================
+        // ✅ CARGAR CATEGORÍAS EN LA BARRA
+        // =========================================
+
+        private void CargarCategoriasCatalogo()
+        {
+            pnlCategorias.Children.Clear();
+
+            // Botón "Todos"
+            var btnTodos = new Button
+            {
+                Content = "🏠 Todos",
+                Style = (Style)FindResource("BtnCategoriaActiva"),
+                Tag = 0
+            };
+            btnTodos.Click += BtnCategoria_Click;
+            pnlCategorias.Children.Add(btnTodos);
+
+            using SqlConnection conn =
+                new SqlConnection(DatabaseHelper.ConnectionString);
+
+            conn.Open();
+
+            string query = "SELECT * FROM Categorias ORDER BY Nombre";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var btn = new Button
+                {
+                    Content = reader["Nombre"].ToString(),
+                    Style = (Style)FindResource("BtnCategoria"),
+                    Tag = Convert.ToInt32(reader["Id"])
+                };
+                btn.Click += BtnCategoria_Click;
+                pnlCategorias.Children.Add(btn);
+            }
+        }
+
+        private void BtnCategoria_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            int categoriaId = Convert.ToInt32(btn?.Tag ?? 0);
+
+            // Resaltar botón activo
+            foreach (Button b in pnlCategorias.Children.OfType<Button>())
+            {
+                b.Style = (Style)FindResource("BtnCategoria");
+            }
+            btn!.Style = (Style)FindResource("BtnCategoriaActiva");
+
+            // Filtrar productos
+            if (categoriaId == 0)
+                icProductosCatalogo.ItemsSource = productos;
+            else
+                icProductosCatalogo.ItemsSource = productos
+                    .Where(p => p.CategoriaId == categoriaId)
+                    .ToList();
+        }
+
+        // =========================================
+        // ✅ CARGAR CATÁLOGO DE PRODUCTOS
+        // =========================================
+
+        private void CargarCatalogo()
+        {
+            icProductosCatalogo.ItemsSource = productos;
+        }
 
 
 

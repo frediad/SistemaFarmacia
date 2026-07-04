@@ -1,107 +1,403 @@
 ﻿<Window x:Class="FarmaciaPOS.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:FarmaciaPOS"
         Title="Sistema de Ventas"
         Height="750"
         Width="1250"
         Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
-        Background="#E9ECEF"
+        Background="#F0F4F8"
         PreviewKeyDown="DashboardWindow_PreviewKeyDown">
+
+    <Window.Resources>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTONES MENÚ SUPERIOR          -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnMenuSuperior" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#EFF6FF"/>
+                                <Setter Property="Foreground" Value="#2563EB"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTONES LATERAL                -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnLateral" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="72"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#EFF6FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTONES CATEGORIA              -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnCategoria" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="20"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#EFF6FF"/>
+                                <Setter TargetName="border"
+                                        Property="BorderBrush"
+                                        Value="#2563EB"/>
+                                <Setter Property="Foreground" Value="#2563EB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTÓN CATEGORÍA ACTIVA         -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnCategoriaActiva" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="20"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTÓN COBRAR                   -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnCobrar" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#1E40AF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
+        <!-- ESTILO BOTONES ACCIÓN INFERIOR        -->
+        <!-- ===================================== -->
+
+        <Style x:Key="BtnAccion" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#F8FAFC"/>
+                                <Setter TargetName="border"
+                                        Property="BorderBrush"
+                                        Value="#94A3B8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
 
     <Grid>
 
         <Grid.RowDefinitions>
-            <!-- HEADER -->
-            <RowDefinition Height="90"/>
-
-            <!-- MENU SUPERIOR -->
-            <RowDefinition Height="70"/>
-
-            <!-- CONTENIDO PRINCIPAL -->
-            <RowDefinition Height="*"/>
-
-            <!-- BOTONES INFERIORES -->
-            <RowDefinition Height="120"/>
-
-            <!-- FOOTER -->
             <RowDefinition Height="80"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="70"/>
         </Grid.RowDefinitions>
 
         <!-- ========================================= -->
-        <!-- HEADER -->
+        <!-- HEADER                                    -->
         <!-- ========================================= -->
 
-        <Border Background="White"
-                Grid.Row="0"
-                BorderBrush="#D6D6D6"
-                BorderThickness="0,0,0,1">
+        <Border Background="#1E3A8A"
+                Grid.Row="0">
 
-            <Grid>
+            <Grid Margin="15,0">
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- LOGO -->
                 <StackPanel Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            Margin="20,0">
+                            VerticalAlignment="Center">
 
                     <Image Source="/Images/logo-click.png"
-                           Width="100"
-                           Height="70"/>
+                           Width="55"
+                           Height="55"
+                           Margin="0,0,12,0"/>
 
-                    <StackPanel Margin="10,0">
+                    <StackPanel VerticalAlignment="Center">
 
                         <TextBlock Text="FarmaClick Yatzil"
-                                   FontSize="32"
+                                   FontSize="24"
                                    FontWeight="Bold"
-                                   Foreground="#1E3A8A"/>
+                                   Foreground="White"/>
 
                         <TextBlock Text="Tu sistema de ventas de confianza"
-                                   FontSize="14"
-                                   Foreground="Gray"/>
+                                   FontSize="12"
+                                   Foreground="#93C5FD"/>
 
                     </StackPanel>
 
                 </StackPanel>
 
-                
+                <!-- MENÚ SUPERIOR -->
+                <ScrollViewer Grid.Column="1"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Hidden"
+                              VerticalAlignment="Center"
+                              Margin="20,0">
 
-                <!-- USUARIO -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
 
+                        <Button x:Name="btnVentas"
+                                Content="Ventas"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnVentas_Click"/>
+
+                        <Button x:Name="btnPedidos"
+                                Content="Pedidos"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnPedidos_Click"/>
+
+                        <Button x:Name="btnProductos"
+                                Content="Productos"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnProductos_Click"/>
+
+                        <Button x:Name="btnInventario"
+                                Content="Inventario"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnInventario_Click"/>
+
+                        <Button Content="Reportes"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnReportes_Click"/>
+
+                        <Button x:Name="btnConfiguracion"
+                                Content="Configuración"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnConfiguracion_Click"/>
+
+                        <Button x:Name="btnCaja"
+                                Content="Caja"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="White"
+                                Click="BtnCaja_Click"/>
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
+                <!-- USUARIO + SALIR -->
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Right"
-                            Margin="0,0,20,0">
+                            VerticalAlignment="Center">
 
-                    <StackPanel Margin="0,0,20,0"
+                    <StackPanel Margin="0,0,15,0"
                                 VerticalAlignment="Center">
 
                         <TextBlock x:Name="txtUsuarioSesion"
                                    Text="Usuario"
-                                   FontSize="22"
+                                   FontSize="16"
                                    FontWeight="Bold"
+                                   Foreground="White"
                                    HorizontalAlignment="Right"/>
 
                         <TextBlock Text="Caja Principal"
-                                   FontSize="14"
-                                   Foreground="Gray"
+                                   FontSize="12"
+                                   Foreground="#93C5FD"
                                    HorizontalAlignment="Right"/>
 
                     </StackPanel>
 
-                    <Button Content="Salir"
-                            Width="100"
-                            Height="40"
-                            FontSize="16"
+                    <Button Content="⏻ Salir"
+                            Width="90"
+                            Height="38"
+                            FontSize="14"
+                            FontWeight="Bold"
                             Background="#DC2626"
                             Foreground="White"
-                            FontWeight="Bold"
-                            Click="BtnSalir_Click"/>
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="BtnSalir_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="b"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="b"
+                                                Property="Background"
+                                                Value="#B91C1C"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
 
                 </StackPanel>
 
@@ -110,310 +406,316 @@
         </Border>
 
         <!-- ========================================= -->
-        <!-- MENU SUPERIOR -->
+        <!-- BARRA DE CÓDIGO DE PRODUCTO              -->
         <!-- ========================================= -->
 
         <Border Grid.Row="1"
-                Background="#F8FAFC"
-                BorderBrush="#D6D6D6"
+                Background="White"
+                BorderBrush="#E2E8F0"
                 BorderThickness="0,0,0,1">
 
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+            <Grid Margin="15,0">
 
-                <StackPanel Orientation="Horizontal"
-                            Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
 
-                    <Button x:Name="btnVentas"
-                            Content="Ventas"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnVentas_Click"/>
+                <TextBlock Text="Código:"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="#374151"
+                           VerticalAlignment="Center"/>
 
-                    <Button x:Name="btnPedidos"
-                            Content="Pedidos"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnPedidos_Click"/>
+                <TextBox x:Name="txtCodigoProducto"
+                         Grid.Column="1"
+                         Height="38"
+                         FontSize="18"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,10,0"
+                         Padding="8,0"
+                         BorderBrush="#CBD5E1"
+                         KeyDown="txtCodigoProducto_KeyDown">
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="White"
+                                    BorderBrush="#CBD5E1"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="8,0"/>
+                            </Border>
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
 
-                    <Button x:Name="btnProductos"
-                            Content="Productos"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnProductos_Click"/>
+                <TextBlock x:Name="txtNombreProductoActual"
+                           Grid.Column="2"
+                           Text=""
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#2563EB"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"
+                           TextTrimming="CharacterEllipsis"/>
 
-                    <Button x:Name="btnInventario"
-                            Content="Inventario"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnInventario_Click"/>
+                <Border Grid.Column="3"
+                        Background="White"
+                        BorderBrush="#CBD5E1"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Margin="0,8,10,8">
 
-                    <Button Content="Reportes"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnReportes_Click"/>
+                    <Image x:Name="imgProductoActual"
+                           Stretch="Uniform"
+                           Margin="4"/>
 
-                    <Button x:Name="btnConfiguracion"
-                            Content="Configuración"
-                            Width="190"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnConfiguracion_Click"/>
+                </Border>
 
-                    <Button x:Name="btnCaja"
-                            Content="Caja"
-                            Width="160"
-                            Height="45"
-                            Margin="5"
-                            Click="BtnCaja_Click"/>
+                <Button Grid.Column="4"
+                        Content="📷 Lector Barras"
+                        Height="38"
+                        FontSize="13"
+                        FontWeight="Bold"
+                        Background="#EFF6FF"
+                        Foreground="#2563EB"
+                        BorderThickness="1"
+                        BorderBrush="#BFDBFE"
+                        Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="b"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="b"
+                                            Property="Background"
+                                            Value="#DBEAFE"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
-                </StackPanel>
-
-            </ScrollViewer>
+            </Grid>
 
         </Border>
 
         <!-- ========================================= -->
-        <!-- CONTENIDO PRINCIPAL                      -->
-        <!-- ✅ Dividido: Menú lateral | Área de venta -->
+        <!-- CONTENIDO PRINCIPAL                       -->
         <!-- ========================================= -->
 
-        <Grid Grid.Row="2"
-              Margin="-1">
+        <Grid Grid.Row="2">
 
             <Grid.ColumnDefinitions>
                 <!-- MENÚ LATERAL -->
-                <ColumnDefinition Width="110"/>
-                <!-- ÁREA DE VENTA -->
+                <ColumnDefinition Width="100"/>
+                <!-- ÁREA CENTRAL -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- ===================================== -->
-            <!-- ✅ MENÚ LATERAL IZQUIERDO (estilo SICAR) -->
+            <!-- MENÚ LATERAL                          -->
             <!-- ===================================== -->
 
-            <Border Grid.Column="0"
-                    Background="White"
-                    BorderBrush="#D6D6D6"
+            <Border Background="White"
+                    BorderBrush="#E2E8F0"
                     BorderThickness="0,0,1,0">
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-                    <StackPanel Margin="5,10">
+                    <StackPanel Margin="5,8">
 
                         <Button x:Name="btnLateralBuscar"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0"
+                                Style="{StaticResource BtnLateral}"
                                 Click="BtnBuscar_Click">
                             <StackPanel>
                                 <TextBlock Text="🔍"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Buscar"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
-                                           HorizontalAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           TextAlignment="Center"/>
-                                <TextBlock Text="(F2)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                           Foreground="#374151"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="F2"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralPrecio"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0"
+                                Style="{StaticResource BtnLateral}"
                                 Click="BtnPrecio_Click">
                             <StackPanel>
                                 <TextBlock Text="💲"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Precio"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F3)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F3"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralCantidad"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0"
+                                Style="{StaticResource BtnLateral}"
                                 Click="BtnCantidad_Click">
                             <StackPanel>
                                 <TextBlock Text="🔢"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Cantidad"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F5)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F5"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralEliminar"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0"
+                                Style="{StaticResource BtnLateral}"
                                 Click="BtnEliminar_Click">
                             <StackPanel>
-                                <TextBlock Text="⛔"
-                                           FontSize="22"
+                                <TextBlock Text="🗑️"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Remover"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F6)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F6"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralDescuento"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0"
+                                Style="{StaticResource BtnLateral}"
                                 Click="BtnDescuento_Click">
                             <StackPanel>
                                 <TextBlock Text="🏷️"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Desc."
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F7)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F7"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <Separator Margin="5,8"/>
+                        <Rectangle Height="1"
+                                   Fill="#E2E8F0"
+                                   Margin="10,6"/>
 
                         <Button x:Name="btnLateralCajon"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0">
+                                Style="{StaticResource BtnLateral}">
                             <StackPanel>
                                 <TextBlock Text="🗄️"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Cajón"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F8)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F8"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralBascula"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0">
+                                Style="{StaticResource BtnLateral}">
                             <StackPanel>
                                 <TextBlock Text="⚖️"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Báscula"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F9)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F9"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralImporte"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0">
+                                Style="{StaticResource BtnLateral}">
                             <StackPanel>
                                 <TextBlock Text="💵"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Importe"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Text="(F10)"
-                                           FontSize="10"
-                                           Foreground="Gray"
+                                <TextBlock Text="F10"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <Separator Margin="5,8"/>
+                        <Rectangle Height="1"
+                                   Fill="#E2E8F0"
+                                   Margin="10,6"/>
 
                         <Button x:Name="btnLateralCliente"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0">
+                                Style="{StaticResource BtnLateral}">
                             <StackPanel>
                                 <TextBlock Text="👤"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Cliente"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralCotizar"
-                                Width="95"
-                                Height="70"
-                                Margin="3"
-                                Background="Transparent"
-                                BorderThickness="0">
+                                Style="{StaticResource BtnLateral}">
                             <StackPanel>
                                 <TextBlock Text="📋"
-                                           FontSize="22"
+                                           FontSize="20"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="Cotizar"
-                                           FontSize="12"
+                                           FontSize="11"
                                            FontWeight="Bold"
+                                           Foreground="#374151"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -425,168 +727,398 @@
             </Border>
 
             <!-- ===================================== -->
-            <!-- ÁREA DE VENTA                         -->
+            <!-- ÁREA CENTRAL — dividida en 2 columnas -->
+            <!-- Izquierda: Carrito | Derecha: Productos + Categorías -->
             <!-- ===================================== -->
 
-            <Grid Grid.Column="1"
-                  Margin="0">
+            <Grid Grid.Column="1">
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="120"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Border Background="#2563EB"
-                        CornerRadius="5"
-                        Margin="5">
-
-                    <TextBlock Text="VENTA - Ticket 1"
-                               Foreground="White"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               Margin="20,0"/>
-
-                </Border>
+                <Grid.ColumnDefinitions>
+                    <!-- CARRITO -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- CATÁLOGO -->
+                    <ColumnDefinition Width="420"/>
+                </Grid.ColumnDefinitions>
 
                 <!-- ===================================== -->
-                <!-- ✅ CÓDIGO + IMAGEN DEL PRODUCTO        -->
+                <!-- CARRITO DE VENTA                      -->
                 <!-- ===================================== -->
 
-                <Grid Grid.Row="1"
-                      Margin="5,5,5,0">
+                <Grid Margin="8,8,4,8">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="55"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- IMAGEN PRODUCTO -->
+                    <!-- TÍTULO TICKET -->
+                    <Border Background="#1E3A8A"
+                            CornerRadius="10,10,0,0">
 
-                    <Border Background="White"
-                            BorderBrush="#D6D6D6"
-                            BorderThickness="1"
-                            CornerRadius="6">
+                        <Grid Margin="15,0">
 
-                        <Image x:Name="imgProductoActual"
-                               Width="90"
-                               Height="90"
-                               Stretch="Uniform"/>
-
-                    </Border>
-
-                    <!-- CÓDIGO + BOTONES -->
-
-                    <Grid Grid.Column="1"
-                          Margin="10,0,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="250"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="Código del Producto:"
-                                       FontSize="20"
+                            <TextBlock Text="🧾  VENTA — Ticket #1"
+                                       Foreground="White"
+                                       FontSize="16"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"/>
 
-                            <TextBox x:Name="txtCodigoProducto"
-                                     Grid.Column="1"
-                                     Height="45"
-                                     FontSize="22"
-                                     Margin="10,0"
-                                     KeyDown="txtCodigoProducto_KeyDown"/>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
 
-                            <Button Grid.Column="2"
-                                    Content="F3"
-                                    Height="45"
-                                    Margin="10,0"/>
+                                <Button x:Name="btnMasCant"
+                                        Content="＋ Cant"
+                                        Height="28"
+                                        Padding="8,0"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Background="#2563EB"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Margin="3,0"
+                                        Cursor="Hand"
+                                        Click="BtnMasCant_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
 
-                            <Button Grid.Column="3"
-                                    Content="Lector Código Barras"
-                                    Height="45"
-                                    Margin="10,0"/>
+                                <Button x:Name="btnCantidad"
+                                        Content="🔢 Cant."
+                                        Height="28"
+                                        Padding="8,0"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Background="#2563EB"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Margin="3,0"
+                                        Cursor="Hand"
+                                        Click="BtnCantidad_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                                <Button x:Name="btnDescuento"
+                                        Content="🏷️ Desc."
+                                        Height="28"
+                                        Padding="8,0"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Background="#2563EB"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Margin="3,0"
+                                        Cursor="Hand"
+                                        Click="BtnDescuento_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                                <Button x:Name="btnEliminar"
+                                        Content="🗑️ Quitar"
+                                        Height="28"
+                                        Padding="8,0"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Background="#DC2626"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Margin="3,0"
+                                        Cursor="Hand"
+                                        Click="BtnEliminar_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                            </StackPanel>
 
                         </Grid>
 
-                        <!-- NOMBRE PRODUCTO ESCANEADO -->
+                    </Border>
 
-                        <TextBlock x:Name="txtNombreProductoActual"
-                                   Grid.Row="1"
-                                   Text=""
-                                   FontSize="22"
-                                   FontWeight="Bold"
-                                   Foreground="#1E3A8A"
-                                   VerticalAlignment="Center"/>
+                    <!-- TABLA CARRITO -->
+                    <Border Grid.Row="1"
+                            Background="White"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1,0,1,0">
 
-                    </Grid>
+                        <DataGrid x:Name="dgCarritoCentral"
+                                  AutoGenerateColumns="False"
+                                  HeadersVisibility="Column"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  FontSize="14"
+                                  RowHeight="38"
+                                  BorderThickness="0"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#F1F5F9"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  SelectionChanged="dgCarritoCentral_SelectionChanged_1">
+
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+
+                            <DataGrid.Columns>
+
+                                <DataGridTextColumn Header="Cant."
+                                    Binding="{Binding Cantidad}"
+                                    Width="65"/>
+
+                                <DataGridTextColumn Header="Descripción"
+                                    Binding="{Binding Nombre}"
+                                    Width="*"/>
+
+                                <DataGridTextColumn Header="Stock"
+                                    Binding="{Binding Stock}"
+                                    Width="70"/>
+
+                                <DataGridTextColumn Header="Desc."
+                                    Binding="{Binding Descuento}"
+                                    Width="80"/>
+
+                                <DataGridTextColumn Header="Precio"
+                                    Binding="{Binding Precio}"
+                                    Width="100"/>
+
+                                <DataGridTextColumn Header="Importe"
+                                    Binding="{Binding Subtotal}"
+                                    Width="110"/>
+
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+
+                    </Border>
+
+                    <!-- ACCIONES ADICIONALES -->
+                    <Border Grid.Row="2"
+                            Background="#F8FAFC"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1,1,1,1"
+                            CornerRadius="0,0,10,10">
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="10,0">
+
+                            <Button Content="↩ Cambiar"
+                                    Style="{StaticResource BtnAccion}"
+                                    Width="110"
+                                    Height="36"
+                                    Margin="4,0"/>
+
+                            <Button Content="↩ Devolución"
+                                    Style="{StaticResource BtnAccion}"
+                                    Width="120"
+                                    Height="36"
+                                    Margin="4,0"/>
+
+                            <Button x:Name="btnPagar"
+                                    Content="🖨️ Ticket"
+                                    Style="{StaticResource BtnAccion}"
+                                    Width="110"
+                                    Height="36"
+                                    Margin="4,0"
+                                    Click="BtnPagar_Click"/>
+
+                        </StackPanel>
+
+                    </Border>
 
                 </Grid>
 
                 <!-- ===================================== -->
-                <!-- TABLA DE PRODUCTOS                    -->
+                <!-- CATÁLOGO: CATEGORÍAS + PRODUCTOS CARDS -->
                 <!-- ===================================== -->
 
-                <Border Grid.Row="2"
-                        Margin="5,10,5,5"
-                        Background="White"
-                        BorderBrush="#D6D6D6"
-                        BorderThickness="1">
+                <Border Grid.Column="1"
+                        Background="#F8FAFC"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1,0,0,0"
+                        Margin="4,8,8,8">
 
-                    <DataGrid x:Name="dgCarritoCentral"
-                              AutoGenerateColumns="False"
-                              HeadersVisibility="Column"
-                              CanUserAddRows="False"
-                              IsReadOnly="True"
-                              FontSize="18"
-                              Margin="10"
-                              RowHeight="45"
-                              SelectionMode="Single"
-                              SelectionUnit="FullRow"
-                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                              MinHeight="300"
-                              SelectionChanged="dgCarritoCentral_SelectionChanged_1">
+                    <Grid>
 
-                        <DataGrid.Columns>
+                        <Grid.RowDefinitions>
+                            <!-- BARRA CATEGORÍAS -->
+                            <RowDefinition Height="55"/>
+                            <!-- GRID PRODUCTOS -->
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                            <DataGridTextColumn Header="Cant."
-                                Binding="{Binding Cantidad}"
-                                Width="100"/>
+                        <!-- ===================================== -->
+                        <!-- ✅ BARRA DE CATEGORÍAS                -->
+                        <!-- ===================================== -->
 
-                            <DataGridTextColumn Header="Descripción"
-                                Binding="{Binding Nombre}"
-                                Width="*"/>
+                        <Border Background="White"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="0,0,0,1"
+                                CornerRadius="10,10,0,0">
 
-                            <DataGridTextColumn Header="Stock"
-                                Binding="{Binding Stock }"
-                                Width="90"/>
+                            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Disabled"
+                                          VerticalAlignment="Center"
+                                          Margin="8,0">
 
-                            <DataGridTextColumn Header=" Desc"
-                                Binding="{Binding Descuento}"
-                                Width="100"/>
+                                <StackPanel x:Name="pnlCategorias"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
 
-                            <DataGridTextColumn Header="Precio U."
-                                Binding="{Binding Precio}"
-                                Width="120"/>
+                                    <!-- Los botones de categoría se generan dinámicamente desde el .cs -->
 
-                            <DataGridTextColumn Header="Importe"
-                                Binding="{Binding Subtotal}"
-                                Width="140"/>
+                                </StackPanel>
 
-                        </DataGrid.Columns>
+                            </ScrollViewer>
 
-                    </DataGrid>
+                        </Border>
+
+                        <!-- ===================================== -->
+                        <!-- ✅ GRID DE TARJETAS DE PRODUCTOS       -->
+                        <!-- ===================================== -->
+
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto">
+
+                            <ItemsControl x:Name="icProductosCatalogo">
+
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"
+                                                   Margin="8"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+
+                                        <!-- TARJETA DE PRODUCTO -->
+                                        <Border Width="120"
+                                                Height="145"
+                                                Margin="5"
+                                                Background="White"
+                                                BorderBrush="#E2E8F0"
+                                                BorderThickness="1"
+                                                CornerRadius="12"
+                                                Cursor="Hand">
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="BorderBrush" Value="#2563EB"/>
+                                                            <Setter Property="Effect">
+                                                                <Setter.Value>
+                                                                    <DropShadowEffect Color="#2563EB"
+                                                                                      Opacity="0.15"
+                                                                                      BlurRadius="8"
+                                                                                      ShadowDepth="2"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick"
+                                                              Command="{x:Static local:MainWindow.AgregarProductoCommand}"
+                                                              CommandParameter="{Binding}"/>
+                                            </Border.InputBindings>
+
+                                            <Grid>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="75"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- IMAGEN -->
+                                                <Border Background="#F1F5F9"
+                                                        CornerRadius="12,12,0,0">
+
+                                                    <Image Source="{Binding ImagenURL}"
+                                                           Stretch="Uniform"
+                                                           Margin="8"/>
+
+                                                </Border>
+
+                                                <!-- INFO -->
+                                                <StackPanel Grid.Row="1"
+                                                            Margin="8,4">
+
+                                                    <TextBlock Text="{Binding Nombre}"
+                                                               FontSize="11"
+                                                               FontWeight="Bold"
+                                                               Foreground="#1E293B"
+                                                               TextWrapping="Wrap"
+                                                               MaxHeight="30"
+                                                               TextTrimming="CharacterEllipsis"/>
+
+                                                    <TextBlock Text="{Binding PrecioVenta, StringFormat=C}"
+                                                               FontSize="13"
+                                                               FontWeight="Bold"
+                                                               Foreground="#2563EB"
+                                                               Margin="0,3,0,0"/>
+
+                                                    <TextBlock Text="{Binding Stock, StringFormat='Stock: {0}'}"
+                                                               FontSize="10"
+                                                               Foreground="#94A3B8"/>
+
+                                                </StackPanel>
+
+                                            </Grid>
+
+                                        </Border>
+
+                                    </DataTemplate>
+
+                                </ItemsControl.ItemTemplate>
+
+                            </ItemsControl>
+
+                        </ScrollViewer>
+
+                    </Grid>
 
                 </Border>
 
@@ -595,132 +1127,114 @@
         </Grid>
 
         <!-- ========================================= -->
-        <!-- TOTAL                                     -->
+        <!-- TOTAL + COBRAR                            -->
         <!-- ========================================= -->
 
         <Grid Grid.Row="3"
-              Height="90"
-              Margin="10">
+              Margin="8,0">
 
             <Grid.ColumnDefinitions>
-
-                <!-- BOTONES -->
-                <ColumnDefinition Width="500"/>
-
-                <!-- TOTAL -->
-                <ColumnDefinition Width="400"/>
-
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ================================= -->
-            <!-- BOTONES -->
-            <!-- ================================= -->
+            <!-- ESPACIO LATERAL -->
+            <Border/>
 
-            <UniformGrid Grid.Column="0"
-                 Columns="4"
-                 Margin="0,0,10,0">
-
-                <Button Content="Cambiar"
-                        Margin="4"
-                        FontSize="15"
-                        Height="50"/>
-
-                <Button Content="Devolución"
-                        Margin="4"
-                        FontSize="15"
-                        Height="50"/>
-
-                <Button Content="Ticket"
-                        Margin="4"
-                        FontSize="15"
-                        Height="50"/>
-
-                <Button Content="COBRAR"
-                        Margin="4"
-                        FontSize="22"
-                        FontWeight="Bold"
-                        Height="50"
-                        Background="#2563EB"
-                        Foreground="White"
-                        Click="BtnCobrarCentral_Click"/>
-
-            </UniformGrid>
-
-            <!-- ================================= -->
             <!-- TOTAL -->
-            <!-- ================================= -->
-
-            <Border Grid.Column="2"
+            <Border Grid.Column="1"
                     Background="White"
-                    BorderBrush="#D6D6D6"
+                    BorderBrush="#E2E8F0"
                     BorderThickness="1"
-                    CornerRadius="20">
+                    CornerRadius="12"
+                    Margin="4,8">
 
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
+                <Grid Margin="20,0">
 
-                    <TextBlock Text="TOTAL"
-                               FontSize="14"
-                               Foreground="Gray"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="txtTotalCentral"
-                               Text="$0.00"
-                               FontSize="28"
-                               Foreground="#1D4ED8"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="TOTAL"
+                                   FontSize="11"
+                                   Foreground="#94A3B8"
+                                   FontWeight="Bold"/>
+                        <TextBlock x:Name="txtTotalCentral"
+                                   Text="$0.00"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="#1E3A8A"/>
+                    </StackPanel>
 
-                </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="PAGO"
+                                   FontSize="11"
+                                   Foreground="#94A3B8"
+                                   FontWeight="Bold"/>
+                        <TextBlock x:Name="txtFooterPago"
+                                   Text="$0.00"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="CAMBIO"
+                                   FontSize="11"
+                                   Foreground="#94A3B8"
+                                   FontWeight="Bold"/>
+                        <TextBlock x:Name="txtFooterCambio"
+                                   Text="$0.00"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="#16A34A"/>
+                    </StackPanel>
+
+                </Grid>
 
             </Border>
+
+            <!-- COBRAR -->
+            <Button Grid.Column="2"
+                    Content="💳  COBRAR"
+                    Style="{StaticResource BtnCobrar}"
+                    Margin="4,8"
+                    Click="BtnCobrarCentral_Click"/>
 
         </Grid>
 
         <!-- ========================================= -->
-        <!-- FOOTER -->
+        <!-- FOOTER                                    -->
         <!-- ========================================= -->
 
         <Border Grid.Row="4"
-                Background="White"
-                BorderBrush="#D6D6D6"
-                BorderThickness="1,1,1,0">
+                Background="#1E3A8A">
 
-            <Grid Margin="20">
+            <Grid Margin="20,0">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBlock x:Name="txtFooterTotal"
-                               Text="Total: $0.00"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               Margin="20,0"/>
-
-                    <TextBlock x:Name="txtFooterPago"
-                               Text="Pago: $0.00"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               Margin="20,0"/>
-
-                    <TextBlock x:Name="txtFooterCambio"
-                               Text="Cambio: $0.00"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               Margin="20,0"/>
-
-                </StackPanel>
+                <TextBlock x:Name="txtFooterTotal"
+                           Text="Total: $0.00"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
 
                 <TextBlock x:Name="txtFechaHora"
                            Grid.Column="1"
                            Text=""
-                           FontSize="20"
-                           HorizontalAlignment="Right"
+                           FontSize="16"
+                           Foreground="#93C5FD"
                            VerticalAlignment="Center"/>
 
             </Grid>

@@ -56,6 +56,10 @@
             <TabItem Header="📊 Ventas">
 
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="229*"/>
+                    </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="110"/>
@@ -66,7 +70,7 @@
                     <Border Background="White"
                             CornerRadius="10"
                             Padding="15"
-                            Margin="0,0,0,15">
+                            Margin="0,0,0,15" Grid.ColumnSpan="2">
 
                         <UniformGrid Columns="4">
 
@@ -109,7 +113,7 @@
                     </Border>
 
                     <!-- CONTENIDO VENTAS -->
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2">
 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="380"/>
