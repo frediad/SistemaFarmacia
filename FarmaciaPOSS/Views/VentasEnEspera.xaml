@@ -1,0 +1,199 @@
+﻿<Window x:Class="FarmaciaPOS.Views.VentasEnEsperaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ventas en espera"
+        Height="480"
+        Width="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+
+        <Style x:Key="BtnRecuperar" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnEliminarEspera" TargetType="Button">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#DC2626"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FCA5A5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnCerrarDialogo" TargetType="Button">
+            <Setter Property="Background" Value="#F1F5F9"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E2E8F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#000000"
+                              Opacity="0.2"
+                              BlurRadius="24"
+                              ShadowDepth="4"/>
+        </Border.Effect>
+
+        <Grid Margin="20">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="⏸️ Ventas en espera"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+                <TextBlock Text="Selecciona una venta para recuperarla"
+                           FontSize="12"
+                           Foreground="#94A3B8"
+                           Margin="0,2,0,12"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="icVentasEspera">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F8FAFC"
+                                        BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Referencia}"
+                                                       FontSize="14"
+                                                       FontWeight="Bold"
+                                                       Foreground="#1E293B"/>
+                                            <TextBlock Text="{Binding Hora, StringFormat='hh:mm tt'}"
+                                                       FontSize="11"
+                                                       Foreground="#94A3B8"/>
+                                            <TextBlock Text="{Binding Total, StringFormat='Total: {0:C}'}"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="#2563EB"
+                                                       Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="1"
+                                                Content="Recuperar"
+                                                Width="86"
+                                                Height="32"
+                                                Margin="6,0"
+                                                Style="{StaticResource BtnRecuperar}"
+                                                Click="BtnRecuperar_Click"
+                                                Tag="{Binding}"/>
+
+                                        <Button Grid.Column="2"
+                                                Content="✕"
+                                                Width="32"
+                                                Height="32"
+                                                Style="{StaticResource BtnEliminarEspera}"
+                                                Click="BtnEliminarEspera_Click"
+                                                Tag="{Binding}"/>
+
+                                    </Grid>
+
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <TextBlock x:Name="txtSinVentas"
+                           Text="No hay ventas en espera"
+                           FontSize="13"
+                           Foreground="#94A3B8"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+
+            </Grid>
+
+            <Button Grid.Row="2"
+                    Content="Cerrar"
+                    Height="42"
+                    Margin="0,14,0,0"
+                    Style="{StaticResource BtnCerrarDialogo}"
+                    Click="BtnCerrar_Click"/>
+
+        </Grid>
+
+    </Border>
+
+</Window>

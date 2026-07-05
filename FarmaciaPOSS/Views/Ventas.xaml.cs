@@ -3,6 +3,7 @@ using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,26 +13,23 @@ namespace FarmaciaPOS.Views
 {
     public partial class VentasWindow : Window
     {
-
-
-
-        List<Producto> productos =
-            new();
-
-        List<VentaItem> carrito =
-            new();
+        private List<Producto> productos = new();
+        private ObservableCollection<VentaItem> carrito = new();
 
         public VentasWindow()
         {
             InitializeComponent();
 
-            CargarProductos();
+            dgCarrito.ItemsSource = carrito;
 
-            KeyDown += VentasWindow_KeyDown;
+            CargarProductos();
+            CargarCategoriasCatalogo();
+            CargarCatalogo();
+            ActualizarTotales();
         }
 
         // =========================================
-        // CARGAR PRODUCTOS
+        // ✅ CARGAR PRODUCTOS
         // =========================================
 
         private void CargarProductos()
@@ -43,576 +41,336 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
-            string query =
-            @"SELECT *
-              FROM Productos
-              WHERE Activo = 1";
-
-            SqlCommand cmd =
-                new SqlCommand(query, conn);
-
-            SqlDataReader reader =
-                cmd.ExecuteReader();
+            string query = "SELECT * FROM Productos WHERE Activo = 1";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            SqlDataReader reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
                 productos.Add(new Producto
                 {
-                    Id =
-                        Convert.ToInt32(
-                            reader["Id"]),
+                    Id = Convert.ToInt32(reader["Id"]),
+                    CodigoBarras = reader["CodigoBarras"].ToString(),
+                    Nombre = reader["Nombre"].ToString(),
+                    Stock = Convert.ToInt32(reader["Stock"]),
+                    PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
+                    ImagenURL = reader["ImagenURL"].ToString(),
+                    CategoriaId = reader["CategoriaId"] != DBNull.Value
+                        ? Convert.ToInt32(reader["CategoriaId"])
+                        : 0,
+                });
+            }
+        }
 
-                    CodigoBarras =
-                        reader["CodigoBarras"]
-                        .ToString(),
+        // =========================================
+        // ✅ CATEGORÍAS
+        // =========================================
 
-                    Nombre =
-                        reader["Nombre"]
-                        .ToString(),
+        private void CargarCategoriasCatalogo()
+        {
+            pnlCategorias.Children.Clear();
 
-                    PrecioVenta =
-                        Convert.ToDecimal(
-                            reader["PrecioVenta"]),
+            var btnTodos = new Button
+            {
+                Content = "🏠 Todos",
+                Style = (Style)FindResource("BtnCategoriaActiva"),
+                Tag = 0
+            };
+            btnTodos.Click += BtnCategoria_Click;
+            pnlCategorias.Children.Add(btnTodos);
 
-                    Stock =
-                        Convert.ToInt32(
-                            reader["Stock"])
+            using SqlConnection conn =
+                new SqlConnection(DatabaseHelper.ConnectionString);
+
+            conn.Open();
+
+            string query = "SELECT * FROM Categorias ORDER BY Nombre";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var btn = new Button
+                {
+                    Content = reader["Nombre"].ToString(),
+                    Style = (Style)FindResource("BtnCategoria"),
+                    Tag = Convert.ToInt32(reader["Id"])
+                };
+                btn.Click += BtnCategoria_Click;
+                pnlCategorias.Children.Add(btn);
+            }
+        }
+
+        private void BtnCategoria_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            int categoriaId = Convert.ToInt32(btn?.Tag ?? 0);
+
+            foreach (Button b in pnlCategorias.Children.OfType<Button>())
+                b.Style = (Style)FindResource("BtnCategoria");
+
+            btn!.Style = (Style)FindResource("BtnCategoriaActiva");
+
+            icProductosCatalogo.ItemsSource =
+                categoriaId == 0
+                    ? productos
+                    : productos.Where(p => p.CategoriaId == categoriaId).ToList();
+        }
+
+        private void CargarCatalogo()
+        {
+            icProductosCatalogo.ItemsSource = productos;
+        }
+
+        // =========================================
+        // ✅ CLIC EN TARJETA DE PRODUCTO
+        // =========================================
+
+        private void CardProducto_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is Producto producto)
+            {
+                AgregarProductoAlCarrito(producto);
+            }
+        }
+
+        private void AgregarProductoAlCarrito(Producto producto)
+        {
+            var ventana = new CantidadWindow(producto)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado != true)
+                return;
+
+            int cantidad = ventana.CantidadSeleccionada;
+
+            var existente = carrito.FirstOrDefault(x => x.ProductoId == producto.Id);
+
+            if (existente != null)
+            {
+                existente.Cantidad += cantidad;
+            }
+            else
+            {
+                carrito.Add(new VentaItem
+                {
+                    ProductoId = producto.Id,
+                    Nombre = producto.Nombre,
+                    Precio = producto.PrecioVenta,
+                    Cantidad = cantidad,
+                    Stock = producto.Stock,
                 });
             }
 
-            dgProductos.ItemsSource =
-                productos;
+            ActualizarTotales();
         }
 
         // =========================================
-        // BUSCAR
+        // ✅ TOTALES
         // =========================================
 
-        private void txtBuscar_TextChanged(
-            object sender,
-            TextChangedEventArgs e)
+        private void ActualizarTotales()
         {
-            if (txtBuscar.Text == "Buscar producto...")
-                return;
+            decimal total = carrito.Sum(x => x.Subtotal);
 
-            string texto = txtBuscar.Text.Trim().ToLower();
+            txtTotal.Text = total.ToString("C");
+            txtPago.Text = "$0.00";
+            txtCambio.Text = "$0.00";
+        }
 
-            if (string.IsNullOrWhiteSpace(texto))
+        // =========================================
+        // ✅ ACCIONES DEL TICKET
+        // =========================================
+
+        private void BtnMasCant_Click(object sender, RoutedEventArgs e)
+        {
+            var seleccionado = dgCarrito.SelectedItem as VentaItem;
+
+            if (seleccionado == null)
             {
-                dgProductos.ItemsSource = productos;
-                return;
-            }
-
-            dgProductos.ItemsSource = productos
-                .Where(p =>
-                    p.Nombre.ToLower().Contains(texto) ||
-                    p.CodigoBarras.ToLower().Contains(texto))
-                .ToList();
-        }
-
-        // =========================================
-        // PLACEHOLDER
-        // =========================================
-
-        private void TxtBuscar_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (txtBuscar.Text == "Buscar producto...")
-            {
-                txtBuscar.Text = "";
-                txtBuscar.Foreground = System.Windows.Media.Brushes.Black;
-            }
-        }
-
-        private void TxtBuscar_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtBuscar.Text))
-            {
-                txtBuscar.Text = "Buscar producto...";
-                txtBuscar.Foreground = System.Windows.Media.Brushes.Gray;
-            }
-        }
-
-
-
-        // =========================================
-        // AGREGAR CARRITO
-        // =========================================
-
-        private void dgProductos_MouseDoubleClick(
-            object sender,
-            System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (dgProductos.SelectedItem
-                is Producto producto)
-            {
-                var existente =
-                    carrito.FirstOrDefault(
-                        x =>
-                        x.ProductoId
-                        == producto.Id);
-
-                if (existente != null)
-                {
-                    existente.Cantidad++;
-                }
-                else
-                {
-                    carrito.Add(
-                        new VentaItem
-                        {
-                            ProductoId =
-                                producto.Id,
-
-                            Nombre =
-                                producto.Nombre,
-
-                            Precio =
-                                producto.PrecioVenta,
-
-                            Cantidad = 1
-                        });
-                }
-
-                ActualizarCarrito();
-            }
-        }
-
-        // =========================================
-        // ACTUALIZAR CARRITO
-        // =========================================
-
-        private void ActualizarCarrito()
-        {
-            dgCarrito.ItemsSource = null;
-
-            dgCarrito.ItemsSource =
-                carrito;
-
-            decimal total =
-                carrito.Sum(
-                    x => x.Subtotal);
-
-            txtTotal.Text =
-                total.ToString("C");
-        }
-
-        // =========================================
-        // COBRAR
-        // =========================================
-
-        private void BtnCobrar_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            if (carrito.Count == 0)
-            {
-                MessageBox.Show(
-                    "No hay productos");
-
+                MessageBox.Show("Selecciona un producto de la lista");
                 return;
             }
 
-            try
-            {
-                using SqlConnection conn =
-                    new SqlConnection(DatabaseHelper.ConnectionString);
-
-                conn.Open();
-
-                SqlTransaction transaction =
-                    conn.BeginTransaction();
-
-                try
-                {
-                    // =========================================
-                    // VALIDAR INVENTARIO
-                    // =========================================
-
-                    foreach (var item in carrito)
-                    {
-                        string queryStock =
-                        @"SELECT Stock
-                          FROM Productos
-                          WHERE Id = @Id";
-
-                        SqlCommand cmdStock =
-                            new SqlCommand(
-                                queryStock,
-                                conn,
-                                transaction);
-
-                        cmdStock.Parameters.AddWithValue(
-                            "@Id",
-                            item.ProductoId);
-
-                        int stockActual =
-                            Convert.ToInt32(
-                                cmdStock.ExecuteScalar());
-
-                        if (stockActual < item.Cantidad)
-                        {
-                            MessageBox.Show(
-                                $"No hay suficiente stock para:\n\n{item.Nombre}\n\nStock disponible: {stockActual}");
-
-                            transaction.Rollback();
-
-                            return;
-                        }
-                    }
-
-                    // =========================================
-                    // TOTALES
-                    // =========================================
-
-                    decimal subtotal =
-                        carrito.Sum(
-                            x => x.Subtotal);
-
-                    decimal iva =
-                        subtotal * 0.16m;
-
-                    decimal total =
-                        subtotal + iva;
-
-                    string folio =
-                        $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
-
-                    // =========================================
-                    // INSERTAR VENTA
-                    // =========================================
-
-                    string insertarVenta =
-                    @"INSERT INTO Ventas
-                    (
-                    Folio,
-                    Fecha,
-                    Subtotal,
-                    IVA,
-                    Descuento,
-                    Total,
-                    MetodoPago,
-                    Estado,
-                    UsuarioId
-                    )
-                    VALUES
-                    (
-                    @Folio,
-                    GETDATE(),
-                    @Subtotal,
-                    @IVA,
-                    0,
-                    @Total,
-                    'Efectivo',
-                    'Completada',
-                    @UsuarioId
-                    );
-
-                    SELECT SCOPE_IDENTITY();";
-
-                    SqlCommand cmdVenta =
-                        new SqlCommand(
-                            insertarVenta,
-                            conn,
-                            transaction);
-
-                    cmdVenta.Parameters.AddWithValue(
-                        "@Folio",
-                        folio);
-
-                    cmdVenta.Parameters.AddWithValue(
-                        "@Subtotal",
-                        subtotal);
-
-                    cmdVenta.Parameters.AddWithValue(
-                        "@IVA",
-                        iva);
-
-                    cmdVenta.Parameters.AddWithValue(
-                        "@Total",
-                        total);
-
-                    cmdVenta.Parameters.AddWithValue(
-                        "@UsuarioId",
-                        Sesion.UsuarioId);
-
-                    int ventaId =
-                        Convert.ToInt32(
-                            cmdVenta.ExecuteScalar());
-
-                    // =========================================
-                    // GUARDAR DETALLE DE VENTA
-                    // =========================================
-
-                    foreach (var item in carrito)
-                    {
-                        string detalle =
-                        @"INSERT INTO DetalleVentas
-                        (
-                         VentaId,
-                         ProductoId,
-                         Cantidad,
-                         PrecioUnitario,
-                         Subtotal
-                        )
-                        VALUES
-                        (
-                        @VentaId,
-                        @ProductoId,
-                        @Cantidad,
-                        @Precio,
-                        @Subtotal
-                        )";
-
-                        SqlCommand cmdDetalle =
-                            new SqlCommand(
-                                detalle,
-                                conn,
-                                transaction);
-
-                        cmdDetalle.Parameters.AddWithValue(
-                            "@VentaId",
-                            ventaId);
-
-                        cmdDetalle.Parameters.AddWithValue(
-                            "@ProductoId",
-                            item.ProductoId);
-
-                        cmdDetalle.Parameters.AddWithValue(
-                            "@Cantidad",
-                            item.Cantidad);
-
-                        cmdDetalle.Parameters.AddWithValue(
-                            "@Precio",
-                            item.Precio);
-
-                        cmdDetalle.Parameters.AddWithValue(
-                            "@Subtotal",
-                            item.Subtotal);
-
-                        cmdDetalle.ExecuteNonQuery();
-                    }
-
-                    // =========================================
-                    // DESCONTAR INVENTARIO
-                    // =========================================
-
-                    foreach (var item in carrito)
-                    {
-                        string actualizarStock =
-                        @"UPDATE Productos
-                          SET Stock = Stock - @Cantidad
-                          WHERE Id = @Id";
-
-                        SqlCommand cmdStock =
-                            new SqlCommand(
-                                actualizarStock,
-                                conn,
-                                transaction);
-
-                        cmdStock.Parameters.AddWithValue(
-                            "@Cantidad",
-                            item.Cantidad);
-
-                        cmdStock.Parameters.AddWithValue(
-                            "@Id",
-                            item.ProductoId);
-
-                        cmdStock.ExecuteNonQuery();
-                    }
-
-                    // =========================================
-                    // CONFIRMAR TRANSACCIÓN
-                    // =========================================
-
-                    transaction.Commit();
-
-                    // =========================================
-                    // IMPRIMIR TICKET
-                    // =========================================
-
-                    TicketPrinter ticket =
-                        new TicketPrinter(
-                            carrito,
-                            total);
-
-                    ticket.Imprimir();
-
-                    MessageBox.Show(
-                        $"Venta registrada correctamente\n\nFolio: {folio}");
-
-                    carrito.Clear();
-
-                    ActualizarCarrito();
-
-                    CargarProductos();
-                }
-                catch
-                {
-                    transaction.Rollback();
-
-                    throw;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    ex.Message);
-            }
+            seleccionado.Cantidad++;
+            ActualizarTotales();
         }
 
-        private void BtnGenerarTicket_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnCantidad_Click(object sender, RoutedEventArgs e)
         {
-            if (carrito.Count == 0)
+            var seleccionado = dgCarrito.SelectedItem as VentaItem;
+
+            if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "No hay productos en el carrito");
-
-                return;
-            }
-
-            try
-            {
-                decimal total =
-                    carrito.Sum(
-                        x => x.Subtotal);
-
-                TicketPrinter ticket =
-                    new TicketPrinter(
-                        carrito,
-                        total);
-
-                ticket.Imprimir();
-
-                MessageBox.Show(
-                    "Ticket generado correctamente");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    ex.Message);
-            }
-        }
-
-        private void txtBuscar_KeyDown(
-            object sender,
-        System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key ==
-                System.Windows.Input.Key.Enter)
-            {
-                MessageBox.Show(
-                    "Código escaneado");
-            }
-        }
-
-        // =========================================
-        // CANCELAR
-        // =========================================
-
-        private void BtnCancelar_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            carrito.Clear();
-
-            ActualizarCarrito();
-        }
-
-        // =========================================
-        // AGREGAR CANTIDAD
-        // =========================================
-
-        private void BtnAgregarCantidad_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            if (dgCarrito.SelectedItem is not VentaItem item)
-            {
-                MessageBox.Show(
-                    "Selecciona un producto del carrito");
-
+                MessageBox.Show("Selecciona un producto de la lista");
                 return;
             }
 
             string input =
-                Microsoft.VisualBasic.Interaction
-                .InputBox(
+                Microsoft.VisualBasic.Interaction.InputBox(
                     "Nueva cantidad:",
-                    "Modificar cantidad",
-                    item.Cantidad.ToString());
+                    "Cambiar cantidad",
+                    seleccionado.Cantidad.ToString());
 
-            if (!int.TryParse(input, out int cantidad)
-                || cantidad <= 0)
+            if (int.TryParse(input, out int nuevaCant) && nuevaCant > 0)
             {
-                MessageBox.Show(
-                    "Cantidad inválida");
+                seleccionado.Cantidad = nuevaCant;
+                ActualizarTotales();
+            }
+        }
 
+        private void BtnDescuento_Click(object sender, RoutedEventArgs e)
+        {
+            var seleccionado = dgCarrito.SelectedItem as VentaItem;
+
+            if (seleccionado == null)
+            {
+                MessageBox.Show("Selecciona un producto de la lista");
                 return;
             }
 
-            item.Cantidad = cantidad;
+            string input =
+                Microsoft.VisualBasic.Interaction.InputBox(
+                    "Descuento en $:",
+                    "Aplicar descuento",
+                    "0");
 
-            ActualizarCarrito();
+            if (decimal.TryParse(input, out decimal descuento) && descuento >= 0)
+            {
+                seleccionado.Descuento = descuento;
+                ActualizarTotales();
+            }
+        }
+
+        private void BtnEliminar_Click(object sender, RoutedEventArgs e)
+        {
+            var seleccionado = dgCarrito.SelectedItem as VentaItem;
+
+            if (seleccionado == null)
+            {
+                MessageBox.Show("Selecciona un producto para eliminar");
+                return;
+            }
+
+            carrito.Remove(seleccionado);
+            ActualizarTotales();
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            if (carrito.Count == 0)
+                return;
+
+            var confirmar = MessageBox.Show(
+                "¿Cancelar la venta actual? Se perderán los productos del ticket.",
+                "Confirmar",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirmar == MessageBoxResult.Yes)
+            {
+                carrito.Clear();
+                ActualizarTotales();
+            }
+        }
+
+        private void BtnGenerarTicket_Click(object sender, RoutedEventArgs e)
+        {
+            if (carrito.Count == 0)
+            {
+                MessageBox.Show("No hay productos en el ticket");
+                return;
+            }
+
+            // Aquí puedes conectar tu lógica real de impresión/generación de ticket
+            MessageBox.Show(
+                "Función de impresión de ticket pendiente de conectar con la impresora.",
+                "Generar Ticket",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         // =========================================
-        // TECLAS DE ACCESO RÁPIDO
+        // ✅ COBRAR
         // =========================================
 
-        private void VentasWindow_KeyDown(
-            object sender,
-            System.Windows.Input.KeyEventArgs e)
+        private void BtnCobrar_Click(object sender, RoutedEventArgs e)
         {
-            
+
+            // ✅ Descontar stock y registrar movimientos de salida
+            InventarioHelper.DescontarStockPorVenta(carrito, Sesion.UsuarioId);
+
+            if (carrito.Count == 0)
+            {
+                MessageBox.Show(
+                    "No hay productos en el carrito",
+                    "Aviso",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            decimal total = carrito.Sum(x => x.Subtotal);
+
+            string inputPago =
+                Microsoft.VisualBasic.Interaction.InputBox(
+                    $"Total: {total:C}\nIngresa el monto recibido:",
+                    "Cobrar");
+
+            if (!decimal.TryParse(inputPago, out decimal pago) || pago < total)
+            {
+                MessageBox.Show("Monto insuficiente o inválido");
+                return;
+            }
+
+            decimal cambio = pago - total;
+
+            txtPago.Text = pago.ToString("C");
+            txtCambio.Text = cambio.ToString("C");
+
+            MessageBox.Show(
+                $"✅ Venta realizada\n\nTotal:  {total:C}\nPago:   {pago:C}\nCambio: {cambio:C}",
+                "Venta exitosa",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            carrito.Clear();
+            ActualizarTotales();
+        }
+
+        // =========================================
+        // ✅ NAVEGACIÓN / ATAJOS
+        // =========================================
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void VentasWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
             switch (e.Key)
             {
-                case Key.F1:
-                    BtnGenerarTicket_Click(sender, new RoutedEventArgs());
+                case Key.F5:
+                    BtnCantidad_Click(sender, new RoutedEventArgs());
                     break;
 
-                case Key.F2:
-                    BtnCobrar_Click(sender, new RoutedEventArgs());
+                case Key.F6:
+                    BtnEliminar_Click(sender, new RoutedEventArgs());
                     break;
 
-                case Key.F3:
-                    BtnCancelar_Click(sender, new RoutedEventArgs());
+                case Key.F7:
+                    BtnDescuento_Click(sender, new RoutedEventArgs());
                     break;
 
-                case Key.F4:
-                    BtnAgregarCantidad_Click(sender, new RoutedEventArgs());
+                case Key.Escape:
+                    this.Close();
                     break;
             }
-        }
-
-        private void VentasWindow_PreviewKeyDown(
-            object sender,
-            KeyEventArgs e)
-        {
-            
-            {
-                switch (e.Key)
-                {
-                    case Key.F1:
-                        BtnGenerarTicket_Click(this, new RoutedEventArgs());
-                        break;
-
-                    case Key.F2:
-                        BtnCobrar_Click(this, new RoutedEventArgs());
-                        break;
-
-                    case Key.F3:
-                        BtnCancelar_Click(this, new RoutedEventArgs());
-                        break;
-
-                    case Key.F4:
-                        BtnAgregarCantidad_Click(this, new RoutedEventArgs());
-                        break;
-                }
-            }
-            
-            
         }
     }
 }

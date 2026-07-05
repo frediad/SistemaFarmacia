@@ -161,6 +161,49 @@
         </Style>
 
         <!-- ===================================== -->
+        <!-- ESTILO SCROLLBAR HORIZONTAL CATEGORÍAS -->
+        <!-- ===================================== -->
+
+        <Style x:Key="ScrollBarThumbCategorias" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Background="#CBD5E1"
+                                CornerRadius="4"
+                                Height="6"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollBarCategorias" TargetType="ScrollBar">
+            <Setter Property="Height" Value="8"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid>
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageLeftCommand"
+                                                  Opacity="0"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageRightCommand"
+                                                  Opacity="0"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollBarThumbCategorias}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================================== -->
         <!-- ESTILO BOTÓN COBRAR                   -->
         <!-- ===================================== -->
 
@@ -251,7 +294,7 @@
         <!-- HEADER                                    -->
         <!-- ========================================= -->
 
-        <Border Background="#1E3A8A"
+        <Border Background="#1693E0"
                 Grid.Row="0">
 
             <Grid Margin="15,0">
@@ -300,7 +343,7 @@
                                 Content="Ventas"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnVentas_Click"/>
 
                         <Button x:Name="btnPedidos"
@@ -417,14 +460,14 @@
             <Grid Margin="15,0">
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="130"/>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="200"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Código:"
+                <TextBlock Text="Código o Nombre:"
                            FontSize="16"
                            FontWeight="Bold"
                            Foreground="#374151"
@@ -471,7 +514,9 @@
 
                     <Image x:Name="imgProductoActual"
                            Stretch="Uniform"
-                           Margin="4"/>
+                           Margin="4"
+                           Height="70"
+                           Width="70"/>
 
                 </Border>
 
@@ -531,7 +576,7 @@
                     BorderBrush="#E2E8F0"
                     BorderThickness="0,0,1,0">
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10,36,-10,-36">
 
                     <StackPanel Margin="5,8">
 
@@ -552,6 +597,45 @@
                                            Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
+                        </Button>
+
+                        <Button x:Name="btnLateralEspera"
+                                Style="{StaticResource BtnLateral}"
+                                Click="BtnEspera_Click">
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="⏸️"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="En espera"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               Foreground="#374151"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="F4"
+                                               FontSize="9"
+                                               Foreground="#94A3B8"
+                       HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Border x:Name="badgeEspera"
+                                        Background="#DC2626"
+                                        CornerRadius="9"
+                                        Width="18"
+                                        Height="18"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-4,4,0"
+                                        Visibility="Collapsed">
+                                    <TextBlock x:Name="txtBadgeEspera"
+                                               Text="0"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
                         </Button>
 
                         <Button x:Name="btnLateralPrecio"
@@ -633,6 +717,8 @@
                         <Rectangle Height="1"
                                    Fill="#E2E8F0"
                                    Margin="10,6"/>
+                        
+                        
 
                         <Button x:Name="btnLateralCajon"
                                 Style="{StaticResource BtnLateral}">
@@ -753,12 +839,12 @@
                     </Grid.RowDefinitions>
 
                     <!-- TÍTULO TICKET -->
-                    <Border Background="#1E3A8A"
+                    <Border Background="#1693E0"
                             CornerRadius="10,10,0,0">
 
                         <Grid Margin="15,0">
 
-                            <TextBlock Text="🧾  VENTA — Ticket #1"
+                            <TextBlock Text="🧾  VENTA "
                                        Foreground="White"
                                        FontSize="16"
                                        FontWeight="Bold"
@@ -768,97 +854,7 @@
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Center">
 
-                                <Button x:Name="btnMasCant"
-                                        Content="＋ Cant"
-                                        Height="28"
-                                        Padding="8,0"
-                                        FontSize="12"
-                                        FontWeight="Bold"
-                                        Background="#2563EB"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Margin="3,0"
-                                        Cursor="Hand"
-                                        Click="BtnMasCant_Click">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="6">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-
-                                <Button x:Name="btnCantidad"
-                                        Content="🔢 Cant."
-                                        Height="28"
-                                        Padding="8,0"
-                                        FontSize="12"
-                                        FontWeight="Bold"
-                                        Background="#2563EB"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Margin="3,0"
-                                        Cursor="Hand"
-                                        Click="BtnCantidad_Click">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="6">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-
-                                <Button x:Name="btnDescuento"
-                                        Content="🏷️ Desc."
-                                        Height="28"
-                                        Padding="8,0"
-                                        FontSize="12"
-                                        FontWeight="Bold"
-                                        Background="#2563EB"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Margin="3,0"
-                                        Cursor="Hand"
-                                        Click="BtnDescuento_Click">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="6">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-
-                                <Button x:Name="btnEliminar"
-                                        Content="🗑️ Quitar"
-                                        Height="28"
-                                        Padding="8,0"
-                                        FontSize="12"
-                                        FontWeight="Bold"
-                                        Background="#DC2626"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Margin="3,0"
-                                        Cursor="Hand"
-                                        Click="BtnEliminar_Click">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="6">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
+                                
 
                             </StackPanel>
 
@@ -981,7 +977,7 @@
 
                         <Grid.RowDefinitions>
                             <!-- BARRA CATEGORÍAS -->
-                            <RowDefinition Height="55"/>
+                            <RowDefinition Height="65"/>
                             <!-- GRID PRODUCTOS -->
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
@@ -995,10 +991,16 @@
                                 BorderThickness="0,0,0,1"
                                 CornerRadius="10,10,0,0">
 
-                            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                           VerticalScrollBarVisibility="Disabled"
                                           VerticalAlignment="Center"
-                                          Margin="8,0">
+                                          Margin="8,0"
+                                          Padding="0,0,0,4">
+
+                                <ScrollViewer.Resources>
+                                    <Style TargetType="ScrollBar"
+                                           BasedOn="{StaticResource ScrollBarCategorias}"/>
+                                </ScrollViewer.Resources>
 
                                 <StackPanel x:Name="pnlCategorias"
                                             Orientation="Horizontal"
@@ -1030,7 +1032,7 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-
+                                      
                                         <!-- TARJETA DE PRODUCTO -->
                                         <Border Width="120"
                                                 Height="145"
@@ -1039,7 +1041,8 @@
                                                 BorderBrush="#E2E8F0"
                                                 BorderThickness="1"
                                                 CornerRadius="12"
-                                                Cursor="Hand">
+                                                Cursor="Hand"
+                                                MouseLeftButtonUp="CardProducto_MouseLeftButtonUp">
 
                                             <Border.Style>
                                                 <Style TargetType="Border">
@@ -1058,12 +1061,6 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-
-                                            <Border.InputBindings>
-                                                <MouseBinding MouseAction="LeftClick"
-                                                              Command="{x:Static local:MainWindow.AgregarProductoCommand}"
-                                                              CommandParameter="{Binding}"/>
-                                            </Border.InputBindings>
 
                                             <Grid>
 
@@ -1214,7 +1211,7 @@
         <!-- ========================================= -->
 
         <Border Grid.Row="4"
-                Background="#1E3A8A">
+                Background="#1693E0">
 
             <Grid Margin="20,0">
 

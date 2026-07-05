@@ -1,0 +1,162 @@
+﻿<Window x:Class="FarmaciaPOS.Views.CantidadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Agregar producto"
+        Height="300"
+        Width="360"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+
+        <Style x:Key="BtnDialogCancelar" TargetType="Button">
+            <Setter Property="Background" Value="#F1F5F9"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E2E8F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnDialogAceptar" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#000000"
+                              Opacity="0.2"
+                              BlurRadius="24"
+                              ShadowDepth="4"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- TITULO -->
+            <TextBlock Text="Agregar producto"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="#1E293B"/>
+
+            <!-- NOMBRE PRODUCTO -->
+            <TextBlock x:Name="txtNombreProducto"
+                       Grid.Row="1"
+                       Text="Nombre del producto"
+                       FontSize="14"
+                       Foreground="#475569"
+                       TextWrapping="Wrap"
+                       Margin="0,8,0,0"/>
+
+            <!-- STOCK DISPONIBLE -->
+            <TextBlock x:Name="txtStockDisponible"
+                       Grid.Row="2"
+                       Text="Stock disponible: 0"
+                       FontSize="12"
+                       Foreground="#94A3B8"
+                       Margin="0,4,0,18"/>
+
+            <!-- CANTIDAD -->
+            <StackPanel Grid.Row="3">
+                <TextBlock Text="CANTIDAD"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           Foreground="#94A3B8"
+                           Margin="0,0,0,6"/>
+
+                <TextBox x:Name="txtCantidad"
+                         Text="1"
+                         FontSize="22"
+                         FontWeight="Bold"
+                         Foreground="#1E3A8A"
+                         Padding="10,10"
+                         BorderBrush="#E2E8F0"
+                         BorderThickness="1.5"
+                         HorizontalContentAlignment="Center"
+                         PreviewTextInput="txtCantidad_PreviewTextInput"
+                         KeyDown="txtCantidad_KeyDown"/>
+            </StackPanel>
+
+            <!-- BOTONES -->
+            <Grid Grid.Row="4" Margin="0,22,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Cancelar"
+                        Height="44"
+                        Margin="0,0,6,0"
+                        Style="{StaticResource BtnDialogCancelar}"
+                        Click="BtnCancelar_Click"/>
+
+                <Button Grid.Column="1"
+                        Content="Agregar"
+                        Height="44"
+                        Margin="6,0,0,0"
+                        Style="{StaticResource BtnDialogAceptar}"
+                        Click="BtnAceptar_Click"/>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+</Window>

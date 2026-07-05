@@ -42,6 +42,7 @@ namespace FarmaciaPOS
 
             CargarCategoriasCatalogo();  
             CargarCatalogo();
+            
 
 
         }
@@ -113,6 +114,11 @@ namespace FarmaciaPOS
                     ImagenURL =
                         reader["ImagenURL"]
                         .ToString(),
+
+                    CategoriaId =
+                        reader["CategoriaId"] != DBNull.Value
+                        ? Convert.ToInt32(reader["CategoriaId"])
+                        : 0,
                 });
             }
         }
@@ -382,6 +388,93 @@ namespace FarmaciaPOS
                 resultado.First().CodigoBarras);
         }
 
+        private List<VentaEnEspera> ventasEnEspera = new();
+        private int contadorEspera = 0;
+        private void BtnEspera_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (carritoCentral.Count == 0)
+            {
+                // No hay nada que poner en espera → mostrar la lista para recuperar una
+                AbrirVentasEnEspera();
+                return;
+            }
+
+            VentaEnEspera ventaEspera = new VentaEnEspera
+            {
+                Id = ++contadorEspera,
+                Referencia = $"VE-{DateTime.Now:yyyyMMddHHmmss}",
+                Items = carritoCentral.ToList()
+            };
+
+            ventasEnEspera.Add(ventaEspera);
+
+            carritoCentral.Clear();
+            ActualizarCarritoCentral();
+
+            txtNombreProductoActual.Text = "";
+            imgProductoActual.Source = null;
+
+            ActualizarBadgeEspera();
+
+            MessageBox.Show(
+                $"Venta \"{ventaEspera.Referencia}\" puesta en espera",
+                "En espera",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        // =========================================
+        // FUNCIONES DE ESPERA
+        // =========================================
+
+        private void AbrirVentasEnEspera()
+        {
+            var ventana = new VentasEnEsperaWindow(ventasEnEspera)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true && ventana.VentaSeleccionada != null)
+                RecuperarVentaEnEspera(ventana.VentaSeleccionada);
+
+            ActualizarBadgeEspera();
+        }
+
+        private void RecuperarVentaEnEspera(VentaEnEspera venta)
+        {
+            carritoCentral.Clear();
+
+            foreach (var item in venta.Items)
+                carritoCentral.Add(item);
+
+            ActualizarCarritoCentral();
+
+            MessageBox.Show(
+                $"Venta \"{venta.Referencia}\" recuperada",
+                "Venta recuperada",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void ActualizarBadgeEspera()
+        {
+            if (ventasEnEspera.Count > 0)
+            {
+                txtBadgeEspera.Text = ventasEnEspera.Count.ToString();
+                badgeEspera.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                badgeEspera.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
+
         private void BtnEliminar_Click(
             object sender,
             RoutedEventArgs e)
@@ -405,6 +498,8 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
+
+            InventarioHelper.DescontarStockPorVenta(carritoCentral, Sesion.UsuarioId);
             BtnCobrarCentral_Click(sender, e);
         }
 
@@ -660,18 +755,7 @@ namespace FarmaciaPOS
             }
         }
 
-        // =========================================
-        // ✅ COMANDO PARA AGREGAR PRODUCTO DESDE CARD
-        // =========================================
-
-        public static readonly ICommand AgregarProductoCommand =
-            new RelayCommand<Producto>(p =>
-            {
-                // Buscar la instancia actual del MainWindow
-                var main = Application.Current.MainWindow as MainWindow;
-                main?.AgregarAlCarrito(p.CodigoBarras);
-            });
-
+        
         // =========================================
         // ✅ CARGAR CATEGORÍAS EN LA BARRA
         // =========================================
@@ -740,6 +824,66 @@ namespace FarmaciaPOS
         private void CargarCatalogo()
         {
             icProductosCatalogo.ItemsSource = productos;
+        }
+
+        // =========================================
+        // ✅ AGREGAR PRODUCTO DESDE EL CATÁLOGO (CON CANTIDAD)
+        // =========================================
+
+        private void AgregarProductoDesdeCatalogo(Producto producto)
+        {
+            if (producto == null)
+                return;
+
+            var ventana = new CantidadWindow(producto)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado != true)
+                return; // El usuario canceló
+
+            int cantidad = ventana.CantidadSeleccionada;
+
+            var existente =
+                carritoCentral.FirstOrDefault(
+                    x => x.ProductoId == producto.Id);
+
+            if (existente != null)
+            {
+                existente.Cantidad += cantidad;
+            }
+            else
+            {
+                carritoCentral.Add(new VentaItem
+                {
+                    ProductoId = producto.Id,
+                    Nombre = producto.Nombre,
+                    Precio = producto.PrecioVenta,
+                    Cantidad = cantidad,
+                    Stock = producto.Stock,
+                });
+            }
+
+            // ✅ Mostrar nombre e imagen del producto agregado
+            txtNombreProductoActual.Text = producto.Nombre;
+            CargarImagenProductoActual(producto.ImagenURL);
+
+            ActualizarCarritoCentral();
+        }
+
+        // =========================================
+        // ✅ CLIC EN TARJETA DE PRODUCTO DEL CATÁLOGO
+        // =========================================
+
+        private void CardProducto_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is Producto producto)
+            {
+                AgregarProductoDesdeCatalogo(producto);
+            }
         }
 
 
