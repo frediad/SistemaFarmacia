@@ -92,5 +92,14 @@ namespace FarmaciaPOS.Views
         {
             MessageBox.Show("FarmaciaPOS v1.0");
         }
+
+        // =====================================
+        // CERRAR
+        // =====================================
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -14,6 +14,13 @@ namespace FarmaciaPOS.Views
         private DateTime fechaFinActual;
         private string periodoActual = "Hoy";
 
+        // ✅ Rango activo de cada pestaña, usado también al exportar
+        private DateTime fechaInicioMasVendidos, fechaFinMasVendidos;
+        private DateTime fechaInicioGanancias, fechaFinGanancias;
+        private DateTime fechaInicioInventario, fechaFinInventario;
+        private DateTime fechaInicioPedidos, fechaFinPedidos;
+        private string periodoPedidos = "Hoy";
+
         public class BarraGrafica
         {
             public string Etiqueta { get; set; } = string.Empty;
@@ -24,10 +31,35 @@ namespace FarmaciaPOS.Views
         public ReportesWindow()
         {
             InitializeComponent();
-            CargarReporte(DateTime.Today, DateTime.Today, "Hoy");
-            CargarMasVendidos(DateTime.Today, DateTime.Today);
-            CargarGanancias(DateTime.Today, DateTime.Today);
-            CargarInventario(DateTime.Today, DateTime.Today);
+
+            
+            CargarSeguro(() => CargarReporte(DateTime.Today, DateTime.Today, "Hoy"), "Ventas");
+            CargarSeguro(() => CargarMasVendidos(DateTime.Today, DateTime.Today), "Más Vendidos");
+            CargarSeguro(() => CargarGanancias(DateTime.Today, DateTime.Today), "Ganancias");
+            CargarSeguro(() => CargarInventario(DateTime.Today, DateTime.Today), "Inventario");
+            CargarSeguro(() => CargarPedidos(DateTime.Today, DateTime.Today, "Hoy"), "Pedidos");
+        }
+
+        // =========================================
+        // ✅ NUEVO — CARGA SEGURA (evita que un error tumbe toda la ventana)
+        // =========================================
+
+        private void CargarSeguro(Action accion, string nombreSeccion)
+        {
+            try
+            {
+                accion();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"No se pudo cargar la sección \"{nombreSeccion}\":\n{ex.Message}\n\n" +
+                    "Revisa que la tabla y columnas correspondientes existan en tu base de datos. " +
+                    "Las demás pestañas seguirán funcionando normalmente.",
+                    "Aviso",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
 
         // =========================================
@@ -35,25 +67,25 @@ namespace FarmaciaPOS.Views
         // =========================================
 
         private void BtnHoy_Click(object sender, RoutedEventArgs e)
-            => CargarReporte(DateTime.Today, DateTime.Today, "Hoy");
+            => CargarSeguro(() => CargarReporte(DateTime.Today, DateTime.Today, "Hoy"), "Ventas");
 
         private void BtnSemana_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
-            CargarReporte(hoy.AddDays(-diff), hoy, "Esta Semana");
+            CargarSeguro(() => CargarReporte(hoy.AddDays(-diff), hoy, "Esta Semana"), "Ventas");
         }
 
         private void BtnMes_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarReporte(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes");
+            CargarSeguro(() => CargarReporte(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes"), "Ventas");
         }
 
         private void BtnAnio_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarReporte(new DateTime(hoy.Year, 1, 1), hoy, "Este Año");
+            CargarSeguro(() => CargarReporte(new DateTime(hoy.Year, 1, 1), hoy, "Este Año"), "Ventas");
         }
 
         // =========================================
@@ -61,25 +93,25 @@ namespace FarmaciaPOS.Views
         // =========================================
 
         private void BtnMasVendidosHoy_Click(object sender, RoutedEventArgs e)
-            => CargarMasVendidos(DateTime.Today, DateTime.Today);
+            => CargarSeguro(() => CargarMasVendidos(DateTime.Today, DateTime.Today), "Más Vendidos");
 
         private void BtnMasVendidosSemana_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
-            CargarMasVendidos(hoy.AddDays(-diff), hoy);
+            CargarSeguro(() => CargarMasVendidos(hoy.AddDays(-diff), hoy), "Más Vendidos");
         }
 
         private void BtnMasVendidosMes_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarMasVendidos(new DateTime(hoy.Year, hoy.Month, 1), hoy);
+            CargarSeguro(() => CargarMasVendidos(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Más Vendidos");
         }
 
         private void BtnMasVendidosAnio_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarMasVendidos(new DateTime(hoy.Year, 1, 1), hoy);
+            CargarSeguro(() => CargarMasVendidos(new DateTime(hoy.Year, 1, 1), hoy), "Más Vendidos");
         }
 
         // =========================================
@@ -87,25 +119,25 @@ namespace FarmaciaPOS.Views
         // =========================================
 
         private void BtnGananciasHoy_Click(object sender, RoutedEventArgs e)
-            => CargarGanancias(DateTime.Today, DateTime.Today);
+            => CargarSeguro(() => CargarGanancias(DateTime.Today, DateTime.Today), "Ganancias");
 
         private void BtnGananciasSemana_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
-            CargarGanancias(hoy.AddDays(-diff), hoy);
+            CargarSeguro(() => CargarGanancias(hoy.AddDays(-diff), hoy), "Ganancias");
         }
 
         private void BtnGananciasMes_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarGanancias(new DateTime(hoy.Year, hoy.Month, 1), hoy);
+            CargarSeguro(() => CargarGanancias(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Ganancias");
         }
 
         private void BtnGananciasAnio_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarGanancias(new DateTime(hoy.Year, 1, 1), hoy);
+            CargarSeguro(() => CargarGanancias(new DateTime(hoy.Year, 1, 1), hoy), "Ganancias");
         }
 
         // =========================================
@@ -113,29 +145,55 @@ namespace FarmaciaPOS.Views
         // =========================================
 
         private void BtnInventarioHoy_Click(object sender, RoutedEventArgs e)
-            => CargarInventario(DateTime.Today, DateTime.Today);
+            => CargarSeguro(() => CargarInventario(DateTime.Today, DateTime.Today), "Inventario");
 
         private void BtnInventarioSemana_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
-            CargarInventario(hoy.AddDays(-diff), hoy);
+            CargarSeguro(() => CargarInventario(hoy.AddDays(-diff), hoy), "Inventario");
         }
 
         private void BtnInventarioMes_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarInventario(new DateTime(hoy.Year, hoy.Month, 1), hoy);
+            CargarSeguro(() => CargarInventario(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Inventario");
         }
 
         private void BtnInventarioAnio_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
-            CargarInventario(new DateTime(hoy.Year, 1, 1), hoy);
+            CargarSeguro(() => CargarInventario(new DateTime(hoy.Year, 1, 1), hoy), "Inventario");
         }
 
         // =========================================
-        // VENTAS — LÓGICA EXISTENTE SIN CAMBIOS
+        // ✅ PESTAÑA PEDIDOS — BOTONES PERIODO
+        // =========================================
+
+        private void BtnPedidosHoy_Click(object sender, RoutedEventArgs e)
+            => CargarSeguro(() => CargarPedidos(DateTime.Today, DateTime.Today, "Hoy"), "Pedidos");
+
+        private void BtnPedidosSemana_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
+            CargarSeguro(() => CargarPedidos(hoy.AddDays(-diff), hoy, "Esta Semana"), "Pedidos");
+        }
+
+        private void BtnPedidosMes_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            CargarSeguro(() => CargarPedidos(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes"), "Pedidos");
+        }
+
+        private void BtnPedidosAnio_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            CargarSeguro(() => CargarPedidos(new DateTime(hoy.Year, 1, 1), hoy, "Este Año"), "Pedidos");
+        }
+
+        // =========================================
+        // VENTAS
         // =========================================
 
         private void CargarReporte(DateTime desde, DateTime hasta, string etiquetaPeriodo)
@@ -271,11 +329,14 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ MÁS VENDIDOS
+        // MÁS VENDIDOS
         // =========================================
 
         private void CargarMasVendidos(DateTime desde, DateTime hasta)
         {
+            fechaInicioMasVendidos = desde;
+            fechaFinMasVendidos = hasta;
+
             List<ReporteMasVendidoItem> lista = new();
 
             using SqlConnection conn =
@@ -316,7 +377,6 @@ namespace FarmaciaPOS.Views
 
             dgMasVendidos.ItemsSource = lista;
 
-            // Productos sin movimiento en el periodo
             CargarSinMovimiento(desde, hasta);
         }
 
@@ -362,11 +422,14 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ GANANCIAS
+        // GANANCIAS
         // =========================================
 
         private void CargarGanancias(DateTime desde, DateTime hasta)
         {
+            fechaInicioGanancias = desde;
+            fechaFinGanancias = hasta;
+
             List<ReporteGananciaItem> lista = new();
 
             using SqlConnection conn =
@@ -417,11 +480,14 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ INVENTARIO
+        // INVENTARIO
         // =========================================
 
         private void CargarInventario(DateTime desde, DateTime hasta)
         {
+            fechaInicioInventario = desde;
+            fechaFinInventario = hasta;
+
             List<MovimientoInventarioView> lista = new();
 
             using SqlConnection conn =
@@ -497,38 +563,137 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // EXPORTAR PDF
+        // ✅ PEDIDOS
+        // =========================================
+        // NOTA: ajusta nombres de tabla/columnas si en tu BD son distintos
+        // ("Pedidos", "Cliente", "Estado", "Total", "Fecha").
+
+        private void CargarPedidos(DateTime desde, DateTime hasta, string etiquetaPeriodo)
+        {
+            fechaInicioPedidos = desde;
+            fechaFinPedidos = hasta;
+            periodoPedidos = etiquetaPeriodo;
+
+            List<ReportePedidoItem> lista = new();
+
+            using SqlConnection conn =
+                new SqlConnection(DatabaseHelper.ConnectionString);
+
+            conn.Open();
+
+            string query =
+            @"SELECT
+        p.Id,
+        p.NumeroPedido,
+        c.Nombre AS Cliente,
+        p.EstadoPedido,
+        p.Total,
+        p.FechaPedido
+      FROM Pedidos p
+      INNER JOIN Clientes c ON p.ClienteId = c.Id
+      WHERE p.FechaPedido >= @Desde AND p.FechaPedido < @Hasta
+      ORDER BY p.FechaPedido DESC";
+
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@Desde", desde.Date);
+            cmd.Parameters.AddWithValue("@Hasta", hasta.Date.AddDays(1));
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                lista.Add(new ReportePedidoItem
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    NumeroPedido = reader["NumeroPedido"].ToString() ?? "",
+                    Cliente = reader["Cliente"].ToString() ?? "",
+                    Estado = reader["EstadoPedido"].ToString() ?? "",
+                    Total = Convert.ToDecimal(reader["Total"]),
+                    Fecha = Convert.ToDateTime(reader["FechaPedido"])
+                });
+            }
+
+            dgPedidos.ItemsSource = lista;
+
+            txtPedidosPendientes.Text = lista.Count(p => p.Estado == "Pendiente").ToString();
+            txtPedidosPreparando.Text = lista.Count(p => p.Estado == "Preparando").ToString();
+            txtPedidosEntregados.Text = lista.Count(p => p.Estado == "Entregado").ToString();
+            txtPedidosCancelados.Text = lista.Count(p => p.Estado == "Cancelado").ToString();
+        }
+
+        // =========================================
+        // ✅ EXPORTAR — SEGÚN LA PESTAÑA ACTIVA (TODO EN PDF)
         // =========================================
 
-        private void BtnExportarPDF_Click(object sender, RoutedEventArgs e)
+        private void BtnExportar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var resumen = ObtenerResumenCompleto();
+                switch (tabReportes.SelectedIndex)
+                {
+                    case 0:
+                        ExportarVentasPDF();
+                        break;
 
-                string nombreArchivo =
-                    $"Reporte_{periodoActual.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+                    case 1:
+                        ExportarMasVendidosPDF();
+                        break;
 
-                string ruta = System.IO.Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                    nombreArchivo);
+                    case 2:
+                        ExportarGananciasPDF();
+                        break;
 
-                ReportePdfGenerator.GenerarReporte(resumen, ruta, periodoActual);
+                    case 3:
+                        ExportarInventarioPDF();
+                        break;
 
-                MessageBox.Show(
-                    $"Reporte guardado en:\n{ruta}",
-                    "Éxito",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    case 4:
+                        ExportarPedidosPDF();
+                        break;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Error al generar PDF: " + ex.Message,
+                    "Error al exportar: " + ex.Message,
                     "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private string RutaReporte(string subcarpeta, string nombreArchivo)
+        {
+            string carpetaBase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string carpetaDestino = System.IO.Path.Combine(carpetaBase, "FarmaClick Yatzil", "Reportes", subcarpeta);
+
+            if (!System.IO.Directory.Exists(carpetaDestino))
+            {
+                System.IO.Directory.CreateDirectory(carpetaDestino);
+            }
+
+            return System.IO.Path.Combine(carpetaDestino, nombreArchivo);
+        }
+
+        private void MostrarExito(string ruta)
+        {
+            MessageBox.Show(
+                $"Reporte guardado en:\n{ruta}",
+                "Éxito",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void ExportarVentasPDF()
+        {
+            var resumen = ObtenerResumenCompleto();
+
+            string ruta = RutaReporte("Ventas",$"Reporte_Ventas_{periodoActual.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+
+            ReportePdfGenerator.GenerarReporte(resumen, ruta, periodoActual);
+
+            MostrarExito(ruta);
         }
 
         private ReporteResumen ObtenerResumenCompleto()
@@ -551,6 +716,176 @@ namespace FarmaciaPOS.Views
             resumen.NumeroVentas = numero;
 
             return resumen;
+        }
+
+        private void ExportarMasVendidosPDF()
+        {
+            var masVendidos = (dgMasVendidos.ItemsSource as List<ReporteMasVendidoItem>) ?? new();
+            var sinMovimiento = (dgSinMovimiento.ItemsSource as List<ProductoStockItem>) ?? new();
+
+            var filas = masVendidos
+                .Select(x => new List<string>
+                {
+                    x.Posicion.ToString(),
+                    x.Producto,
+                    x.Cantidad.ToString(),
+                    x.Total.ToString("C")
+                })
+                .ToList();
+
+            var filasSinMovimiento = sinMovimiento
+                .Select(x => new List<string>
+                {
+                    x.Nombre,
+                    x.Stock.ToString(),
+                    x.StockMinimo.ToString()
+                })
+                .ToList();
+
+            string ruta = RutaReporte("MasVendidos", $"Reporte_MasVendidos_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+            ReportePdfGenerator.GenerarReporteGenerico(
+                tituloReporte: "Productos Más Vendidos",
+                periodo: "Personalizado",
+                desde: fechaInicioMasVendidos,
+                hasta: fechaFinMasVendidos,
+                tarjetasResumen: new() { ("Total de productos en Top", masVendidos.Count.ToString()) },
+                encabezados: new() { "#", "Producto", "Cantidad", "Total" },
+                filas: filas,
+                rutaArchivo: ruta,
+                tituloTablaSecundaria: "Productos Sin Movimiento",
+                encabezadosSecundarios: new() { "Producto", "Stock", "Stock Mínimo" },
+                filasSecundarias: filasSinMovimiento
+            );
+
+            MostrarExito(ruta);
+        }
+
+        private void ExportarGananciasPDF()
+        {
+            var ganancias = (dgGanancias.ItemsSource as List<ReporteGananciaItem>) ?? new();
+
+            var filas = ganancias
+                .Select(x => new List<string>
+                {
+                    x.Producto,
+                    x.Cantidad.ToString(),
+                    x.Ingreso.ToString("C"),
+                    x.Costo.ToString("C"),
+                    x.Ganancia.ToString("C"),
+                    x.Margen.ToString("N1") + "%"
+                })
+                .ToList();
+
+            string ruta = RutaReporte("Ganancias", $"Reporte_Ganancias_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+            ReportePdfGenerator.GenerarReporteGenerico(
+                tituloReporte: "Reporte de Ganancias",
+                periodo: "Personalizado",
+                desde: fechaInicioGanancias,
+                hasta: fechaFinGanancias,
+                tarjetasResumen: new()
+                {
+                    ("Ingresos", txtIngresos.Text),
+                    ("Costos", txtCostos.Text),
+                    ("Ganancia Neta", txtGananciaNeta.Text)
+                },
+                encabezados: new() { "Producto", "Cantidad", "Ingreso", "Costo", "Ganancia", "% Margen" },
+                filas: filas,
+                rutaArchivo: ruta
+            );
+
+            MostrarExito(ruta);
+        }
+
+        private void ExportarInventarioPDF()
+        {
+            var movimientos = (dgMovimientosInventario.ItemsSource as List<MovimientoInventarioView>) ?? new();
+            var stockBajo = (dgStockBajo.ItemsSource as List<ProductoStockItem>) ?? new();
+
+            var filas = movimientos
+                .Select(x => new List<string>
+                {
+                    x.ProductoNombre,
+                    x.TipoMovimiento,
+                    x.Cantidad.ToString(),
+                    x.Fecha.ToString("dd/MM/yyyy"),
+                    x.Motivo
+                })
+                .ToList();
+
+            var filasStockBajo = stockBajo
+                .Select(x => new List<string>
+                {
+                    x.Nombre,
+                    x.Stock.ToString(),
+                    x.StockMinimo.ToString()
+                })
+                .ToList();
+
+            string ruta = RutaReporte("Inventario", $"Reporte_Inventario_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+            ReportePdfGenerator.GenerarReporteGenerico(
+                tituloReporte: "Movimientos de Inventario",
+                periodo: "Personalizado",
+                desde: fechaInicioInventario,
+                hasta: fechaFinInventario,
+                tarjetasResumen: new() { ("Total de movimientos", movimientos.Count.ToString()) },
+                encabezados: new() { "Producto", "Tipo", "Cantidad", "Fecha", "Motivo" },
+                filas: filas,
+                rutaArchivo: ruta,
+                tituloTablaSecundaria: "Alertas de Stock Bajo",
+                encabezadosSecundarios: new() { "Producto", "Stock", "Stock Mínimo" },
+                filasSecundarias: filasStockBajo
+            );
+
+            MostrarExito(ruta);
+        }
+
+        private void ExportarPedidosPDF()
+        {
+            var pedidos = (dgPedidos.ItemsSource as List<ReportePedidoItem>) ?? new();
+
+            var filas = pedidos
+                .Select(x => new List<string>
+                {
+            x.NumeroPedido,
+            x.Cliente,
+            x.Estado,
+            x.Total.ToString("C"),
+            x.Fecha.ToString("dd/MM/yyyy hh:mm tt")
+                })
+                .ToList();
+
+            string ruta = RutaReporte("Pedidos", $"Reporte_Pedidos_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+            ReportePdfGenerator.GenerarReporteGenerico(
+                tituloReporte: "Reporte de Pedidos",
+                periodo: periodoPedidos,
+                desde: fechaInicioPedidos,
+                hasta: fechaFinPedidos,
+                tarjetasResumen: new()
+                {
+            ("Pendientes", txtPedidosPendientes.Text),
+            ("Preparando", txtPedidosPreparando.Text),
+            ("Entregados", txtPedidosEntregados.Text),
+            ("Cancelados", txtPedidosCancelados.Text)
+                },
+                encabezados: new() { "No. Pedido", "Cliente", "Estado", "Total", "Fecha" },
+                filas: filas,
+                rutaArchivo: ruta
+            );
+
+            MostrarExito(ruta);
+        }
+
+        // =========================================
+        // CERRAR VENTANA
+        // =========================================
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

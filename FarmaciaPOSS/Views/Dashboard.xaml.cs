@@ -33,6 +33,8 @@ namespace FarmaciaPOS
 
             txtUsuarioSesion.Text =
                Sesion.NombreUsuario;
+           txtRolId.Text =
+               Sesion.RolId.ToString();
 
             CargarProductos();
 
@@ -42,7 +44,9 @@ namespace FarmaciaPOS
 
             CargarCategoriasCatalogo();  
             CargarCatalogo();
-            
+
+            AplicarPermisosEnMenu();
+
 
 
         }
@@ -64,7 +68,19 @@ namespace FarmaciaPOS
             txtFechaHora.Text = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt");
         }
 
-       
+        private void AplicarPermisosEnMenu()
+        {
+            PermisosHelper.AplicarPermisosEnMenu(
+                btnVentas,
+                btnPedidos,
+                btnProductos,
+                btnInventario,
+                btnReportes,      // asegúrate que este botón tiene x:Name="btnReportes"
+                btnConfiguracion,
+                btnCaja);
+        }
+
+
         // =========================================
         // CARGAR PRODUCTOS
         // =========================================
@@ -648,10 +664,11 @@ namespace FarmaciaPOS
                 return;
             }
 
-            ConfiguracionWindow config =
-                new ConfiguracionWindow();
+            ConfiguracionWindow configuracion
+                = new ConfiguracionWindow();
 
-            config.ShowDialog();
+            configuracion.ShowDialog();
+
         }
 
         private void BtnCaja_Click(

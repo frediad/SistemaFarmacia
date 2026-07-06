@@ -1,5 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using FarmaciaPOS.Helpers;
+using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace FarmaciaPOS.Helpers
@@ -7,12 +9,11 @@ namespace FarmaciaPOS.Helpers
     public static class PermisosHelper
     {
         // =========================================
-        // ✅ VERIFICAR ACCESO A UN MÓDULO
+        // VERIFICAR ACCESO A UN MÓDULO
         // =========================================
 
         public static bool TieneAcceso(string nombreModulo)
         {
-            // Administrador siempre tiene acceso total
             if (Sesion.RolId == 1)
                 return true;
 
@@ -40,13 +41,53 @@ namespace FarmaciaPOS.Helpers
         }
 
         // =========================================
-        // ✅ MOSTRAR MENSAJE FLOTANTE DE ACCESO DENEGADO
+        // ✅ NUEVO — CARGAR PERMISOS Y OCULTAR BOTONES
+        // =========================================
+
+        public static void AplicarPermisosEnMenu(
+            System.Windows.Controls.Button btnVentas,
+            System.Windows.Controls.Button btnPedidos,
+            System.Windows.Controls.Button btnProductos,
+            System.Windows.Controls.Button btnInventario,
+            System.Windows.Controls.Button btnReportes,
+            System.Windows.Controls.Button btnConfiguracion,
+            System.Windows.Controls.Button btnCaja)
+        {
+            // Administrador ve todo
+            if (Sesion.RolId == 1)
+                return;
+
+            // Ocultar según permisos reales
+            if (!TieneAcceso("Ventas"))
+                btnVentas.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Pedidos"))
+                btnPedidos.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Productos"))
+                btnProductos.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Inventario"))
+                btnInventario.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Reportes"))
+                btnReportes.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Configuración"))
+                btnConfiguracion.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Caja"))
+                btnCaja.Visibility = Visibility.Collapsed;
+        }
+
+        // =========================================
+        // MENSAJE ACCESO DENEGADO (solo para casos especiales)
         // =========================================
 
         public static void MostrarAccesoDenegado()
         {
             MessageBox.Show(
-                "No tienes acceso a este módulo.\nDebes ser administrador o solicitar permiso de acceso.",
+                "No tienes acceso a este módulo.",
                 "Acceso Restringido",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);

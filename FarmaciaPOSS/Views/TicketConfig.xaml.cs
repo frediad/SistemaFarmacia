@@ -1,7 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using FarmaciaPOS.Helpers;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
-using FarmaciaPOS.Helpers;
+using System.Windows.Controls;
 
 namespace FarmaciaPOS.Views
 {
@@ -166,6 +167,42 @@ namespace FarmaciaPOS.Views
                     ex.Message,
                     "ERROR");
             }
+        }
+
+        // =========================================
+        // ✅ ACTUALIZAR VISTA PREVIA EN TIEMPO REAL
+        // =========================================
+
+        private void Campo_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ActualizarPreview();
+        }
+
+        private void ActualizarPreview()
+        {
+            if (previewNegocio == null) return;
+
+            previewNegocio.Text = string.IsNullOrWhiteSpace(txtNegocio.Text)
+                ? "Nombre del Negocio"
+                : txtNegocio.Text;
+
+            previewRFC.Text = string.IsNullOrWhiteSpace(txtRFC.Text)
+                ? "RFC: —"
+                : $"RFC: {txtRFC.Text}";
+
+            previewDireccion.Text = string.IsNullOrWhiteSpace(txtDireccion.Text)
+                ? "Dirección"
+                : txtDireccion.Text;
+
+            previewTelefono.Text = string.IsNullOrWhiteSpace(txtTelefono.Text)
+                ? "Tel: —"
+                : $"Tel: {txtTelefono.Text}";
+
+            previewCorreo.Text = txtCorreo.Text;
+
+            previewMensaje.Text = string.IsNullOrWhiteSpace(txtMensaje.Text)
+                ? "¡Gracias por su compra!"
+                : txtMensaje.Text;
         }
     }
 }
