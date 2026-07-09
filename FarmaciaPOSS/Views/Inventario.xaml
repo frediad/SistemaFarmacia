@@ -47,24 +47,17 @@
             <Setter Property="BorderThickness" Value="1.5"/>
         </Style>
 
-        <Style x:Key="BtnGuardarMovimiento" TargetType="Button">
-            <Setter Property="Background" Value="#2563EB"/>
+        <Style x:Key="BtnAccionInventario" TargetType="Button">
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -77,36 +70,37 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
-            
         </Grid.RowDefinitions>
 
-        <!-- HEADER -->
+        <!-- ===================================== -->
+        <!-- HEADER                                -->
+        <!-- ===================================== -->
+
         <Border Background="#1E3A8A" Grid.Row="0">
             <Grid Margin="20,0">
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="110"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="📦  Inventario"
-                   Foreground="White"
-                   FontSize="20"
-                   FontWeight="Bold"
-                   VerticalAlignment="Center"/>
+                           Foreground="White"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
 
                 <Button Grid.Column="1"
-                Content="✕ Cerrar"
-                Width="100"
-                Height="38"
-                FontSize="14"
-                FontWeight="Bold"
-                Background="#DC2626"
-                Foreground="White"
-                BorderThickness="0"
-                Cursor="Hand"
-                VerticalAlignment="Center"
-                Click="BtnCerrarVentana_Click">
+                        Content="✕ Cerrar"
+                        Width="100"
+                        Height="40"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Background="#DC2626"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        Click="BtnCerrarVentana_Click">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" CornerRadius="8">
@@ -115,167 +109,762 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-
             </Grid>
         </Border>
 
-        <!-- CONTENIDO -->
+        <!-- ===================================== -->
+        <!-- CONTENIDO                             -->
+        <!-- ===================================== -->
+
         <Grid Grid.Row="1" Margin="15">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="300"/>
             </Grid.ColumnDefinitions>
 
             <!-- ===================================== -->
-            <!-- COLUMNA IZQUIERDA: FORM + MOVIMIENTOS -->
+            <!-- COLUMNA IZQUIERDA — PESTAÑAS          -->
             <!-- ===================================== -->
 
-            <Grid Margin="0,0,10,0">
+            <TabControl x:Name="tabInventario"
+                        Margin="0,0,10,0"
+                        Background="Transparent"
+                        BorderThickness="0">
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <!-- ===================================== -->
+                <!-- PESTAÑA 1 — MOVIMIENTOS (MODO SUMAR)   -->
+                <!-- ===================================== -->
 
-                <!-- FORMULARIO -->
-                <Border Background="White"
-                        CornerRadius="12"
-                        Padding="18"
-                        Margin="0,0,0,12">
+                <TabItem Header="🔄 Movimientos (Modo Sumar)">
 
-                    <Grid>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="130"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Margin="0,0,10,0">
-                            <TextBlock Text="PRODUCTO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
-                            <ComboBox x:Name="cbProductos" Height="38" Style="{StaticResource CboInventario}"
-                                      SelectionChanged="cbProductos_SelectionChanged"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                            <TextBlock Text="MOVIMIENTO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
-                            <ComboBox x:Name="cbTipo" Height="38" Style="{StaticResource CboInventario}">
-                                <ComboBoxItem Content="Entrada"/>
-                                <ComboBoxItem Content="Salida"/>
-                            </ComboBox>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
-                            <TextBlock Text="CANTIDAD" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
-                            <TextBox x:Name="txtCantidad" Height="38" Style="{StaticResource TxtInventario}"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                            <TextBlock Text="MOTIVO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
-                            <TextBox x:Name="txtMotivo" Height="38" Style="{StaticResource TxtInventario}"/>
-                        </StackPanel>
-
-                        <Button Grid.Column="4"
-                                Content="💾 Guardar"
-                                Height="38"
-                                VerticalAlignment="Bottom"
-                                Style="{StaticResource BtnGuardarMovimiento}"
-                                Click="BtnGuardar_Click"/>
-
-                        <TextBlock x:Name="txtStockActualInfo"
-                                   Grid.Row="1"
-                                   Grid.ColumnSpan="5"
-                                   Text=""
-                                   FontSize="12"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2563EB"
-                                   Margin="0,10,0,0"/>
-
-                    </Grid>
-
-                </Border>
-
-                <!-- HISTORIAL DE MOVIMIENTOS -->
-                <Border Grid.Row="1"
-                        Background="White"
-                        CornerRadius="12"
-                        Padding="10">
-
-                    <Grid>
+                    <Grid Margin="0,15,0,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Historial de movimientos"
-                                   FontSize="14"
-                                   FontWeight="Bold"
-                                   Foreground="#1E293B"
-                                   Margin="6,4,0,10"/>
+                        <!-- FORMULARIO -->
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="18"
+                                Margin="0,0,0,12">
 
-                        <DataGrid x:Name="dgMovimientos"
-                                  Grid.Row="1"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  BorderThickness="0"
-                                  RowHeight="36"
-                                  FontSize="13"
-                                  GridLinesVisibility="Horizontal"
-                                  HorizontalGridLinesBrush="#F1F5F9">
+                            <Grid>
 
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#F8FAFC"/>
-                                    <Setter Property="Foreground" Value="#64748B"/>
-                                    <Setter Property="FontSize" Value="12"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Padding" Value="10,8"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding TipoMovimiento}" Value="Entrada">
-                                            <Setter Property="Background" Value="#F0FDF4"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding TipoMovimiento}" Value="Salida">
-                                            <Setter Property="Background" Value="#FEF2F2"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.RowStyle>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
 
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Producto" Binding="{Binding ProductoNombre}" Width="*"/>
-                                <DataGridTextColumn Header="Movimiento" Binding="{Binding TipoMovimiento}" Width="110"/>
-                                <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="90"/>
-                                <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="150"/>
-                                <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="220"/>
-                            </DataGrid.Columns>
+                                <TextBlock Grid.ColumnSpan="5"
+                                           
+                                           FontSize="11"
+                                           FontStyle="Italic"
+                                           Foreground="#94A3B8"
+                                           Margin="2,0,0,10"/>
 
-                        </DataGrid>
+                                <StackPanel Grid.Row="1" Margin="0,0,10,0">
+                                    <TextBlock Text="PRODUCTO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                                    <ComboBox x:Name="cbProductos" Height="38" Style="{StaticResource CboInventario}"
+                                              SelectionChanged="cbProductos_SelectionChanged"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Text="MOVIMIENTO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                                    <ComboBox x:Name="cbTipo" Height="38" Style="{StaticResource CboInventario}">
+                                        <ComboBoxItem Content="Entrada"/>
+                                        <ComboBoxItem Content="Salida"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,10,0">
+                                    <TextBlock Text="CANTIDAD" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                                    <TextBox x:Name="txtCantidad" Height="38" Style="{StaticResource TxtInventario}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,0,10,0">
+                                    <TextBlock Text="MOTIVO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                                    <TextBox x:Name="txtMotivo" Height="38" Style="{StaticResource TxtInventario}"/>
+                                </StackPanel>
+
+                                <Button Grid.Row="1" Grid.Column="4"
+                                        Content="💾 Guardar"
+                                        Height="38"
+                                        VerticalAlignment="Bottom"
+                                        Background="#2563EB"
+                                        Style="{StaticResource BtnAccionInventario}"
+                                        Click="BtnGuardar_Click"/>
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- HISTORIAL -->
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="10">
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Historial de movimientos"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="#1E293B"
+                                           Margin="6,4,0,10"/>
+
+                                <DataGrid x:Name="dgMovimientos"
+                                          Grid.Row="1"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          IsReadOnly="True"
+                                          HeadersVisibility="Column"
+                                          BorderThickness="0"
+                                          RowHeight="36"
+                                          FontSize="13"
+                                          GridLinesVisibility="Horizontal"
+                                          HorizontalGridLinesBrush="#F1F5F9">
+
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Background" Value="#F8FAFC"/>
+                                            <Setter Property="Foreground" Value="#64748B"/>
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Padding" Value="10,8"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TipoMovimiento}" Value="Entrada">
+                                                    <Setter Property="Background" Value="#F0FDF4"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TipoMovimiento}" Value="Salida">
+                                                    <Setter Property="Background" Value="#FEF2F2"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.RowStyle>
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Producto" Binding="{Binding ProductoNombre}" Width="*"/>
+                                        <DataGridTextColumn Header="Movimiento" Binding="{Binding TipoMovimiento}" Width="110"/>
+                                        <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="90"/>
+                                        <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="150"/>
+                                        <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="260"/>
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </Grid>
+
+                        </Border>
 
                     </Grid>
 
-                </Border>
+                </TabItem>
 
-            </Grid>
+                <!-- ===================================== -->
+                <!-- PESTAÑA 2 — COMPRAS                    -->
+                <!-- ===================================== -->
+
+                <TabItem Header="🛒 Compras">
+
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="80"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- DATOS DE LA COMPRA -->
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="18"
+                                Margin="0,0,0,12">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Text="PROVEEDOR" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                    <ComboBox x:Name="cbProveedor"
+                                              Height="40"
+                                              Style="{StaticResource CboInventario}"
+                                              DisplayMemberPath="Nombre"
+                                              SelectedValuePath="Id"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="No. FACTURA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                    <TextBox x:Name="txtNumeroFactura" Height="40" Style="{StaticResource TxtInventario}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text=" " FontSize="11" Margin="2,0,0,6"/>
+                                    <Button Content="🔍 Buscar producto"
+                                            Height="40"
+                                            Background="#2563EB"
+                                            Style="{StaticResource BtnAccionInventario}"
+                                            Click="BtnBuscarProductoCompra_Click"/>
+                                </StackPanel>
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- TABLA DE PRODUCTOS DE LA COMPRA -->
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgItemsCompra"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      BorderThickness="0"
+                                      RowHeight="38"
+                                      FontSize="14"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#F1F5F9"
+                                      CellEditEnding="dgItemsCompra_CellEditEnding">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.Columns>
+
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Stock actual" Binding="{Binding StockActual}" Width="100" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Costo actual" Binding="{Binding CostoActual, StringFormat=C}" Width="100" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTextColumn Header="Costo nuevo" Binding="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                    <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="110" IsReadOnly="True"/>
+
+                                    <DataGridTemplateColumn Header="" Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="✕"
+                                                        Width="28" Height="28"
+                                                        Background="#FEE2E2"
+                                                        Foreground="#DC2626"
+                                                        BorderThickness="0"
+                                                        FontWeight="Bold"
+                                                        Cursor="Hand"
+                                                        Click="BtnQuitarItemCompra_Click">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                        <!-- TOTAL Y CONFIRMAR -->
+                        <Grid Grid.Row="2" Margin="0,12,0,0">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="240"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Background="#1E293B" CornerRadius="12" Margin="0,0,10,0">
+                                <StackPanel VerticalAlignment="Center" Margin="18,0">
+                                    <TextBlock Text="TOTAL DE LA COMPRA" FontSize="11" Foreground="#94A3B8"/>
+                                    <TextBlock x:Name="txtTotalCompra" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#22C55E"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Button Grid.Column="1"
+                                    Content="✅ Confirmar Compra"
+                                    Background="#16A34A"
+                                    Style="{StaticResource BtnAccionInventario}"
+                                    FontSize="15"
+                                    Click="BtnConfirmarCompra_Click"/>
+
+                        </Grid>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!-- ===================================== -->
+                <!-- PESTAÑA 3 — AJUSTE DE INVENTARIO       -->
+                <!-- ===================================== -->
+
+                <TabItem Header="🧮 Ajuste de Inventario">
+
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="80"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="16"
+                                Margin="0,0,0,12">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="220"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Conteo físico de inventario"
+                                               FontSize="15"
+                                               FontWeight="Bold"
+                                               Foreground="#1E293B"/>
+                                    <TextBlock Text="Captura la cantidad contada físicamente por producto. El sistema calculará la diferencia automáticamente."
+                                               FontSize="11"
+                                               Foreground="#94A3B8"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1"
+                                        Content="🔄 Cargar todos los productos"
+                                        Height="40"
+                                        VerticalAlignment="Center"
+                                        Background="#7C3AED"
+                                        Style="{StaticResource BtnAccionInventario}"
+                                        Click="BtnCargarAjuste_Click"/>
+
+                            </Grid>
+
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgAjuste"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      BorderThickness="0"
+                                      RowHeight="38"
+                                      FontSize="14"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#F1F5F9"
+                                      CellEditEnding="dgAjuste_CellEditEnding">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding TieneDiferencia}" Value="True">
+                                                <Setter Property="Background" Value="#FEF9C3"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+
+                                <DataGrid.Columns>
+
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Stock en sistema" Binding="{Binding StockSistema}" Width="140" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Stock contado" Binding="{Binding StockContado, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
+                                    <DataGridTextColumn Header="Diferencia" Binding="{Binding Diferencia}" Width="110" IsReadOnly="True"/>
+
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                        <Grid Grid.Row="2" Margin="0,12,0,0">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="220"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="MOTIVO DEL AJUSTE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtMotivoAjuste" Height="40" Style="{StaticResource TxtInventario}"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="2"
+                                    Content="✅ Aplicar Ajustes"
+                                    Height="40"
+                                    VerticalAlignment="Bottom"
+                                    Background="#DC2626"
+                                    Style="{StaticResource BtnAccionInventario}"
+                                    FontSize="15"
+                                    Click="BtnAplicarAjustes_Click"/>
+
+                        </Grid>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!-- ===================================== -->
+                <!-- PESTAÑA 4 — KARDEX POR PRODUCTO        -->
+                <!-- ===================================== -->
+
+                <TabItem Header="📋 Kardex">
+
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="18"
+                                Margin="0,0,0,12">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="160"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Text="PRODUCTO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                    <ComboBox x:Name="cbProductoKardex"
+                                              Height="40"
+                                              Style="{StaticResource CboInventario}"
+                                              DisplayMemberPath="Nombre"
+                                              SelectedValuePath="Id"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1"
+                                        Content="📋 Ver Kardex"
+                                        Height="40"
+                                        VerticalAlignment="Bottom"
+                                        Background="#2563EB"
+                                        Style="{StaticResource BtnAccionInventario}"
+                                        Click="BtnVerKardex_Click"/>
+
+                            </Grid>
+
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgKardex"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      IsReadOnly="True"
+                                      BorderThickness="0"
+                                      RowHeight="36"
+                                      FontSize="13"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#F1F5F9">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding TipoMovimiento}" Value="Entrada">
+                                                <Setter Property="Background" Value="#F0FDF4"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding TipoMovimiento}" Value="Salida">
+                                                <Setter Property="Background" Value="#FEF2F2"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" Width="150"/>
+                                    <DataGridTextColumn Header="Movimiento" Binding="{Binding TipoMovimiento}" Width="110"/>
+                                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="90"/>
+                                    <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*"/>
+                                    <DataGridTextColumn Header="Saldo" Binding="{Binding Saldo}" Width="90"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!-- ===================================== -->
+                <!-- PESTAÑA 5 — VALORIZACIÓN DE INVENTARIO -->
+                <!-- ===================================== -->
+
+                <TabItem Header="💲 Valorización">
+
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Margin="0,0,0,12">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Background="#1E293B" CornerRadius="12" Margin="0,0,8,0" Padding="16">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="VALOR A COSTO" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtValorCostoTotal" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="#1E293B" CornerRadius="12" Margin="4,0" Padding="16">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="VALOR A VENTA" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtValorVentaTotal" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#60A5FA" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Background="#1E293B" CornerRadius="12" Margin="8,0,0,0" Padding="16">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="GANANCIA POTENCIAL" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtGananciaPotencialTotal" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                        </Grid>
+
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgValorizacion"
+                                     AutoGenerateColumns="False"
+                                     HeadersVisibility="Column"
+                                     IsReadOnly="True"
+                                     BorderThickness="0"
+                                     RowHeight="36"
+                                     FontSize="13"
+                                     CanUserAddRows="False"
+                                     GridLinesVisibility="Horizontal"
+                                     HorizontalGridLinesBrush="#F1F5F9">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*"/>
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="80"/>
+                                    <DataGridTextColumn Header="Costo Unit." Binding="{Binding PrecioCompra, StringFormat=C}" Width="110"/>
+                                    <DataGridTextColumn Header="Valor Costo" Binding="{Binding ValorCosto, StringFormat=C}" Width="120"/>
+                                    <DataGridTextColumn Header="Precio Venta" Binding="{Binding PrecioVenta, StringFormat=C}" Width="110"/>
+                                    <DataGridTextColumn Header="Valor Venta" Binding="{Binding ValorVenta, StringFormat=C}" Width="120"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!-- ===================================== -->
+                <!-- PESTAÑA 6 — SUGERENCIA DE COMPRA       -->
+                <!-- ===================================== -->
+
+                <TabItem Header="🛍️ Sugerencia de Compra">
+
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="70"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="16"
+                                Margin="0,0,0,12">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="220"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Productos que necesitan reabastecerse"
+                               FontSize="15" FontWeight="Bold" Foreground="#1E293B"/>
+                                    <TextBlock Text="Basado en stock mínimo y máximo configurado en cada producto"
+                               FontSize="11" Foreground="#94A3B8"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1"
+                                        Content="🔄 Generar sugerencias"
+                                        Height="40"
+                                        VerticalAlignment="Center"
+                                        Background="#7C3AED"
+                                        Style="{StaticResource BtnAccionInventario}"
+                                        Click="BtnGenerarSugerencias_Click"/>
+
+                            </Grid>
+
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgSugerencias"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      BorderThickness="0"
+                                      RowHeight="36"
+                                      FontSize="13"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#F1F5F9"
+                                      CellEditEnding="dgSugerencias_CellEditEnding">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Header="✓" Binding="{Binding Seleccionado, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="70" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Mínimo" Binding="{Binding StockMinimo}" Width="80" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Máximo" Binding="{Binding StockMaximo}" Width="80" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Sugerido" Binding="{Binding CantidadSugerida, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTextColumn Header="Costo Estimado" Binding="{Binding CostoEstimado, StringFormat=C}" Width="130" IsReadOnly="True"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                        <Grid Grid.Row="2" Margin="0,12,0,0">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="260"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Background="#1E293B" CornerRadius="12" Margin="0,0,10,0">
+                                <StackPanel VerticalAlignment="Center" Margin="18,0">
+                                    <TextBlock Text="TOTAL ESTIMADO SELECCIONADO" FontSize="11" Foreground="#94A3B8"/>
+                                    <TextBlock x:Name="txtTotalSugerencias" Text="$0.00" FontSize="22" FontWeight="Bold" Foreground="#22C55E"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Button Grid.Column="1"
+                                    Content="➕ Agregar a Compras"
+                                    Background="#16A34A"
+                                    Style="{StaticResource BtnAccionInventario}"
+                                    FontSize="14"
+                                    Click="BtnAgregarSugerenciasACompras_Click"/>
+
+                        </Grid>
+
+                    </Grid>
+
+                </TabItem>
+
+
+
+            </TabControl>
 
             <!-- ===================================== -->
-            <!-- COLUMNA DERECHA: ALERTAS DE STOCK       -->
+            <!-- COLUMNA DERECHA — ALERTAS DE STOCK     -->
             <!-- ===================================== -->
 
             <Border Grid.Column="1"

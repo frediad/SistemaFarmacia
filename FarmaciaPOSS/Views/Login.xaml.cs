@@ -33,11 +33,13 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT *
-              FROM Usuarios
-              WHERE UsuarioLogin = @Usuario
-              AND PasswordHash = @Password
-              AND Activo = 1";
+            @"SELECT U.*, R.Nombre AS Rol
+            FROM Usuarios U
+            INNER JOIN Roles R
+            ON U.RolId = R.Id
+            WHERE U.UsuarioLogin = @Usuario
+            AND U.PasswordHash = @Password
+            AND U.Activo = 1";
 
             SqlCommand cmd =
                 new SqlCommand(query, conn);
@@ -63,6 +65,9 @@ namespace FarmaciaPOS.Views
 
                 Sesion.RolId =
                     Convert.ToInt32(reader["RolId"]);
+
+                Sesion.Rol =
+                    reader["Rol"].ToString();
 
                 MainWindow main =
                     new MainWindow();

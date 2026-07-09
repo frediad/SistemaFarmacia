@@ -251,16 +251,22 @@ namespace FarmaciaPOS.Views
 
             string query =
             @"SELECT
-                p.Nombre AS Producto,
-                SUM(dv.Cantidad) AS Cantidad,
-                SUM(dv.Subtotal) AS Total
-              FROM DetalleVentas dv
-              INNER JOIN Ventas v ON dv.VentaId = v.Id
-              INNER JOIN Productos p ON dv.ProductoId = p.Id
-              WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
-              AND v.Estado = 'Completada'
-              GROUP BY p.Nombre
-              ORDER BY SUM(dv.Subtotal) DESC";
+        p.Nombre AS Producto,
+        SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0) AS Cantidad,
+        SUM(dv.Subtotal) - ISNULL(SUM(dev.MontoDevuelto), 0) AS Total
+      FROM DetalleVentas dv
+      INNER JOIN Ventas v ON dv.VentaId = v.Id
+      INNER JOIN Productos p ON dv.ProductoId = p.Id
+      LEFT JOIN (
+          SELECT VentaId, ProductoId, SUM(Cantidad) AS CantidadDevuelta, SUM(MontoDevuelto) AS MontoDevuelto
+          FROM Devoluciones
+          GROUP BY VentaId, ProductoId
+      ) dev ON dev.VentaId = dv.VentaId AND dev.ProductoId = dv.ProductoId
+      WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
+      AND v.Estado = 'Completada'
+      GROUP BY p.Nombre
+      HAVING SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0) > 0
+      ORDER BY (SUM(dv.Subtotal) - ISNULL(SUM(dev.MontoDevuelto), 0)) DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@Desde", desde.Date);
@@ -346,17 +352,23 @@ namespace FarmaciaPOS.Views
 
             string query =
             @"SELECT TOP 10
-                ROW_NUMBER() OVER (ORDER BY SUM(dv.Cantidad) DESC) AS Posicion,
-                p.Nombre AS Producto,
-                SUM(dv.Cantidad) AS Cantidad,
-                SUM(dv.Subtotal) AS Total
-              FROM DetalleVentas dv
-              INNER JOIN Ventas v ON dv.VentaId = v.Id
-              INNER JOIN Productos p ON dv.ProductoId = p.Id
-              WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
-              AND v.Estado = 'Completada'
-              GROUP BY p.Nombre
-              ORDER BY SUM(dv.Cantidad) DESC";
+        ROW_NUMBER() OVER (ORDER BY (SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0)) DESC) AS Posicion,
+        p.Nombre AS Producto,
+        SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0) AS Cantidad,
+        SUM(dv.Subtotal) - ISNULL(SUM(dev.MontoDevuelto), 0) AS Total
+      FROM DetalleVentas dv
+      INNER JOIN Ventas v ON dv.VentaId = v.Id
+      INNER JOIN Productos p ON dv.ProductoId = p.Id
+      LEFT JOIN (
+          SELECT VentaId, ProductoId, SUM(Cantidad) AS CantidadDevuelta, SUM(MontoDevuelto) AS MontoDevuelto
+          FROM Devoluciones
+          GROUP BY VentaId, ProductoId
+      ) dev ON dev.VentaId = dv.VentaId AND dev.ProductoId = dv.ProductoId
+      WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
+      AND v.Estado = 'Completada'
+      GROUP BY p.Nombre
+      HAVING SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0) > 0
+      ORDER BY (SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0)) DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@Desde", desde.Date);
@@ -379,7 +391,6 @@ namespace FarmaciaPOS.Views
 
             CargarSinMovimiento(desde, hasta);
         }
-
         private void CargarSinMovimiento(DateTime desde, DateTime hasta)
         {
             List<ProductoStockItem> lista = new();
@@ -438,18 +449,22 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT
-                p.Nombre AS Producto,
-                SUM(dv.Cantidad) AS Cantidad,
-                SUM(dv.Subtotal) AS Ingreso,
-                SUM(dv.Cantidad * p.PrecioCompra) AS Costo
-              FROM DetalleVentas dv
-              INNER JOIN Ventas v ON dv.VentaId = v.Id
-              INNER JOIN Productos p ON dv.ProductoId = p.Id
-              WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
-              AND v.Estado = 'Completada'
-              GROUP BY p.Nombre
-              ORDER BY (SUM(dv.Subtotal) - SUM(dv.Cantidad * p.PrecioCompra)) DESC";
+            @"SELECT p.Nombre AS Producto,
+            SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0) AS Cantidad,
+            SUM(dv.Subtotal) - ISNULL(SUM(dev.MontoDevuelto), 0) AS Ingreso,
+            (SUM(dv.Cantidad) - ISNULL(SUM(dev.CantidadDevuelta), 0)) * MAX(p.PrecioCompra) AS Costo
+            FROM DetalleVentas dv
+            INNER JOIN Ventas v ON dv.VentaId = v.Id
+            INNER JOIN Productos p ON dv.ProductoId = p.Id
+            LEFT JOIN (
+            SELECT VentaId, ProductoId, SUM(Cantidad) AS CantidadDevuelta, SUM(MontoDevuelto) AS MontoDevuelto
+            FROM Devoluciones
+            GROUP BY VentaId, ProductoId
+            ) dev ON dev.VentaId = dv.VentaId AND dev.ProductoId = dv.ProductoId
+            WHERE v.Fecha >= @Desde AND v.Fecha < @Hasta
+            AND v.Estado = 'Completada'
+            GROUP BY p.Nombre
+            ORDER BY (SUM(dv.Subtotal) - SUM(dv.Cantidad * p.PrecioCompra)) DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@Desde", desde.Date);

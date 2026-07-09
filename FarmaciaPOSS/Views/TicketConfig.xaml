@@ -11,7 +11,7 @@
     <Grid Margin="20">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="115"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -285,7 +285,7 @@
             </Border>
 
             <!-- ===================================== -->
-            <!-- ✅ VISTA PREVIA — TICKET FÍSICO        -->
+            <!-- ✅ VISTA PREVIA DEL TICKET      -->
             <!-- ===================================== -->
 
             <Border Grid.Column="1"

@@ -80,8 +80,11 @@ namespace FarmaciaPOS.Views
                     PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
 
                     Precio2 = Convert.ToDecimal(reader["Precio2"]),
+
                     CantidadMayoreo2 = Convert.ToInt32(reader["CantidadMayoreo2"]),
+
                     Precio3 = Convert.ToDecimal(reader["Precio3"]),
+
                     CantidadMayoreo3 = Convert.ToInt32(reader["CantidadMayoreo3"]),
 
                     Stock = Convert.ToInt32(reader["Stock"]),
@@ -250,7 +253,6 @@ namespace FarmaciaPOS.Views
                         Stock,
                         StockMinimo,
                         ImagenURL,
-                        EsMedicamentoControlado,
                         Activo,
                         FechaCreacion
                     )
@@ -270,7 +272,6 @@ namespace FarmaciaPOS.Views
                         @Stock,
                         @StockMinimo,
                         @ImagenURL,
-                        @EsMedicamentoControlado,
                         @Activo,
                         GETDATE()
                     );
@@ -298,7 +299,6 @@ namespace FarmaciaPOS.Views
                         Stock = @Stock,
                         StockMinimo = @StockMinimo,
                         ImagenURL = @ImagenURL,
-                        EsMedicamentoControlado = @EsMedicamentoControlado,
                         Activo = @Activo
 
                     WHERE Id = @Id";
@@ -416,8 +416,11 @@ namespace FarmaciaPOS.Views
                 txtPrecioVenta.Text = producto.PrecioVenta.ToString();
 
                 txtPrecio2.Text = producto.Precio2 > 0 ? producto.Precio2.ToString() : "";
+
                 txtCantidadMayoreo2.Text = producto.CantidadMayoreo2 > 0 ? producto.CantidadMayoreo2.ToString() : "";
+
                 txtPrecio3.Text = producto.Precio3 > 0 ? producto.Precio3.ToString() : "";
+
                 txtCantidadMayoreo3.Text = producto.CantidadMayoreo3 > 0 ? producto.CantidadMayoreo3.ToString() : "";
 
                 txtStock.Text = producto.Stock.ToString();
@@ -482,8 +485,6 @@ namespace FarmaciaPOS.Views
             indiceImagenActual = 0;
             imgProductoPreview.Source = null;
             txtIndicadorImagen.Text = "0 / 0";
-
-            // ✅ NUEVO
             rutasImagenesPendientes.Clear();
         }
 

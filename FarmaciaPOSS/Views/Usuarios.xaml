@@ -63,7 +63,7 @@
     <Grid Margin="15">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="110"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -75,23 +75,46 @@
                 CornerRadius="12"
                 Padding="20"
                 Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel VerticalAlignment="Center">
+                <StackPanel VerticalAlignment="Center">
 
-                <TextBlock Text="👤Gestión de Usuarios y Roles"
-                           FontSize="26"
-                           FontWeight="Bold"
-                           Foreground="White"/>
+                    <TextBlock Text="👤Gestión de Usuarios y Roles"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Foreground="White"/>
 
-                <TextBlock Text="Administra usuarios, roles y permisos de acceso"
-                           FontSize="13"
-                           Foreground="#93C5FD"/>
-                
-                
+                    <TextBlock Text="Administra usuarios, roles y permisos de acceso"
+                       FontSize="13"
+                       Foreground="#93C5FD"/>
+                </StackPanel>
 
-            </StackPanel>
-            
-            
+                <Button Grid.Column="1"
+                        Content="✕ Cerrar"
+                        Width="100"
+                        Height="40"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Background="#DC2626"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        Click="BtnCerrarVentana_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </Grid>
 
         </Border>
 

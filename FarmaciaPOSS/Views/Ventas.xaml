@@ -415,28 +415,57 @@
                             BorderThickness="0,0,0,1"
                             CornerRadius="10,10,0,0">
 
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Disabled"
-                                      VerticalAlignment="Center"
-                                      Margin="8,0"
-                                      Padding="0,0,0,4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                            <ScrollViewer.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBarCategorias}"/>
-                            </ScrollViewer.Resources>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled"
+                                          VerticalAlignment="Center"
+                                          Margin="8,0"
+                                          Padding="0,0,0,4">
 
-                            <StackPanel x:Name="pnlCategorias"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <!-- Los botones de categoría se generan dinámicamente desde el .cs -->
-                            </StackPanel>
+                                <ScrollViewer.Resources>
+                                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBarCategorias}"/>
+                                </ScrollViewer.Resources>
 
-                        </ScrollViewer>
+                                <StackPanel x:Name="pnlCategorias"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <!-- Los botones de categoría se generan dinámicamente desde el .cs -->
+                                </StackPanel>
+
+                            </ScrollViewer>
+
+                            <Button Grid.Column="1"
+                                    Content="🔍"
+                                    Width="46"
+                                    Height="42"
+                                    FontSize="18"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Margin="0,0,10,0"
+                                    Click="BtnBuscarProducto_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                        </Grid>
 
                     </Border>
 
                     <!-- GRID DE TARJETAS DE PRODUCTOS -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        
 
                         <ItemsControl x:Name="icProductosCatalogo">
 

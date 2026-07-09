@@ -4,9 +4,10 @@
     {
         public static int UsuarioId { get; set; }
 
-        public static string NombreUsuario { get; set; } =
-            string.Empty;
+        public static string NombreUsuario { get; set; } =string.Empty;
 
         public static int RolId { get; set; }
+
+        public static string? Rol { get; internal set; }
     }
 }

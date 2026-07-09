@@ -300,17 +300,14 @@ namespace FarmaciaPOS.Views
 
         private void BtnCobrar_Click(object sender, RoutedEventArgs e)
         {
-
-            // ✅ Descontar stock y registrar movimientos de salida
-            InventarioHelper.DescontarStockPorVenta(carrito, Sesion.UsuarioId);
-
             if (carrito.Count == 0)
             {
                 MessageBox.Show(
-                    "No hay productos en el carrito",
+                    "No hay productos en el carrito.",
                     "Aviso",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+
                 return;
             }
 
@@ -318,28 +315,173 @@ namespace FarmaciaPOS.Views
 
             string inputPago =
                 Microsoft.VisualBasic.Interaction.InputBox(
-                    $"Total: {total:C}\nIngresa el monto recibido:",
+                    $"Total: {total:C}\n\nIngrese el monto recibido:",
                     "Cobrar");
 
-            if (!decimal.TryParse(inputPago, out decimal pago) || pago < total)
+            if (!decimal.TryParse(inputPago, out decimal pago))
             {
-                MessageBox.Show("Monto insuficiente o inválido");
+                MessageBox.Show("Monto inválido.");
+                return;
+            }
+
+            if (pago < total)
+            {
+                MessageBox.Show("El pago es insuficiente.");
                 return;
             }
 
             decimal cambio = pago - total;
 
-            txtPago.Text = pago.ToString("C");
-            txtCambio.Text = cambio.ToString("C");
+            using SqlConnection conn =
+                new SqlConnection(DatabaseHelper.ConnectionString);
 
-            MessageBox.Show(
-                $"✅ Venta realizada\n\nTotal:  {total:C}\nPago:   {pago:C}\nCambio: {cambio:C}",
-                "Venta exitosa",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            conn.Open();
 
-            carrito.Clear();
-            ActualizarTotales();
+            SqlTransaction trans = conn.BeginTransaction();
+
+            try
+            {
+                decimal subtotal = carrito.Sum(x => x.Subtotal);
+                decimal iva = subtotal * 0.16m;
+
+                string folio =
+                    $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
+
+                //----------------------------------
+                // INSERTAR VENTA
+                //----------------------------------
+
+                string sqlVenta =
+                @"INSERT INTO Ventas
+                (
+                Folio,
+                Fecha,
+                Subtotal,
+                IVA,
+                Descuento,
+                Total,
+                MetodoPago,
+                Estado,
+                UsuarioId
+                )
+                VALUES
+                (
+                @Folio,
+                GETDATE(),
+                @Subtotal,
+                @IVA,
+                0,
+                @Total,
+                'Efectivo',
+                'Completada',
+                @UsuarioId
+                );
+
+                SELECT SCOPE_IDENTITY();";
+
+                SqlCommand cmdVenta =
+                    new SqlCommand(sqlVenta, conn, trans);
+
+                cmdVenta.Parameters.AddWithValue("@Folio", folio);
+                cmdVenta.Parameters.AddWithValue("@Subtotal", subtotal);
+                cmdVenta.Parameters.AddWithValue("@IVA", iva);
+                cmdVenta.Parameters.AddWithValue("@Total", subtotal + iva);
+                cmdVenta.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+
+                int ventaId =
+                    Convert.ToInt32(cmdVenta.ExecuteScalar());
+
+                //----------------------------------
+                // DETALLE DE VENTA
+                //----------------------------------
+
+                foreach (var item in carrito)
+                {
+                    SqlCommand cmdDetalle =
+                        new SqlCommand(
+                        @"INSERT INTO DetalleVentas
+                (
+                    VentaId,
+                    ProductoId,
+                    Cantidad,
+                    PrecioUnitario,
+                    Subtotal
+                )
+                VALUES
+                (
+                    @VentaId,
+                    @ProductoId,
+                    @Cantidad,
+                    @Precio,
+                    @Subtotal
+                )",
+                        conn,
+                        trans);
+
+                    cmdDetalle.Parameters.AddWithValue("@VentaId", ventaId);
+                    cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+                    cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+                    cmdDetalle.Parameters.AddWithValue("@Precio", item.Precio);
+                    cmdDetalle.Parameters.AddWithValue("@Subtotal", item.Subtotal);
+
+                    cmdDetalle.ExecuteNonQuery();
+
+                    //----------------------------------
+                    // DESCONTAR STOCK
+                    //----------------------------------
+
+                    SqlCommand cmdStock =
+                        new SqlCommand(
+                        @"UPDATE Productos
+                  SET Stock = Stock - @Cantidad
+                  WHERE Id = @ProductoId",
+                        conn,
+                        trans);
+
+                    cmdStock.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+                    cmdStock.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+
+                    cmdStock.ExecuteNonQuery();
+                }
+
+                trans.Commit();
+
+                txtPago.Text = pago.ToString("C");
+                txtCambio.Text = cambio.ToString("C");
+
+                MessageBox.Show(
+                    $"Venta registrada correctamente.\n\nCambio: {cambio:C}",
+                    "Venta",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                carrito.Clear();
+
+                ActualizarTotales();
+
+                CargarProductos();
+            }
+            catch (Exception ex)
+            {
+                trans.Rollback();
+
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void BtnBuscarProducto_Click(object sender, RoutedEventArgs e)
+        {
+            var ventana = new BuscarProductoWindow(productos)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true && ventana.ProductoSeleccionado != null)
+            {
+                AgregarProductoAlCarrito(ventana.ProductoSeleccionado);
+            }
         }
 
         // =========================================
@@ -355,6 +497,10 @@ namespace FarmaciaPOS.Views
         {
             switch (e.Key)
             {
+                case Key.F2:
+                    BtnBuscarProducto_Click(sender, new RoutedEventArgs());
+                    break;
+
                 case Key.F5:
                     BtnCantidad_Click(sender, new RoutedEventArgs());
                     break;

@@ -51,7 +51,8 @@ namespace FarmaciaPOS.Helpers
             System.Windows.Controls.Button btnInventario,
             System.Windows.Controls.Button btnReportes,
             System.Windows.Controls.Button btnConfiguracion,
-            System.Windows.Controls.Button btnCaja)
+            System.Windows.Controls.Button btnCaja,
+            System.Windows.Controls.Button btnDevoluciones)
         {
             // Administrador ve todo
             if (Sesion.RolId == 1)
@@ -77,6 +78,9 @@ namespace FarmaciaPOS.Helpers
                 btnConfiguracion.Visibility = Visibility.Collapsed;
 
             if (!TieneAcceso("Caja"))
+                btnCaja.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Devoluciones"))
                 btnCaja.Visibility = Visibility.Collapsed;
         }
 
