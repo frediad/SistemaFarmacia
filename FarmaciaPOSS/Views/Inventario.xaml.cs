@@ -54,7 +54,15 @@ namespace FarmaciaPOS.Views
             using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
             conn.Open();
 
-            string query = "SELECT * FROM Productos WHERE Activo = 1 ORDER BY Nombre";
+            string query =
+            @"SELECT p.*,
+            (SELECT TOP 1 img.RutaImagen
+            FROM ImagenesProducto img
+            WHERE img.ProductoId = p.Id
+            ORDER BY img.Orden) AS PrimeraImagen
+            FROM Productos p
+            WHERE p.Activo = 1";
+
             SqlCommand cmd = new SqlCommand(query, conn);
             SqlDataReader reader = cmd.ExecuteReader();
 
@@ -68,7 +76,7 @@ namespace FarmaciaPOS.Views
                     Stock = Convert.ToInt32(reader["Stock"]),
                     PrecioCompra = Convert.ToDecimal(reader["PrecioCompra"]),
                     PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
-                    ImagenURL = reader["ImagenURL"].ToString(),
+                    ImagenURL = reader["PrimeraImagen"] != DBNull.Value ? reader["PrimeraImagen"].ToString():"",
                     StockMinimo = reader["StockMinimo"] != DBNull.Value ? Convert.ToInt32(reader["StockMinimo"]) : 0,
                 });
             }

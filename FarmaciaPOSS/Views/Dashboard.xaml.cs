@@ -94,7 +94,13 @@ namespace FarmaciaPOS
             conn.Open();
 
             string query =
-                "SELECT * FROM Productos WHERE Activo = 1";
+            @"SELECT p.*,
+            (SELECT TOP 1 img.RutaImagen
+            FROM ImagenesProducto img
+            WHERE img.ProductoId = p.Id
+            ORDER BY img.Orden) AS PrimeraImagen
+            FROM Productos p
+            WHERE p.Activo = 1";
 
             SqlCommand cmd =
                 new SqlCommand(query, conn);
@@ -142,8 +148,9 @@ namespace FarmaciaPOS
                              reader["CantidadMayoreo3"]),
 
                     ImagenURL =
-                        reader["ImagenURL"]
-                        .ToString(),
+                       reader["PrimeraImagen"] != DBNull.Value
+                       ? reader["PrimeraImagen"].ToString()
+                       : "",
 
                     CategoriaId =
                         reader["CategoriaId"] != DBNull.Value

@@ -41,7 +41,15 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
-            string query = "SELECT * FROM Productos WHERE Activo = 1";
+            string query =
+            @"SELECT p.*,
+            (SELECT TOP 1 img.RutaImagen
+            FROM ImagenesProducto img
+            WHERE img.ProductoId = p.Id
+            ORDER BY img.Orden) AS PrimeraImagen
+            FROM Productos p
+            WHERE p.Activo = 1";
+
             SqlCommand cmd = new SqlCommand(query, conn);
             SqlDataReader reader = cmd.ExecuteReader();
 
@@ -50,11 +58,20 @@ namespace FarmaciaPOS.Views
                 productos.Add(new Producto
                 {
                     Id = Convert.ToInt32(reader["Id"]),
+
                     CodigoBarras = reader["CodigoBarras"].ToString(),
+
                     Nombre = reader["Nombre"].ToString(),
+
                     Stock = Convert.ToInt32(reader["Stock"]),
+
                     PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
-                    ImagenURL = reader["ImagenURL"].ToString(),
+
+                    ImagenURL =
+                       reader["PrimeraImagen"] != DBNull.Value
+                       ? reader["PrimeraImagen"].ToString()
+                       : "",
+
                     CategoriaId = reader["CategoriaId"] != DBNull.Value
                         ? Convert.ToInt32(reader["CategoriaId"])
                         : 0,

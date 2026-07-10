@@ -1,11 +1,12 @@
-﻿using FarmaciaPOS.Models;
-using FarmaciaPOS.Helpers;
+﻿using FarmaciaPOS.Helpers;
+using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FarmaciaPOS.Views
 {
@@ -49,10 +50,13 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT *
-              FROM Productos
-              WHERE Activo = 1
-              ORDER BY Nombre";
+            @"SELECT p.*,
+            (SELECT TOP 1 img.RutaImagen
+            FROM ImagenesProducto img
+            WHERE img.ProductoId = p.Id
+            ORDER BY img.Orden) AS PrimeraImagen
+            FROM Productos p
+            WHERE p.Activo = 1";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             SqlDataReader reader = cmd.ExecuteReader();
@@ -91,7 +95,7 @@ namespace FarmaciaPOS.Views
 
                     StockMinimo = Convert.ToInt32(reader["StockMinimo"]),
 
-                    ImagenURL = reader["ImagenURL"].ToString(),
+                    ImagenURL = reader["PrimeraImagen"] != DBNull.Value ? reader["PrimeraImagen"].ToString(): "",
 
                     Activo = Convert.ToBoolean(reader["Activo"])
                 });
@@ -721,7 +725,7 @@ namespace FarmaciaPOS.Views
 
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp"
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"
             };
 
             if (dialog.ShowDialog() != true)
@@ -914,11 +918,7 @@ namespace FarmaciaPOS.Views
         {
             try
             {
-                if (productoId == 0)
-                {
-                    MessageBox.Show("Primero guarda o selecciona un producto");
-                    return;
-                }
+               
 
                 if (string.IsNullOrWhiteSpace(txtNumeroLote.Text))
                 {
