@@ -197,5 +197,21 @@ namespace FarmaciaPOS.Views
 
             CargarProveedores();
         }
+
+        private void BtnPedirMercancia_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgProveedores.SelectedItem is not Proveedor proveedor)
+            {
+                MessageBox.Show("Selecciona un proveedor de la lista");
+                return;
+            }
+
+            var ventana = new PedirMercanciaWindow(proveedor)
+            {
+                Owner = this
+            };
+
+            ventana.ShowDialog();
+        }
     }
 }

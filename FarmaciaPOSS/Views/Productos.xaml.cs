@@ -721,7 +721,7 @@ namespace FarmaciaPOS.Views
 
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp"
             };
 
             if (dialog.ShowDialog() != true)

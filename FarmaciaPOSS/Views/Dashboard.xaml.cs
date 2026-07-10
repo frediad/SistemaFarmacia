@@ -764,7 +764,15 @@ namespace FarmaciaPOS
 
                 case Key.F3:
 
-                    BtnPrecio_Click(
+                    BtnEspera_Click(
+                        sender,
+                        new RoutedEventArgs());
+
+                    break;
+
+                case Key.F4:
+
+                    BtnLateralDevoluciones_Click(
                         sender,
                         new RoutedEventArgs());
 
@@ -772,7 +780,7 @@ namespace FarmaciaPOS
 
                 case Key.F5:
 
-                    BtnCantidad_Click(
+                    BtnPrecio_Click(
                         sender,
                         new RoutedEventArgs());
 
@@ -780,18 +788,22 @@ namespace FarmaciaPOS
 
                 case Key.F6:
 
-                    BtnEliminar_Click(
+                    BtnCantidad_Click(
                         sender,
                         new RoutedEventArgs());
 
                     break;
 
                 case Key.F7:
+                    BtnEliminar_Click(
+                        sender,
+                        new RoutedEventArgs());
+                    break;
 
+                case Key.F8:
                     BtnDescuento_Click(
                         sender,
                         new RoutedEventArgs());
-
                     break;
 
                 case Key.Escape:
