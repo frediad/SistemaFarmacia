@@ -2,195 +2,743 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-        Title="Dashboard de Ventas"
-        Height="700"
-        Width="1200"
+        Title="Dashboard"
+        Height="920"
+        Width="1420"
+        MinHeight="680"
+        MinWidth="980"
         WindowStartupLocation="CenterScreen"
-        Background="#F4F6F9">
-    
+        WindowState="Maximized"
+        Background="#F1F4F9"
+        FontFamily="Segoe UI">
 
-    <Grid Margin="15">
+    <Window.Resources>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
-            <RowDefinition Height="110"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Style x:Key="Tarjeta" TargetType="Border">
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="18"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#1A2540" Opacity="0.06" BlurRadius="14" ShadowDepth="2" Direction="270"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="140"/>
-            </Grid.ColumnDefinitions>
+        <Style x:Key="IconoCuadro" TargetType="Border">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
 
-            <StackPanel>
+        <Style x:Key="BotonModerno" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <TextBlock Text="Dashboard de Ventas"
-                   FontSize="28"
-                   FontWeight="Bold"
-                   Foreground="#2C3E50"/>
+        <!-- Botón "Regresar": ancho automático (responsivo a su contenido),
+             con estados de hover / presionado. -->
+        <Style x:Key="BotonRegresar" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E3E6EE"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#4B5468"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Content" Value="⟵  Regresar"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0F2F8"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#D4D8E6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E7EAF3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <TextBlock Text="Análisis de ventas de la farmacia"
-                   FontSize="15"
-                   Foreground="Gray"/>
+        <!-- Botón de pestaña del menú (Ventas / Ganancias). El color/estado
+             activo-inactivo se controla desde el code-behind. -->
+        <Style x:Key="BotonMenuTab" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="22,11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
+        <Style x:Key="LinkVerTodos" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#1976D2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- ScrollViewer + columnas con ancho '*' hacen que el layout responda
+         al redimensionar la ventana en vez de romperse con anchos fijos. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="25">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ================== ENCABEZADO ================== -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Botón regresar: ancho automático (se adapta al texto/DPI), altura fija cómoda -->
+                <Button Grid.Column="0"
+                        Style="{StaticResource BotonRegresar}"
+                        Click="btnRegresar_Click"
+                        Height="38"
+                        MinWidth="100"
+                        Margin="0,0,18,0"
+                        ToolTip="Regresar"/>
+
+                <!-- Logo + título -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <UniformGrid Columns="2" Rows="2" Width="26" Height="26" Margin="0,0,12,0">
+                        <Border Background="#263238" CornerRadius="3" Margin="1"/>
+                        <Border Background="#263238" CornerRadius="3" Margin="1"/>
+                        <Border Background="#263238" CornerRadius="3" Margin="1"/>
+                        <Border Background="#263238" CornerRadius="3" Margin="1"/>
+                    </UniformGrid>
+                    <StackPanel>
+                        <TextBlock x:Name="txtTituloDashboard" Text="Dashboard de Ventas" FontSize="22" FontWeight="Bold" Foreground="#212121"/>
+                        <TextBlock x:Name="txtSubtituloDashboard" Text="Resumen general de ventas y productos" FontSize="12" Foreground="Gray"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Selector de fecha -->
+                <Grid Grid.Column="3" Margin="0,0,20,0">
+                    <ToggleButton x:Name="btnFecha" Width="220" Height="42">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Border Background="White" CornerRadius="10" Padding="14,0" BorderBrush="#E0E0E0" BorderThickness="1">
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                        <ToggleButton.Content>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="📅" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBlock x:Name="txtFechaSeleccionada"
+                                           Grid.Column="1"
+                                           Text="Seleccionar fecha"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#37474F"/>
+                                <TextBlock Grid.Column="2" Text="▾" VerticalAlignment="Center" Foreground="Gray"/>
+                            </Grid>
+                        </ToggleButton.Content>
+                    </ToggleButton>
+
+                    <Popup IsOpen="{Binding IsChecked, ElementName=btnFecha}"
+                           StaysOpen="False"
+                           PlacementTarget="{Binding ElementName=btnFecha}"
+                           Placement="Bottom">
+                        <Border Background="White" CornerRadius="10" Padding="6" BorderBrush="#DDDDDD" BorderThickness="1">
+                            <Calendar x:Name="calFecha" SelectedDatesChanged="calFecha_SelectedDatesChanged"/>
+                        </Border>
+                    </Popup>
+                </Grid>
+
+                <!-- Perfil -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="38" Height="38" CornerRadius="19" Background="#37474F">
+                        <TextBlock Text="👤" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="10,0,6,0">
+                        <TextBlock Text="Administrador" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock Text="admin" FontSize="11" Foreground="Gray"/>
+                    </StackPanel>
+                    <TextBlock Text="▾" Foreground="Gray" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ================== MENÚ: VENTAS / GANANCIAS ================== -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+                <Button x:Name="btnMenuVentas"
+                        Style="{StaticResource BotonMenuTab}"
+                        Content="📊  Ventas"
+                        Click="btnMenuVentas_Click"
+                        Margin="0,0,10,0"/>
+                <Button x:Name="btnMenuGanancias"
+                        Style="{StaticResource BotonMenuTab}"
+                        Content="💰  Ganancias"
+                        Click="btnMenuGanancias_Click"/>
             </StackPanel>
 
-            <Button Grid.Column="1"
-            Content="← Regresar"
-            Width="120"
-            Height="40"
-            Click="btnRegresar_Click"
-            Background="#2563EB"
-            Foreground="White"
-            FontWeight="Bold"/>
+            <!-- ================== CONTENIDO (una vista visible a la vez) ================== -->
+            <Grid Grid.Row="2">
+
+                <!-- ============ VISTA: VENTAS ============ -->
+                <Grid x:Name="vistaVentas" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- KPIs de ventas -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- DÍA -->
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="#FDEEEE" Margin="0,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#E53935">
+                                    <TextBlock Text="🛒" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="VENTAS DEL DÍA" FontSize="11" FontWeight="Bold" Foreground="#D32F2F" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtVentasDia" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaDia" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkDia" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- SEMANA -->
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="#EAF3FE" Margin="8,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#1E88E5">
+                                    <TextBlock Text="📅" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="VENTAS DE LA SEMANA" FontSize="11" FontWeight="Bold" Foreground="#1976D2" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtVentasSemana" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaSemana" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkSemana" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- MES -->
+                        <Border Grid.Column="2" Style="{StaticResource Tarjeta}" Background="#EAF7EC" Margin="8,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#43A047">
+                                    <TextBlock Text="📆" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="VENTAS DEL MES" FontSize="11" FontWeight="Bold" Foreground="#2E7D32" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtVentasMes" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaMes" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkMes" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- AÑO -->
+                        <Border Grid.Column="3" Style="{StaticResource Tarjeta}" Background="#F2ECFB" Margin="8,0,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#8E24AA">
+                                    <TextBlock Text="📊" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="VENTAS DEL AÑO" FontSize="11" FontWeight="Bold" Foreground="#7B1FA2" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtVentasAnio" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaAnio" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkAnio" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Gráficas superiores de ventas -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Ventas por Día (Últimos 7 días)" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaDia" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="White" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Ventas por Mes (Este año)" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaMes" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Gráficas y paneles inferiores de ventas -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,7,0">
+                            <StackPanel>
+                                <TextBlock Text="Productos más vendidos" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaTopProductos" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="White" Margin="7,0,7,0">
+                            <StackPanel>
+                                <TextBlock Text="Ventas por Año" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaAnio" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="2" Margin="7,0,0,0">
+
+                            <Border Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="⚠ Productos con bajo stock" FontWeight="Bold" FontSize="14"/>
+                                        <TextBlock Grid.Column="1" Text="Ver todos" Style="{StaticResource LinkVerTodos}"/>
+                                    </Grid>
+                                    <ItemsControl x:Name="listaBajoStock" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="13"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding StockTexto}" FontSize="13" FontWeight="Bold" Foreground="#D32F2F"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Tarjeta}" Background="White">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="⏰ Próximos a caducar" FontWeight="Bold" FontSize="14"/>
+                                        <TextBlock Grid.Column="1" Text="Ver todos" Style="{StaticResource LinkVerTodos}"/>
+                                    </Grid>
+                                    <ItemsControl x:Name="listaCaducar" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="13"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding FechaTexto}" FontSize="13" FontWeight="Bold" Foreground="#F57C00"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+
+                <!-- ============ VISTA: GANANCIAS ============ -->
+                <Grid x:Name="vistaGanancias" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- KPIs de ganancias -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- DÍA -->
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="#FFF6E5" Margin="0,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#FB8C00">
+                                    <TextBlock Text="💰" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="GANANCIA DEL DÍA" FontSize="11" FontWeight="Bold" Foreground="#EF6C00" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtGananciaDia" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaGananciaDia" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkGananciaDia" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- SEMANA -->
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="#EAF7EC" Margin="8,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#43A047">
+                                    <TextBlock Text="📅" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="GANANCIA DE LA SEMANA" FontSize="11" FontWeight="Bold" Foreground="#2E7D32" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtGananciaSemana" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaGananciaSemana" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkGananciaSemana" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- MES -->
+                        <Border Grid.Column="2" Style="{StaticResource Tarjeta}" Background="#EAF3FE" Margin="8,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#1E88E5">
+                                    <TextBlock Text="📆" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="GANANCIA DEL MES" FontSize="11" FontWeight="Bold" Foreground="#1976D2" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtGananciaMes" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaGananciaMes" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkGananciaMes" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- AÑO -->
+                        <Border Grid.Column="3" Style="{StaticResource Tarjeta}" Background="#F2ECFB" Margin="8,0,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource IconoCuadro}" Background="#8E24AA">
+                                    <TextBlock Text="📊" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="GANANCIA DEL AÑO" FontSize="11" FontWeight="Bold" Foreground="#7B1FA2" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Row="2" x:Name="txtGananciaAnio" Text="$0.00" FontSize="23" FontWeight="Bold" Foreground="#212121"/>
+                                <Grid Grid.Row="3" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="txtTendenciaGananciaAnio" Text="" FontSize="12" VerticalAlignment="Center"/>
+                                    <Canvas x:Name="sparkGananciaAnio" Grid.Column="1" Width="90" Height="34"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Gráficas superiores de ganancias -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Ganancia por Día (Últimos 7 días)" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaGananciaDia" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="White" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Ganancia por Mes (Este año)" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaGananciaMes" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Gráficas y paneles inferiores de ganancias -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,7,0">
+                            <StackPanel>
+                                <TextBlock Text="Productos que más ganancia generan" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaTopProductosGanancia" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Tarjeta}" Background="White" Margin="7,0,7,0">
+                            <StackPanel>
+                                <TextBlock Text="Ganancia por Año" FontWeight="Bold" FontSize="15" Margin="0,0,0,10"/>
+                                <lvc:CartesianChart x:Name="GraficaGananciaAnio" Height="260"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="2" Margin="7,0,0,0">
+
+                            <Border Style="{StaticResource Tarjeta}" Background="White" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="🏆 Mayor margen de ganancia" FontWeight="Bold" FontSize="14"/>
+                                    <ItemsControl x:Name="listaMayorMargen" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="13"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding MargenTexto}" FontSize="13" FontWeight="Bold" Foreground="#2E7D32"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Tarjeta}" Background="White">
+                                <StackPanel>
+                                    <TextBlock Text="📉 Menor margen de ganancia" FontWeight="Bold" FontSize="14"/>
+                                    <ItemsControl x:Name="listaMenorMargen" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="13"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding MargenTexto}" FontSize="13" FontWeight="Bold" Foreground="#D32F2F"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
+            <!-- ================== BARRA INFERIOR (compartida) ================== -->
+            <Border Grid.Row="3" Style="{StaticResource Tarjeta}" Background="White" Margin="0,20,0,0">
+                <UniformGrid Columns="5" Rows="1">
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#F2ECFB" VerticalAlignment="Center">
+                            <TextBlock Text="📦" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Total de Productos" FontSize="12" Foreground="Gray"/>
+                            <TextBlock x:Name="txtTotalProductos" Text="0" FontSize="16" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#EAF3FE" VerticalAlignment="Center">
+                            <TextBlock Text="👥" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Total de Clientes" FontSize="12" Foreground="Gray"/>
+                            <TextBlock x:Name="txtTotalClientes" Text="0" FontSize="16" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#EAF7EC" VerticalAlignment="Center">
+                            <TextBlock Text="✅" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Productos con Stock" FontSize="12" Foreground="Gray"/>
+                            <TextBlock x:Name="txtConStock" Text="0" FontSize="16" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#FDEEEE" VerticalAlignment="Center">
+                            <TextBlock Text="🚫" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Productos sin Stock" FontSize="12" Foreground="Gray"/>
+                            <TextBlock x:Name="txtSinStock" Text="0" FontSize="16" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="#FFF3DE" VerticalAlignment="Center">
+                            <TextBlock Text="💵" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="txtEtiquetaTotalInferior" Text="Total de Ventas (Año)" FontSize="12" Foreground="Gray"/>
+                            <TextBlock x:Name="txtTotalVentas" Text="$0.00" FontSize="16" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                </UniformGrid>
+            </Border>
+
         </Grid>
-
-        <!-- TARJETAS -->
-        <Grid Grid.Row="1">
-
-            <Grid.ColumnDefinitions>
-
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="250"/>
-
-            </Grid.ColumnDefinitions>
-
-            <!-- TOTAL -->
-            <Border Grid.Column="0"
-                    Margin="5"
-                    CornerRadius="12"
-                    Background="White">
-
-                <StackPanel
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-
-                    <TextBlock Text="TOTAL VENDIDO"
-                               FontWeight="Bold"
-                               FontSize="14"/>
-
-                    <TextBlock x:Name="txtTotal"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="Green"/>
-
-                </StackPanel>
-                
-
-            </Border>
-
-            <!-- VENTAS -->
-            <Border Grid.Column="1"
-                    Margin="5"
-                    CornerRadius="12"
-                    Background="White">
-
-                <StackPanel
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-
-                    <TextBlock Text="VENTAS"
-                               FontWeight="Bold"/>
-
-                    <TextBlock x:Name="txtVentas"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="DodgerBlue"/>
-
-                </StackPanel>
-
-            </Border>
-            <Border Grid.Row="2"
-        Margin="5,10,5,5"
-        Background="White"
-        CornerRadius="12"
-        Padding="15">
-
-                <StackPanel>
-
-                    <TextBlock Text="Estado de productos vendidos"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   Margin="0,0,0,10"/>
-
-                    <lvc:PieChart x:Name="GraficaEstadoProductos"
-                      Height="200"/>
-
-                    <ListBox x:Name="lstProductos"
-                 Margin="0,10,0,0"
-                 Height="200"/>
-
-                </StackPanel>
-
-            </Border>
-
-            <!-- PROMEDIO -->
-            <Border Grid.Column="2"
-                    Margin="5"
-                    CornerRadius="12"
-                    Background="White">
-
-                <StackPanel
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-
-                    <TextBlock Text="PROMEDIO"
-                               FontWeight="Bold"/>
-
-                    <TextBlock x:Name="txtPromedio"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="DarkViolet"/>
-
-                </StackPanel>
-
-            </Border>
-
-            <!-- FILTRO -->
-            <Border Grid.Column="3"
-                    Margin="5"
-                    CornerRadius="12"
-                    Background="White">
-
-                <StackPanel
-                    Margin="15">
-
-                    <TextBlock Text="Mostrar por"
-                               FontWeight="Bold"/>
-
-                    <ComboBox x:Name="cmbPeriodo"
-                              Margin="0,10,0,0"
-                              Height="35"
-                              SelectionChanged="cmbPeriodo_SelectionChanged">
-
-                        <ComboBoxItem Content="Día"/>
-                        <ComboBoxItem Content="Semana"/>
-                        <ComboBoxItem Content="Mes"/>
-                        <ComboBoxItem Content="Año"/>
-
-                    </ComboBox>
-
-                </StackPanel>
-
-            </Border>
-
-        </Grid>
-
-        <!-- GRAFICA -->
-        <Border Grid.Row="2"
-                Margin="5,20,5,5"
-                Background="White"
-                CornerRadius="12"
-                Padding="15">
-
-            <lvc:CartesianChart
-                x:Name="GraficaVentas"/>
-
-        </Border>
-
-    </Grid>
+    </ScrollViewer>
 
 </Window>
