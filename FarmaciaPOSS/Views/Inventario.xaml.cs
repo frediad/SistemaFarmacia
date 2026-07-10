@@ -343,9 +343,9 @@ namespace FarmaciaPOS.Views
 
             string queryCompra =
             @"INSERT INTO Compras
-            (ProveedorId, NumeroFactura, Fecha, Total, UsuarioId)
+            (ProveedorId, NumeroFactura, Fecha, Total, UsuarioId, MetodoPago)
             VALUES
-            (@ProveedorId, @NumeroFactura, GETDATE(), @Total, @UsuarioId);
+            (@ProveedorId, @NumeroFactura, GETDATE(), @Total, @UsuarioId, @MetodoPago);
             SELECT SCOPE_IDENTITY();";
 
             SqlCommand cmdCompra = new SqlCommand(queryCompra, conn);
@@ -354,6 +354,8 @@ namespace FarmaciaPOS.Views
                 string.IsNullOrWhiteSpace(txtNumeroFactura.Text) ? (object)DBNull.Value : txtNumeroFactura.Text);
             cmdCompra.Parameters.AddWithValue("@Total", totalCompra);
             cmdCompra.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+            cmdCompra.Parameters.AddWithValue("@MetodoPago",
+                (cbMetodoPagoCompra.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Transferencia");
 
             int compraId = Convert.ToInt32(cmdCompra.ExecuteScalar());
 
@@ -425,7 +427,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // PESTAÑA 3 — AJUSTE DE INVENTARIO (CONTEO FÍSICO)
+        // PESTAÑA 3 — AJUSTE DE INVENTARIO 
         // =========================================
 
         private void BtnCargarAjuste_Click(object sender, RoutedEventArgs e)
@@ -697,6 +699,49 @@ namespace FarmaciaPOS.Views
                 "Listo",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        // =========================================
+        // ✅ BOTÓN GENERAL DEL HEADER — PEDIDO LIBRE
+        // =========================================
+
+        private void BtnPedirMercanciaInventario_Click(object sender, RoutedEventArgs e)
+        {
+            var ventana = new PedirMercanciaWindow
+            {
+                Owner = this
+            };
+
+            ventana.ShowDialog();
+        }
+
+        // =========================================
+        // ✅ PEDIR POR CORREO DESDE SUGERENCIA DE COMPRA
+        // =========================================
+
+        private void BtnPedirSugerenciasPorCorreo_Click(object sender, RoutedEventArgs e)
+        {
+            var seleccionados = sugerencias.Where(x => x.Seleccionado && x.CantidadSugerida > 0).ToList();
+
+            if (seleccionados.Count == 0)
+            {
+                MessageBox.Show("Selecciona al menos un producto");
+                return;
+            }
+
+            var itemsPedido = seleccionados.Select(x => new PedidoProveedorItem
+            {
+                Nombre = x.Nombre,
+                Cantidad = x.CantidadSugerida,
+                CostoUnitario = x.CostoUnitario
+            }).ToList();
+
+            var ventana = new PedirMercanciaWindow(null, itemsPedido)
+            {
+                Owner = this
+            };
+
+            ventana.ShowDialog();
         }
 
         // =========================================

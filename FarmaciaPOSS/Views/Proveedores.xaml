@@ -86,6 +86,16 @@
                     FontSize="16"
                     Click="BtnEliminar_Click"/>
 
+            <Button x:Name="btnPedirMercancia"
+                    Content="📧 Pedir Mercancía"
+                    Height="45"
+                    Background="#2563EB"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="BtnPedirMercancia_Click"/>
+
         </StackPanel>
 
     </Grid>

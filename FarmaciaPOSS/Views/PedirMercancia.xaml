@@ -1,0 +1,238 @@
+﻿<Window x:Class="FarmaciaPOS.Views.PedirMercanciaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pedir mercancía"
+        Height="680"
+        Width="800"
+        WindowStartupLocation="CenterOwner"
+        Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="TxtPedido" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#2563EB"/>
+                                <Setter TargetName="border" Property="Background" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CboPedido" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+        </Style>
+
+        <Style x:Key="BtnAccionPedido" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Background="#1E3A8A" Grid.Row="0">
+            <TextBlock Text="📧  Pedir mercancía al proveedor"
+                       Foreground="White"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Margin="20,0"/>
+        </Border>
+
+        <!-- PROVEEDOR + PAGO -->
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="12"
+                Padding="16"
+                Margin="15,15,15,0">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="PROVEEDOR" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                    <ComboBox x:Name="cbProveedor"
+                              Height="40"
+                              Style="{StaticResource CboPedido}"
+                              DisplayMemberPath="Nombre"
+                              SelectedValuePath="Id"
+                              SelectionChanged="cbProveedor_SelectionChanged"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="MÉTODO DE PAGO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                    <ComboBox x:Name="cbMetodoPago" Height="40" Style="{StaticResource CboPedido}">
+                        <ComboBoxItem Content="Transferencia" IsSelected="True"/>
+                        <ComboBoxItem Content="Tarjeta"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text=" " FontSize="11" Margin="2,0,0,6"/>
+                    <Button Content="🔍 Agregar producto"
+                            Height="40"
+                            Background="#2563EB"
+                            Style="{StaticResource BtnAccionPedido}"
+                            Click="BtnAgregarProducto_Click"/>
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <!-- TABLA DE PRODUCTOS -->
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="12"
+                Padding="12"
+                Margin="15,12,15,0">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Productos a pedir"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"
+                           Margin="4,4,0,10"/>
+
+                <DataGrid x:Name="dgItemsPedido"
+                          Grid.Row="1"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          BorderThickness="0"
+                          RowHeight="36"
+                          FontSize="14"
+                          CanUserAddRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#F1F5F9">
+
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F8FAFC"/>
+                            <Setter Property="Foreground" Value="#64748B"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="10,8"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                        <DataGridTextColumn Header="Costo Unit." Binding="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged, StringFormat=C}" Width="120"/>
+                        <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="120" IsReadOnly="True"/>
+
+                        <DataGridTemplateColumn Header="" Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="✕"
+                                            Width="28" Height="28"
+                                            Background="#FEE2E2"
+                                            Foreground="#DC2626"
+                                            BorderThickness="0"
+                                            FontWeight="Bold"
+                                            Cursor="Hand"
+                                            Click="BtnQuitarItem_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+            </Grid>
+
+        </Border>
+
+        <!-- TOTAL + ENVIAR -->
+        <Grid Grid.Row="3" Margin="15,12,15,15">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="220"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Background="#1E293B" CornerRadius="12" Margin="0,0,10,0">
+                <StackPanel VerticalAlignment="Center" Margin="18,0">
+                    <TextBlock Text="TOTAL ESTIMADO DEL PEDIDO" FontSize="11" Foreground="#94A3B8"/>
+                    <TextBlock x:Name="txtTotalPedido" Text="$0.00" FontSize="22" FontWeight="Bold" Foreground="#22C55E"/>
+                </StackPanel>
+            </Border>
+
+            <Button Grid.Column="1"
+                    Content="📧 Redactar Correo"
+                    Background="#16A34A"
+                    Style="{StaticResource BtnAccionPedido}"
+                    FontSize="15"
+                    Click="BtnEnviarCorreo_Click"/>
+
+        </Grid>
+
+    </Grid>
+
+</Window>
