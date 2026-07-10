@@ -350,41 +350,42 @@
                                 Content="Pedidos"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnPedidos_Click"/>
 
                         <Button x:Name="btnProductos"
                                 Content="Productos"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnProductos_Click"/>
 
                         <Button x:Name="btnInventario"
                                 Content="Inventario"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnInventario_Click"/>
 
-                        <Button Content="Reportes"
+                        <Button x:Name="btnReportes"
+                                Content="Reportes"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnReportes_Click"/>
 
                         <Button x:Name="btnConfiguracion"
                                 Content="Configuración"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnConfiguracion_Click"/>
 
                         <Button x:Name="btnCaja"
                                 Content="Caja"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
-                                Foreground="White"
+                                Foreground="#32248A"
                                 Click="BtnCaja_Click"/>
 
                     </StackPanel>
@@ -406,9 +407,11 @@
                                    Foreground="White"
                                    HorizontalAlignment="Right"/>
 
-                        <TextBlock Text="Caja Principal"
-                                   FontSize="12"
-                                   Foreground="#93C5FD"
+                        <TextBlock x:Name="txtCargoSesion"
+                                   Text="Cargo"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="White"
                                    HorizontalAlignment="Right"/>
 
                     </StackPanel>
@@ -615,7 +618,7 @@
                                     <TextBlock Text="F4"
                                                FontSize="9"
                                                Foreground="#94A3B8"
-                       HorizontalAlignment="Center"/>
+                                               HorizontalAlignment="Center"/>
                                 </StackPanel>
 
                                 <Border x:Name="badgeEspera"
@@ -636,6 +639,15 @@
                                                VerticalAlignment="Center"/>
                                 </Border>
                             </Grid>
+                        </Button>
+
+                        <Button x:Name="btnDevoluciones"
+                                Style="{StaticResource BtnLateral}"
+                                Click="BtnLateralDevoluciones_Click">
+                            <StackPanel>
+                                <TextBlock Text="↩️" FontSize="20" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Devolucion" FontSize="10" FontWeight="Bold" Foreground="#374151" HorizontalAlignment="Center"/>
+                            </StackPanel>
                         </Button>
 
                         <Button x:Name="btnLateralPrecio"

@@ -6,94 +6,291 @@
         Width="900"
         Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
-        Background="#F5F7FA">
+        Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="BtnConfig" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                Property="Background"
+                                Value="#EFF6FF"/>
+                                <Setter TargetName="border"
+                                Property="BorderBrush"
+                                Value="#2563EB"/>
+                                <Setter Property="Foreground"
+                                Value="#2563EB"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                Property="Background"
+                                Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
 
     <Grid Margin="20">
 
         <Grid.RowDefinitions>
-
-            <RowDefinition Height="80"/>
-
+            <RowDefinition Height="110"/>
             <RowDefinition Height="*"/>
-
         </Grid.RowDefinitions>
 
-        <!-- TITULO -->
+        <!-- ========================================= -->
+        <!-- HEADER                                    -->
+        <!-- ========================================= -->
 
-        <TextBlock Text="Configuración del Sistema"
-                   FontSize="30"
-                   FontWeight="Bold"
-                   VerticalAlignment="Center"/>
+        <Border Background="#1E3A8A"
+                CornerRadius="12"
+                Padding="20"
+                Margin="0,0,0,20">
 
-        <!-- BOTONES -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel VerticalAlignment="Center">
+
+                    <TextBlock Text="⚙️  Configuración del Sistema"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="White"/>
+
+                    <TextBlock Text="Administra las opciones de tu sistema"
+                               FontSize="13"
+                               Foreground="#93C5FD"/>
+
+                </StackPanel>
+
+                <Button Grid.Column="2"
+                        Content="✕ Cerrar"
+                        Width="100"
+                        Height="42"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Background="#DC2626"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        Click="BtnCerrarVentana_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+
+            </Grid>
+
+        </Border>
+
+        <!-- ========================================= -->
+        <!-- BOTONES DE CONFIGURACIÓN                  -->
+        <!-- ========================================= -->
 
         <UniformGrid Grid.Row="1"
                      Columns="2"
-                     Rows="4"
-                     Margin="0,20,0,0">
+                     Rows="4">
 
             <!-- TICKET -->
 
-            <Button Content="🎫 Configuración Ticket"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnTicket_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnTicket_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🎫"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Configuración Ticket"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Diseño e impresión de tickets"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
-            <!-- PERIFERICOS -->
+            <!-- PERIFÉRICOS -->
 
-            <Button Content="🖨️ Periféricos"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnPerifericos_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnPerifericos_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🖨️"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Periféricos"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Impresoras, lectores y cajón"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
             <!-- USUARIOS -->
 
-            <Button Content="👤 Usuarios y Roles"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnUsuarios_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnUsuarios_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="👤"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Usuarios y Roles"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Permisos y accesos del sistema"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
+
             <!-- POS -->
 
-            <Button Content="💳 Configuración POS"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnPOS_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnPOS_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="💳"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Configuración POS"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Métodos de pago y caja"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
             <!-- FARMACIA -->
 
-            <Button Content="💊 Configuración Farmacia"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnFarmacia_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnFarmacia_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="💊"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Configuración Farmacia"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Parámetros de la farmacia"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
             <!-- NEGOCIO -->
 
-            <Button Content="🏪 Información Negocio"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnNegocio_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnNegocio_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🏪"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Información Negocio"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Datos fiscales y de contacto"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
             <!-- PROVEEDORES -->
 
-            <Button Content=" Proveedores"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnProveedor_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnProveedor_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🚚"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Proveedores"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Gestión de proveedores"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
             <!-- ACERCA -->
 
-            <Button Content="ℹ️ Acerca del Sistema"
-                    Margin="10"
-                    FontSize="18"
-                    Height="100"
-                    Click="BtnAcerca_Click"/>
+            <Button Style="{StaticResource BtnConfig}"
+                    Click="BtnAcerca_Click">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="ℹ️"
+                               FontSize="32"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Acerca del Sistema"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Versión e información técnica"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Button>
 
         </UniformGrid>
 

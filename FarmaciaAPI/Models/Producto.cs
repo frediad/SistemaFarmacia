@@ -17,18 +17,23 @@
         public decimal PrecioCompra { get; set; }
 
         public decimal PrecioVenta { get; set; }
+        public decimal Precio2 { get; set; }
+        public decimal Precio3 { get; set; }
+
+        public int CantidadMayoreo2 { get; set; }
+
+        public int CantidadMayoreo3 { get; set; }
 
         public int Stock { get; set; }
 
         public int StockMinimo { get; set; }
 
         public int? SubCategoriaId { get; set; }
-        public object SubcategoriaId { get; set; }
+        
         public DateTime? Caducidad { get; set; }
 
         public string ImagenURL { get; set; } = string.Empty;
 
-        public bool EsMedicamentoControlado { get; set; }
 
         public bool Activo { get; set; } = true;
 

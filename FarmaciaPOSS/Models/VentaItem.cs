@@ -61,9 +61,7 @@ namespace FarmaciaPOS.Models
         {
             get
             {
-                return
-                    (Precio * Cantidad)
-                    - Descuento;
+                return Precio * Cantidad;
             }
         }
 

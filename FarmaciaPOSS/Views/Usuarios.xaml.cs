@@ -26,7 +26,8 @@ namespace FarmaciaPOS.Views
             "Caja",
             "Usuarios y Roles",
             "Proveedores",
-            "FarmaciaConfi"
+            "FarmaciaConfi",
+            "Devoluciones"
         };
 
         ObservableCollection<ModuloPermiso> listaModulos = new();
@@ -227,7 +228,6 @@ namespace FarmaciaPOS.Views
             txtTelefono.Clear();
             txtPassword.Password = "";
 
-            // ✅ Ocultar el placeholder para usuario nuevo
             txtPlaceholderPassword.Visibility = Visibility.Collapsed;
 
             cbRoles.SelectedIndex = -1;
@@ -437,6 +437,11 @@ namespace FarmaciaPOS.Views
             using var sha256 = System.Security.Cryptography.SHA256.Create();
             byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
+        }
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

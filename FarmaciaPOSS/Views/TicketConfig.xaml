@@ -1,76 +1,658 @@
 ﻿<Window x:Class="FarmaciaPOS.Views.TicketConfigWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configuración Ticket"
-        Height="600"
-        Width="500"
+        Title="Configuración de Ticket"
+        Height="650"
+        Width="950"
         Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
-        Background="#F5F7FA">
+        Background="#F0F4F8">
 
     <Grid Margin="20">
 
-        <Border Background="White"
-                CornerRadius="10"
-                Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="115"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <StackPanel>
+        <!-- ========================================= -->
+        <!-- HEADER                                    -->
+        <!-- ========================================= -->
 
-                <TextBlock Text="Nombre Negocio"
-                           FontWeight="Bold"/>
+        <Border Background="#1E3A8A"
+                CornerRadius="12"
+                Padding="20"
+                Margin="0,0,0,20">
 
-                <TextBox x:Name="txtNegocio"
-                         Height="35"
-                         Margin="0,5,0,15"/>
+            <StackPanel VerticalAlignment="Center">
 
-                <!-- RFC -->
+                <TextBlock Text="🎫  Configuración de Ticket"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           Foreground="White"/>
 
-                <TextBlock Text="RFC"
-                           FontWeight="Bold"/>
-
-                <TextBox x:Name="txtRFC"
-                         Height="35"
-                         Margin="0,5,0,15"/>
-
-                <!-- DIRECCION -->
-
-                <TextBlock Text="Dirección"
-                           FontWeight="Bold"/>
-
-                <TextBox x:Name="txtDireccion"
-                         Height="35"
-                         Margin="0,5,0,15"/>
-
-                <!-- TELEFONO -->
-
-                <TextBlock Text="Teléfono"
-                           FontWeight="Bold"/>
-
-                <TextBox x:Name="txtTelefono"
-                         Height="35"
-                         Margin="0,5,0,15"/>
-
-                <!-- MENSAJE -->
-
-                <TextBlock Text="Mensaje Ticket"
-                           FontWeight="Bold"/>
-
-                <TextBox x:Name="txtMensaje"
-                         Height="100"
-                         TextWrapping="Wrap"
-                         AcceptsReturn="True"
-                         Margin="0,5,0,20"/>
-
-                <!-- BOTON -->
-
-                <Button Content="Guardar Configuración"
-                        Height="45"
-                        FontSize="16"
-                        Click="BtnGuardar_Click"/>
+                <TextBlock Text="Personaliza la información que aparece en tus tickets de venta"
+                           FontSize="13"
+                           Foreground="#93C5FD"/>
 
             </StackPanel>
 
         </Border>
+
+        <!-- ========================================= -->
+        <!-- CONTENIDO: FORMULARIO + VISTA PREVIA      -->
+        <!-- ========================================= -->
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <!-- FORMULARIO -->
+                <ColumnDefinition Width="*"/>
+                <!-- VISTA PREVIA TICKET -->
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===================================== -->
+            <!-- FORMULARIO                            -->
+            <!-- ===================================== -->
+
+            <Border Background="White"
+                    CornerRadius="12"
+                    Padding="25"
+                    Margin="0,0,15,0"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                    <StackPanel>
+
+                        <TextBlock Text="Datos del Negocio"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#1E293B"
+                                   Margin="0,0,0,20"/>
+
+                        <!-- NOMBRE NEGOCIO -->
+
+                        <TextBlock Text="Nombre del Negocio"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtNegocio"
+                                 Height="40"
+                                 FontSize="15"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 BorderBrush="#CBD5E1"
+                                 Margin="0,0,0,15"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- RFC -->
+
+                        <TextBlock Text="RFC"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtRFC"
+                                 Height="40"
+                                 FontSize="15"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 Margin="0,0,0,15"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- DIRECCIÓN -->
+
+                        <TextBlock Text="Dirección"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtDireccion"
+                                 Height="40"
+                                 FontSize="15"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 Margin="0,0,0,15"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- TELÉFONO -->
+
+                        <TextBlock Text="Teléfono"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtTelefono"
+                                 Height="40"
+                                 FontSize="15"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 Margin="0,0,0,15"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- CORREO -->
+
+                        <TextBlock Text="Correo"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtCorreo"
+                                 Height="40"
+                                 FontSize="15"
+                                 Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 Margin="0,0,0,15"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- MENSAJE TICKET -->
+
+                        <TextBlock Text="Mensaje al pie del ticket"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,5"/>
+
+                        <TextBox x:Name="txtMensaje"
+                                 Height="80"
+                                 FontSize="14"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 Padding="10,8"
+                                 Margin="0,0,0,25"
+                                 TextChanged="Campo_TextChanged">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="White"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="10,8"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                        <!-- BOTÓN GUARDAR -->
+
+                        <Button Content="💾  Guardar Configuración"
+                                Height="48"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="#1E3A8A"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Click="BtnGuardar_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="b"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="10">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="b"
+                                                    Property="Background"
+                                                    Value="#2563EB"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="b"
+                                                    Property="Background"
+                                                    Value="#1E40AF"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
+            </Border>
+
+            <!-- ===================================== -->
+            <!-- ✅ VISTA PREVIA DEL TICKET      -->
+            <!-- ===================================== -->
+
+            <Border Grid.Column="1"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="15"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Vista Previa"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="#64748B"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,12"/>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <!-- TICKET -->
+
+                        <Border Background="White"
+                                BorderBrush="#D1D5DB"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="15,10"
+                                HorizontalAlignment="Center"
+                                Width="240">
+
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000"
+                                                  Opacity="0.12"
+                                                  BlurRadius="10"
+                                                  ShadowDepth="3"/>
+                            </Border.Effect>
+
+                            <StackPanel>
+
+                                <!-- BORDE SUPERIOR SERRADO -->
+
+                                <ItemsControl Margin="0,0,0,8">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.Items>
+                                        <TextBlock Text="▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲"
+                                                   FontSize="6"
+                                                   Foreground="#D1D5DB"/>
+                                    </ItemsControl.Items>
+                                </ItemsControl>
+
+                                <!-- LOGO/NOMBRE NEGOCIO -->
+
+                                <TextBlock x:Name="previewNegocio"
+                                           Text="Nombre del Negocio"
+                                           FontSize="15"
+                                           FontWeight="Bold"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Margin="0,0,0,3"/>
+
+                                <!-- RFC -->
+
+                                <TextBlock x:Name="previewRFC"
+                                           Text="RFC: —"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#6B7280"/>
+
+                                <!-- DIRECCIÓN -->
+
+                                <TextBlock x:Name="previewDireccion"
+                                           Text="Dirección"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Foreground="#6B7280"
+                                           Margin="0,2,0,0"/>
+
+                                <!-- TELÉFONO -->
+
+                                <TextBlock x:Name="previewTelefono"
+                                           Text="Tel: —"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#6B7280"/>
+
+                                <!-- CORREO -->
+
+                                <TextBlock x:Name="previewCorreo"
+                                           Text=""
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#6B7280"
+                                           Margin="0,0,0,8"/>
+
+                                <!-- SEPARADOR -->
+
+                                <TextBlock Text="--------------------------------"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#9CA3AF"/>
+
+                                <!-- TICKET INFO -->
+
+                                <Grid Margin="0,6,0,3">
+                                    <TextBlock Text="TICKET #00001"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"/>
+                                    <TextBlock Text="05/07/2026"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"
+                                               Foreground="#6B7280"/>
+                                </Grid>
+
+                                <TextBlock Text="Cajero:"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           Foreground="#6B7280"
+                                           Margin="0,0,0,6"/>
+
+                                <!-- SEPARADOR -->
+
+                                <TextBlock Text="--------------------------------"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#9CA3AF"/>
+
+                                <!-- ENCABEZADO PRODUCTOS -->
+
+                                <Grid Margin="0,5,0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="35"/>
+                                        <ColumnDefinition Width="55"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="DESCRIPCIÓN"
+                                               FontSize="9"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"
+                                               Foreground="#374151"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="CANT"
+                                               FontSize="9"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"
+                                               Foreground="#374151"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="PRECIO"
+                                               FontSize="9"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"
+                                               Foreground="#374151"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <TextBlock Text="--------------------------------"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#9CA3AF"/>
+
+                                <!-- PRODUCTOS EJEMPLO -->
+
+                                <Grid Margin="0,3,0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="35"/>
+                                        <ColumnDefinition Width="55"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Paracetamol 500mg"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="2"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="$50.00"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Grid Margin="0,3,0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="35"/>
+                                        <ColumnDefinition Width="55"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Omeprazol 20mg"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="1"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="$35.00"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Grid Margin="0,3,0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="35"/>
+                                        <ColumnDefinition Width="55"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Vitamina C 1000mg"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="3"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="$90.00"
+                                               FontSize="9"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <!-- SEPARADOR -->
+
+                                <TextBlock Text="--------------------------------"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#9CA3AF"
+                                           Margin="0,5,0,0"/>
+
+                                <!-- TOTALES -->
+
+                                <Grid Margin="0,4,0,2">
+                                    <TextBlock Text="Subtotal:"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               Foreground="#6B7280"/>
+                                    <TextBlock Text="$175.00"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"
+                                               Foreground="#6B7280"/>
+                                </Grid>
+
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="Descuento:"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               Foreground="#6B7280"/>
+                                    <TextBlock Text="$0.00"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"
+                                               Foreground="#6B7280"/>
+                                </Grid>
+
+                                <TextBlock Text="================================"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#374151"/>
+
+                                <Grid Margin="0,3,0,3">
+                                    <TextBlock Text="TOTAL:"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"/>
+                                    <TextBlock Text="$175.00"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Grid Margin="0,2,0,2">
+                                    <TextBlock Text="Pago:"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               Foreground="#6B7280"/>
+                                    <TextBlock Text="$200.00"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"
+                                               Foreground="#6B7280"/>
+                                </Grid>
+
+                                <Grid Margin="0,2,0,8">
+                                    <TextBlock Text="Cambio:"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               Foreground="#6B7280"/>
+                                    <TextBlock Text="$25.00"
+                                               FontSize="10"
+                                               FontFamily="Courier New"
+                                               HorizontalAlignment="Right"
+                                               Foreground="#6B7280"/>
+                                </Grid>
+
+                                <!-- SEPARADOR -->
+
+                                <TextBlock Text="--------------------------------"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#9CA3AF"/>
+
+                                <!-- MENSAJE PIE -->
+
+                                <TextBlock x:Name="previewMensaje"
+                                           Text="¡Gracias por su compra!"
+                                           FontSize="10"
+                                           FontFamily="Courier New"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Foreground="#374151"
+                                           Margin="0,8,0,8"/>
+
+                                <!-- BORDE INFERIOR SERRADO -->
+
+                                <TextBlock Text="▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼"
+                                           FontSize="6"
+                                           Foreground="#D1D5DB"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,5,0,0"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </ScrollViewer>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
 
     </Grid>
 

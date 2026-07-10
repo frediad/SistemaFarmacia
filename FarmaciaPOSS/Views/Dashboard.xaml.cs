@@ -34,6 +34,9 @@ namespace FarmaciaPOS
             txtUsuarioSesion.Text =
                Sesion.NombreUsuario;
 
+            txtCargoSesion.Text = 
+               Sesion.Rol;
+
             CargarProductos();
 
             InicializarCarritoCentral();
@@ -42,9 +45,8 @@ namespace FarmaciaPOS
 
             CargarCategoriasCatalogo();  
             CargarCatalogo();
-            
 
-
+            AplicarPermisosEnMenu();
         }
 
         private DispatcherTimer relojTimer;
@@ -64,7 +66,20 @@ namespace FarmaciaPOS
             txtFechaHora.Text = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt");
         }
 
-       
+        private void AplicarPermisosEnMenu()
+        {
+            PermisosHelper.AplicarPermisosEnMenu(
+                btnVentas,
+                btnPedidos,
+                btnProductos,
+                btnInventario,
+                btnReportes,      
+                btnConfiguracion,
+                btnCaja,
+                btnDevoluciones);
+        }
+
+
         // =========================================
         // CARGAR PRODUCTOS
         // =========================================
@@ -110,6 +125,21 @@ namespace FarmaciaPOS
                     PrecioVenta =
                         Convert.ToDecimal(
                             reader["PrecioVenta"]),
+
+                    Precio2 =
+                         Convert.ToDecimal(
+                             reader["Precio2"]),
+                    Precio3 =
+                         Convert.ToDecimal(
+                            reader["Precio3"]),
+
+                    CantidadMayoreo2 =
+                         Convert.ToInt32(
+                             reader["CantidadMayoreo2"]),
+
+                    CantidadMayoreo3 =
+                         Convert.ToInt32(
+                             reader["CantidadMayoreo3"]),
 
                     ImagenURL =
                         reader["ImagenURL"]
@@ -296,32 +326,53 @@ namespace FarmaciaPOS
             }
         }
 
-        private void BtnPrecio_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void BtnPrecio_Click(object sender, RoutedEventArgs e)
         {
-            var seleccionado =
-                dgCarritoCentral.SelectedItem
-                as VentaItem;
+            var seleccionado = dgCarritoCentral.SelectedItem as VentaItem;
 
             if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "Selecciona un producto de la lista");
+                MessageBox.Show("Selecciona un producto de la lista");
                 return;
             }
 
-            string input =
-                Microsoft.VisualBasic.Interaction
-                .InputBox(
-                    "Nuevo precio:",
-                    "Cambiar precio",
-                    seleccionado.Precio.ToString());
+            var producto = productos.FirstOrDefault(
+                p => p.Id == seleccionado.ProductoId);
 
-            if (decimal.TryParse(input, out decimal nuevoPrecio)
-                && nuevoPrecio > 0)
+            if (producto == null)
+                return;
+
+            var ventana = new SeleccionarPrecioWindow(producto);
+            ventana.Owner = this;
+
+            if (ventana.ShowDialog() == true)
             {
-                seleccionado.Precio = nuevoPrecio;
+                seleccionado.Precio = ventana.PrecioSeleccionado;
+
+                // ✅ Ajustar cantidad mínima según el tipo de precio elegido
+                switch (ventana.TipoPrecio)
+                {
+                    case 2:
+                        if (seleccionado.Cantidad < producto.CantidadMayoreo2
+                            && producto.CantidadMayoreo2 > 0)
+                        {
+                            seleccionado.Cantidad = producto.CantidadMayoreo2;
+                        }
+                        break;
+
+                    case 3:
+                        if (seleccionado.Cantidad < producto.CantidadMayoreo3
+                            && producto.CantidadMayoreo3 > 0)
+                        {
+                            seleccionado.Cantidad = producto.CantidadMayoreo3;
+                        }
+                        break;
+
+                    default:
+                        // Precio 1 — no cambia la cantidad
+                        break;
+                }
+
                 ActualizarCarritoCentral();
             }
         }
@@ -360,32 +411,17 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            string input =
-                Microsoft.VisualBasic.Interaction
-                .InputBox(
-                    "Nombre o código del producto:",
-                    "Buscar producto");
-
-            if (string.IsNullOrEmpty(input))
-                return;
-
-            var resultado =
-                productos.Where(
-                    p =>
-                    p.Nombre.Contains(
-                        input,
-                        StringComparison.OrdinalIgnoreCase)
-                    || p.CodigoBarras.Contains(input))
-                .ToList();
-
-            if (resultado.Count == 0)
+            var ventana = new BuscarProductoWindow(productos)
             {
-                MessageBox.Show("No se encontraron productos");
-                return;
-            }
+                Owner = this
+            };
 
-            AgregarAlCarrito(
-                resultado.First().CodigoBarras);
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true && ventana.ProductoSeleccionado != null)
+            {
+                AgregarProductoDesdeCatalogo(ventana.ProductoSeleccionado);
+            }
         }
 
         private List<VentaEnEspera> ventasEnEspera = new();
@@ -472,8 +508,6 @@ namespace FarmaciaPOS
                 badgeEspera.Visibility = Visibility.Collapsed;
             }
         }
-
-
 
         private void BtnEliminar_Click(
             object sender,
@@ -648,10 +682,11 @@ namespace FarmaciaPOS
                 return;
             }
 
-            ConfiguracionWindow config =
-                new ConfiguracionWindow();
+            ConfiguracionWindow configuracion
+                = new ConfiguracionWindow();
 
-            config.ShowDialog();
+            configuracion.ShowDialog();
+
         }
 
         private void BtnCaja_Click(
@@ -668,6 +703,18 @@ namespace FarmaciaPOS
                 new CajaWindow();
 
             caja.ShowDialog();
+        }
+
+        private void BtnLateralDevoluciones_Click(object sender, RoutedEventArgs e)
+        {
+            if (!PermisosHelper.TieneAcceso("Devoluciones"))
+            {
+                PermisosHelper.MostrarAccesoDenegado();
+                return;
+            }
+
+            var ventana = new DevolucionesWindow();
+            ventana.ShowDialog();
         }
 
         private void BtnSalir_Click(

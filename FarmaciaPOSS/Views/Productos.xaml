@@ -3,21 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Productos"
         Height="700"
-        Width="1150"
+        Width="1100"
         Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
-        Background="#EEF2F7">
+        Background="#F0F4F8">
 
     <Grid Margin="15">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="90"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- HEADER -->
+        <!-- ===================================== -->
+        <!-- HEADER                                -->
+        <!-- ===================================== -->
 
-        <Border Background="White"
+        <Border Background="#1E3A8A"
                 CornerRadius="10"
                 Padding="20"
                 Margin="0,0,0,15">
@@ -27,50 +29,97 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="110"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Gestión de Productos"
-                           FontSize="32"
+                <TextBlock Text="🧪  Gestión de Productos"
+                           FontSize="26"
                            FontWeight="Bold"
+                           Foreground="White"
                            VerticalAlignment="Center"/>
 
-                <TextBox x:Name="txtBuscar"
-                         Grid.Column="1"
-                         Height="45"
-                         FontSize="18"
-                         VerticalContentAlignment="Center"
-                         Text="Buscar producto..."
-                         Foreground="Gray"
-                         TextChanged="txtBuscar_TextChanged"
-                         GotFocus="TxtBuscar_GotFocus"
-                         LostFocus="TxtBuscar_LostFocus"/>
+                <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="8"
+                        Margin="10,0"
+                        VerticalAlignment="Center">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="🔍"
+                                   FontSize="16"
+                                   Margin="10,0,5,0"
+                                   VerticalAlignment="Center"/>
+
+                        <TextBox x:Name="txtBuscar"
+                                 Grid.Column="1"
+                                 Height="42"
+                                 FontSize="15"
+                                 BorderThickness="0"
+                                 VerticalContentAlignment="Center"
+                                 Text="Buscar producto..."
+                                 Foreground="Gray"
+                                 TextChanged="txtBuscar_TextChanged"
+                                 GotFocus="TxtBuscar_GotFocus"
+                                 LostFocus="TxtBuscar_LostFocus">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="Transparent">
+                                        <ScrollViewer x:Name="PART_ContentHost" Margin="4,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+
+                    </Grid>
+
+                </Border>
+
+                <Button Grid.Column="2"
+                        Content="✕ Cerrar"
+                        Width="100"
+                        Height="40"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Background="#DC2626"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        Click="BtnCerrarVentana_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
             </Grid>
 
         </Border>
 
-        <!-- CONTENIDO -->
+        <!-- ===================================== -->
+        <!-- CONTENIDO                             -->
+        <!-- ===================================== -->
 
         <Grid Grid.Row="1">
 
             <Grid.ColumnDefinitions>
-                
-                <ColumnDefinition Width="1"/>
-                <!-- FORMULARIO -->
                 <ColumnDefinition Width="430"/>
-                <!-- TABLA -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
-            
-
-            
 
             <!-- ===================================== -->
             <!-- FORMULARIO                            -->
             <!-- ===================================== -->
 
-            <Border Grid.Column="1"
+            <Border Grid.Column="0"
                     Background="White"
                     CornerRadius="10"
                     Padding="20"
@@ -86,7 +135,7 @@
                                    Margin="0,0,0,15"/>
 
                         <!-- ===================================== -->
-                        <!-- ✅ CARRUSEL DE 3 IMÁGENES              -->
+                        <!-- CARRUSEL DE 3 IMÁGENES                -->
                         <!-- ===================================== -->
 
                         <Border Background="#F8FAFC"
@@ -104,8 +153,6 @@
                                     <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- FLECHA IZQUIERDA -->
-
                                 <Button Grid.Column="0"
                                         x:Name="btnImagenAnterior"
                                         Content="‹"
@@ -115,15 +162,11 @@
                                         VerticalAlignment="Center"
                                         Click="BtnImagenAnterior_Click"/>
 
-                                <!-- IMAGEN ACTUAL -->
-
                                 <Grid Grid.Column="1">
 
                                     <Image x:Name="imgProductoPreview"
                                            Stretch="Uniform"
                                            Margin="10,10,10,30"/>
-
-                                    <!-- BOTÓN CÁMARA (overlay) -->
 
                                     <Button x:Name="btnCargarImagen"
                                             Width="50"
@@ -140,8 +183,6 @@
                                                    Foreground="White"/>
                                     </Button>
 
-                                    <!-- INDICADOR DE POSICIÓN (1/3, 2/3, 3/3) -->
-
                                     <TextBlock x:Name="txtIndicadorImagen"
                                                Text="1 / 3"
                                                FontSize="13"
@@ -150,8 +191,6 @@
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Bottom"
                                                Margin="0,0,0,5"/>
-
-                                    <!-- BOTÓN ELIMINAR IMAGEN ACTUAL -->
 
                                     <Button x:Name="btnEliminarImagen"
                                             Content="✕"
@@ -170,8 +209,6 @@
 
                                 </Grid>
 
-                                <!-- FLECHA DERECHA -->
-
                                 <Button Grid.Column="2"
                                         x:Name="btnImagenSiguiente"
                                         Content="›"
@@ -184,6 +221,7 @@
                             </Grid>
 
                         </Border>
+
                         <!-- NOMBRE -->
 
                         <TextBlock Text="Nombre"
@@ -234,7 +272,6 @@
                                  AcceptsReturn="True"
                                  Margin="0,5,0,15"/>
 
-                      
                         <!-- CATEGORIA -->
 
                         <TextBlock Text="Categoría"
@@ -249,7 +286,7 @@
                                   SelectionChanged="CbCategorias_SelectionChanged"
                                   Margin="0,5,0,15"/>
 
-                        <!-- ✅ NUEVO — SUBCATEGORIA -->
+                        <!-- SUBCATEGORIA -->
 
                         <TextBlock Text="Subcategoría"
                                    FontWeight="Bold"
@@ -275,7 +312,7 @@
 
                         <!-- PRECIO VENTA -->
 
-                        <TextBlock Text="Precio Venta"
+                        <TextBlock Text="Precio Venta (Precio 1 — menudeo)"
                                    FontWeight="Bold"
                                    FontSize="16"/>
 
@@ -283,6 +320,87 @@
                                  Height="40"
                                  FontSize="16"
                                  Margin="0,5,0,15"/>
+
+                        <!-- ===================================== -->
+                        <!-- PRECIOS POR VOLUMEN (ESTILO SICAR)    -->
+                        <!-- ===================================== -->
+
+                        <Border Background="#EFF6FF"
+                                BorderBrush="#BFDBFE"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12"
+                                Margin="0,0,0,15">
+
+                            <StackPanel>
+
+                                <TextBlock Text="💰 Precios por volumen"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#1E3A8A"
+                                           Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Precio por pieza"
+                                           FontSize="11"
+                                           Foreground="#64748B"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,10"/>
+
+                                <!-- PRECIO 2 -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="140"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Precio 2"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="A partir de (pzas.)" FontSize="11" Foreground="Gray"/>
+                                        <TextBox x:Name="txtCantidadMayoreo2" Height="34" FontSize="14"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Precio c/u" FontSize="11" Foreground="Gray"/>
+                                        <TextBox x:Name="txtPrecio2" Height="34" FontSize="14"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- PRECIO 3 -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="140"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Precio 3"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="A partir de (pzas.)" FontSize="11" Foreground="Gray"/>
+                                        <TextBox x:Name="txtCantidadMayoreo3" Height="34" FontSize="14"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Precio c/u" FontSize="11" Foreground="Gray"/>
+                                        <TextBox x:Name="txtPrecio3" Height="34" FontSize="14"/>
+                                    </StackPanel>
+                                </Grid>
+
+                            </StackPanel>
+
+                        </Border>
 
                         <!-- STOCK -->
 
@@ -306,13 +424,7 @@
                                  FontSize="16"
                                  Margin="0,5,0,15"/>
 
-                        <!-- CONTROLADO -->
-
-                        <CheckBox x:Name="chkControlado"
-                                  Content="Medicamento Controlado"
-                                  FontSize="16"
-                                  Margin="0,0,0,15"/>
-
+                       
                         <!-- ACTIVO -->
 
                         <CheckBox x:Name="chkActivo"
@@ -322,7 +434,7 @@
                                   Margin="0,0,0,20"/>
 
                         <!-- ===================================== -->
-                        <!-- ✅ BOTONES ESTILO SICAR                -->
+                        <!-- BOTONES                               -->
                         <!-- ===================================== -->
 
                         <Grid Margin="0,10,0,0">
@@ -371,7 +483,7 @@
                                 Click="BtnEliminar_Click"/>
 
                         <!-- ===================================== -->
-                        <!-- ✅ NUEVO — SECCIÓN DE LOTES            -->
+                        <!-- LOTES                                 -->
                         <!-- ===================================== -->
 
                         <Separator Margin="0,20,0,15"/>
@@ -450,65 +562,181 @@
             </Border>
 
             <!-- ===================================== -->
-            <!-- TABLA -->
+            <!-- TABLA + CATÁLOGO (SOLO LECTURA)        -->
             <!-- ===================================== -->
 
-            <Border Grid.Column="2"
+            <Border Grid.Column="1"
                     Background="White"
                     CornerRadius="10"
                     Padding="10">
 
-                <DataGrid x:Name="dgProductos"
-                          AutoGenerateColumns="False"
-                          FontSize="16"
-                          CanUserAddRows="False"
-                          SelectionChanged="dgProductos_SelectionChanged">
+                <TabControl x:Name="tabVistaProductos"
+                            BorderThickness="0"
+                            Background="Transparent">
 
-                    <DataGrid.Columns>
+                    <!-- ===================================== -->
+                    <!-- PESTAÑA: LISTA                        -->
+                    <!-- ===================================== -->
 
-                        <DataGridTextColumn Header="ID"
-                                            Binding="{Binding Id}"
-                                            Width="80"/>
+                    <TabItem Header="📋 Lista">
 
-                        <DataGridTextColumn Header="Código"
-                                            Binding="{Binding CodigoBarras}"
-                                            Width="180"/>
+                        <DataGrid x:Name="dgProductos"
+                                  AutoGenerateColumns="False"
+                                  FontSize="16"
+                                  CanUserAddRows="False"
+                                  SelectionChanged="dgProductos_SelectionChanged">
 
-                        <DataGridTextColumn Header="Nombre"
-                                            Binding="{Binding Nombre}"
-                                            Width="220"/>
+                            <DataGrid.Columns>
 
-                        <DataGridTextColumn Header="Descripción"
-                                            Binding="{Binding Descripcion}"
-                                            Width="250"/>
+                                <DataGridTextColumn Header="ID"
+                                                    Binding="{Binding Id}"
+                                                    Width="80"/>
 
-                        <DataGridTextColumn Header="Categoría"
-                                            Binding="{Binding CategoriaId}"
-                                            Width="120"/>
+                                <DataGridTextColumn Header="Código"
+                                                    Binding="{Binding CodigoBarras}"
+                                                    Width="180"/>
 
-                        <DataGridTextColumn Header="Precio Compra"
-                                            Binding="{Binding PrecioCompra}"
-                                            Width="140"/>
+                                <DataGridTextColumn Header="Nombre"
+                                                    Binding="{Binding Nombre}"
+                                                    Width="220"/>
 
-                        <DataGridTextColumn Header="Precio Venta"
-                                            Binding="{Binding PrecioVenta}"
-                                            Width="140"/>
+                                <DataGridTextColumn Header="Descripción"
+                                                    Binding="{Binding Descripcion}"
+                                                    Width="250"/>
 
-                        <DataGridTextColumn Header="Stock"
-                                            Binding="{Binding Stock}"
-                                            Width="100"/>
+                                <DataGridTextColumn Header="Categoría"
+                                                    Binding="{Binding CategoriaId}"
+                                                    Width="120"/>
 
-                        <DataGridTextColumn Header="Stock Min."
-                                            Binding="{Binding StockMinimo}"
-                                            Width="120"/>
+                                <DataGridTextColumn Header="Precio Compra"
+                                                    Binding="{Binding PrecioCompra}"
+                                                    Width="140"/>
 
-                        <DataGridCheckBoxColumn Header="Activo"
-                                                Binding="{Binding Activo}"
-                                                Width="100"/>
+                                <DataGridTextColumn Header="Precio 1"
+                                                    Binding="{Binding PrecioVenta}"
+                                                    Width="100"/>
 
-                    </DataGrid.Columns>
+                                <DataGridTextColumn Header="Precio 2"
+                                                    Binding="{Binding Precio2}"
+                                                    Width="100"/>
 
-                </DataGrid>
+                                <DataGridTextColumn Header="Precio 3"
+                                                    Binding="{Binding Precio3}"
+                                                    Width="100"/>
+
+                                <DataGridTextColumn Header="Stock"
+                                                    Binding="{Binding Stock}"
+                                                    Width="100"/>
+
+                                <DataGridTextColumn Header="Stock Min."
+                                                    Binding="{Binding StockMinimo}"
+                                                    Width="120"/>
+
+                                <DataGridCheckBoxColumn Header="Activo"
+                                                        Binding="{Binding Activo}"
+                                                        Width="100"/>
+
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+
+                    </TabItem>
+
+                    <!-- ===================================== -->
+                    <!-- PESTAÑA: CATÁLOGO (SOLO VISTA)          -->
+                    <!-- ===================================== -->
+
+                    <TabItem Header="🖼️ Vista de catálogo">
+
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="55"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                       Text="Así se ven los productos en el punto de venta (solo referencia visual, no interactivo)"
+                                       FontSize="12"
+                                       Foreground="#94A3B8"
+                                       FontStyle="Italic"
+                                       VerticalAlignment="Center"
+                                       Margin="6,0"
+                                       TextWrapping="Wrap"/>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+
+                                <ItemsControl x:Name="icCatalogoVista">
+
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" Margin="8"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+
+                                            <!-- TARJETA — SOLO VISUAL, SIN INTERACCIÓN -->
+                                            <Border Width="120"
+                                                    Height="145"
+                                                    Margin="5"
+                                                    Background="White"
+                                                    BorderBrush="#E2E8F0"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+
+                                                <Grid>
+
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="75"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <Border Background="#F1F5F9" CornerRadius="12,12,0,0">
+                                                        <Image Source="{Binding ImagenURL}"
+                                                               Stretch="Uniform"
+                                                               Margin="8"/>
+                                                    </Border>
+
+                                                    <StackPanel Grid.Row="1" Margin="8,4">
+
+                                                        <TextBlock Text="{Binding Nombre}"
+                                                                   FontSize="11"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="#1E293B"
+                                                                   TextWrapping="Wrap"
+                                                                   MaxHeight="30"
+                                                                   TextTrimming="CharacterEllipsis"/>
+
+                                                        <TextBlock Text="{Binding PrecioVenta, StringFormat=C}"
+                                                                   FontSize="13"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="#2563EB"
+                                                                   Margin="0,3,0,0"/>
+
+                                                        <TextBlock Text="{Binding Stock, StringFormat='Stock: {0}'}"
+                                                                   FontSize="10"
+                                                                   Foreground="#94A3B8"/>
+
+                                                    </StackPanel>
+
+                                                </Grid>
+
+                                            </Border>
+
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+
+                                </ItemsControl>
+
+                            </ScrollViewer>
+
+                        </Grid>
+
+                    </TabItem>
+
+                </TabControl>
 
             </Border>
 
