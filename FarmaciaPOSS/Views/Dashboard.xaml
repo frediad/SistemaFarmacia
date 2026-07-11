@@ -1095,7 +1095,7 @@
                                                 <Border Background="#F1F5F9"
                                                         CornerRadius="12,12,0,0">
 
-                                                    <Image Source="{Binding ImagenURL}"
+                                                    <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                                            Stretch="Uniform"
                                                            Margin="8"/>
 

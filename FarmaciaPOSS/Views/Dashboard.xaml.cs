@@ -95,10 +95,10 @@ namespace FarmaciaPOS
 
             string query =
             @"SELECT p.*,
-            (SELECT TOP 1 img.RutaImagen
+            (SELECT TOP 1 img.ImagenData
             FROM ImagenesProducto img
             WHERE img.ProductoId = p.Id
-            ORDER BY img.Orden) AS PrimeraImagen
+            ORDER BY img.Orden) AS PrimeraImagenData
             FROM Productos p
             WHERE p.Activo = 1";
 
@@ -147,10 +147,9 @@ namespace FarmaciaPOS
                          Convert.ToInt32(
                              reader["CantidadMayoreo3"]),
 
-                    ImagenURL =
-                       reader["PrimeraImagen"] != DBNull.Value
-                       ? reader["PrimeraImagen"].ToString()
-                       : "",
+                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
+                        ? (byte[])reader["PrimeraImagenData"]
+                        : null,
 
                     CategoriaId =
                         reader["CategoriaId"] != DBNull.Value

@@ -1,9 +1,17 @@
 ﻿<Application x:Class="FarmaciaPOSS.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FarmaciaPOSS"
+             xmlns:helpers="clr-namespace:FarmaciaPOS.Helpers"
              StartupUri="Views/Login.xaml">
+
     <Application.Resources>
-         
+
+        <ResourceDictionary>
+
+            <helpers:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+
+        </ResourceDictionary>
+
     </Application.Resources>
+
 </Application>

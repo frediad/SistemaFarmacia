@@ -9,5 +9,7 @@
         public string RutaImagen { get; set; } = string.Empty;
 
         public int Orden { get; set; }
+
+        public byte[]? ImagenData { get; set; }
     }
 }

@@ -51,6 +51,8 @@ namespace FarmaciaPOS.Models
 
         public string ImagenURL { get; set; } = string.Empty;
 
+        public byte[]? ImagenBytes { get; set; }
+
         public bool Activo { get; set; }
     }
 }

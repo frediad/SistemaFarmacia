@@ -278,13 +278,41 @@
                                    FontWeight="Bold"
                                    FontSize="16"/>
 
-                        <ComboBox x:Name="cbCategorias"
-                                  Height="40"
-                                  FontSize="16"
-                                  DisplayMemberPath="Nombre"
-                                  SelectedValuePath="Id"
-                                  SelectionChanged="CbCategorias_SelectionChanged"
-                                  Margin="0,5,0,15"/>
+                        <Grid Margin="0,5,0,15">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="46"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox x:Name="cbCategorias"
+                                      Height="40"
+                                      FontSize="16"
+                                      DisplayMemberPath="Nombre"
+                                      SelectedValuePath="Id"
+                                      SelectionChanged="CbCategorias_SelectionChanged"/>
+
+                            <Button Grid.Column="1"
+                                    Content="➕"
+                                    Height="40"
+                                    Margin="8,0,0,0"
+                                    FontSize="16"
+                                    Background="#16A34A"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    ToolTip="Agregar nueva categoría"
+                                    Click="BtnNuevaCategoria_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                        </Grid>
 
                         <!-- SUBCATEGORIA -->
 
@@ -292,12 +320,40 @@
                                    FontWeight="Bold"
                                    FontSize="16"/>
 
-                        <ComboBox x:Name="cbSubcategorias"
-                                  Height="40"
-                                  FontSize="16"
-                                  DisplayMemberPath="Nombre"
-                                  SelectedValuePath="Id"
-                                  Margin="0,5,0,15"/>
+                        <Grid Margin="0,5,0,15">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="46"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox x:Name="cbSubcategorias"
+                                      Height="40"
+                                      FontSize="16"
+                                      DisplayMemberPath="Nombre"
+                                      SelectedValuePath="Id"/>
+
+                            <Button Grid.Column="1"
+                                    Content="➕"
+                                    Height="40"
+                                    Margin="8,0,0,0"
+                                    FontSize="16"
+                                    Background="#16A34A"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    ToolTip="Agregar nueva subcategoría"
+                                    Click="BtnNuevaSubcategoria_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                        </Grid>
 
                         <!-- PRECIO COMPRA -->
 
@@ -694,7 +750,7 @@
                                                     </Grid.RowDefinitions>
 
                                                     <Border Background="#F1F5F9" CornerRadius="12,12,0,0">
-                                                        <Image Source="{Binding ImagenURL}"
+                                                        <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                                                Stretch="Uniform"
                                                                Margin="8"/>
                                                     </Border>
