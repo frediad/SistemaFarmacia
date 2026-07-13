@@ -26,8 +26,7 @@ namespace FarmaciaPOS.Views
 
         private void BtnPerifericos_Click(object sender, RoutedEventArgs e)
         {
-            Perifericos ventana = new Perifericos();
-            ventana.ShowDialog();
+            MessageBox.Show("Información del negocio");
         }
 
         // =====================================
