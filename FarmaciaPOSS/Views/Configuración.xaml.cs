@@ -26,7 +26,8 @@ namespace FarmaciaPOS.Views
 
         private void BtnPerifericos_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Configuración de periféricos");
+            Perifericos ventana = new Perifericos();
+            ventana.ShowDialog();
         }
 
         // =====================================
@@ -51,7 +52,9 @@ namespace FarmaciaPOS.Views
 
         private void BtnPOS_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Configuración POS");
+            PosConfig Ventana  = new PosConfig();
+            Ventana.ShowDialog();
+            
         }
 
         // =====================================

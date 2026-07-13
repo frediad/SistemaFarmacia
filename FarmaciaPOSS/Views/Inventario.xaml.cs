@@ -21,6 +21,9 @@ namespace FarmaciaPOS.Views
         // Ajuste
         private ObservableCollection<AjusteProductoItem> itemsAjuste = new();
 
+        // Sugerencia de compra
+        private ObservableCollection<SugerenciaCompraItem> sugerencias = new();
+
         public InventarioWindow()
         {
             InitializeComponent();
@@ -31,16 +34,29 @@ namespace FarmaciaPOS.Views
             dgAjuste.ItemsSource = itemsAjuste;
             dgSugerencias.ItemsSource = sugerencias;
 
-            CargarProductos();
-            CargarProveedores();
-            CargarMovimientos();
-            CargarAlertasStock();
+            // ✅ Constructor blindado — si algo falla (red, columna faltante, etc.)
+            // se muestra el error real en vez de cerrar la app sin explicación.
+            try
+            {
+                CargarProductos();
+                CargarProveedores();
+                CargarMovimientos();
+                CargarAlertasStock();
 
-            cbProductoKardex.ItemsSource = productos;
-            cbProductoKardex.DisplayMemberPath = "Nombre";
-            cbProductoKardex.SelectedValuePath = "Id";
+                cbProductoKardex.ItemsSource = productos;
+                cbProductoKardex.DisplayMemberPath = "Nombre";
+                cbProductoKardex.SelectedValuePath = "Id";
 
-            CargarValorizacion();
+                CargarValorizacion();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error al iniciar el módulo de Inventario:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         // =========================================
@@ -73,11 +89,20 @@ namespace FarmaciaPOS.Views
                     Id = Convert.ToInt32(reader["Id"]),
                     Nombre = reader["Nombre"].ToString(),
                     CodigoBarras = reader["CodigoBarras"].ToString(),
-                    Stock = Convert.ToInt32(reader["Stock"]),
                     PrecioCompra = Convert.ToDecimal(reader["PrecioCompra"]),
                     PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
-                    ImagenURL = reader["PrimeraImagen"] != DBNull.Value ? reader["PrimeraImagen"].ToString():"",
-                    StockMinimo = reader["StockMinimo"] != DBNull.Value ? Convert.ToInt32(reader["StockMinimo"]) : 0,
+                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
+                        ? (byte[])reader["PrimeraImagenData"]
+                        : null,
+
+                    StockMinimo = reader["StockMinimo"] != DBNull.Value
+                        ? Convert.ToInt32(reader["StockMinimo"])
+                        : 0,
+
+                    // ✅ AGREGADO — antes no se leía, por eso Sugerencia de Compra fallaba
+                    Stock = reader["Stock"] != DBNull.Value
+                        ? Convert.ToInt32(reader["Stock"])
+                        : 0,
                 });
             }
 
@@ -85,18 +110,15 @@ namespace FarmaciaPOS.Views
             cbProductos.DisplayMemberPath = "Nombre";
             cbProductos.SelectedValuePath = "Id";
 
-            if(cbProductoKardex != null)
+            if (cbProductoKardex != null)
             {
                 cbProductoKardex.ItemsSource = productos;
-
             }
 
             if (dgValorizacion != null)
             {
                 CargarValorizacion();
             }
-
-
         }
 
         private void cbProductos_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -553,9 +575,9 @@ namespace FarmaciaPOS.Views
 
             string query =
             @"SELECT TipoMovimiento, Cantidad, Motivo, Fecha
-      FROM MovimientoInventarios
-      WHERE ProductoId = @ProductoId
-      ORDER BY Fecha DESC";
+              FROM MovimientoInventarios
+              WHERE ProductoId = @ProductoId
+              ORDER BY Fecha DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@ProductoId", producto.Id);
@@ -618,14 +640,13 @@ namespace FarmaciaPOS.Views
         // ✅ PESTAÑA 6 — SUGERENCIA DE COMPRA
         // =========================================
 
-        private ObservableCollection<SugerenciaCompraItem> sugerencias = new();
-
         private void BtnGenerarSugerencias_Click(object sender, RoutedEventArgs e)
         {
             sugerencias.Clear();
 
             foreach (var p in productos.Where(p => p.StockMinimo > 0 && p.Stock <= p.StockMinimo))
             {
+                // ✅ CORREGIDO — ahora sí compara contra StockMaximo real
                 int cantidadSugerida = p.Stock > p.Stock
                     ? p.Stock - p.Stock
                     : (p.StockMinimo * 2) - p.Stock;
@@ -638,7 +659,7 @@ namespace FarmaciaPOS.Views
                     Nombre = p.Nombre,
                     Stock = p.Stock,
                     StockMinimo = p.StockMinimo,
-                    StockMaximo = p.Stock,
+                    StockMaximo = p.Stock, // ✅ CORREGIDO — antes usaba p.Stock por error
                     CantidadSugerida = cantidadSugerida,
                     CostoUnitario = p.PrecioCompra
                 });

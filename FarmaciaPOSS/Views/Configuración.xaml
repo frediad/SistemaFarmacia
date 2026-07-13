@@ -158,7 +158,7 @@
                                FontSize="15"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Impresoras, lectores y cajón"
+                    <TextBlock Text="Impresoras y lectores"
                                FontSize="11"
                                Foreground="#94A3B8"
                                HorizontalAlignment="Center"
@@ -196,11 +196,11 @@
                                FontSize="32"
                                HorizontalAlignment="Center"
                                Margin="0,0,0,8"/>
-                    <TextBlock Text="Configuración POS"
+                    <TextBlock Text="Base de datos"
                                FontSize="15"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Métodos de pago y caja"
+                    <TextBlock Text="Respalda tu información"
                                FontSize="11"
                                Foreground="#94A3B8"
                                HorizontalAlignment="Center"

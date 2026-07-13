@@ -213,7 +213,7 @@ namespace FarmaciaPOS
 
             // ✅ Mostrar nombre e imagen del producto escaneado
             txtNombreProductoActual.Text = producto.Nombre;
-            CargarImagenProductoActual(producto.ImagenURL);
+            CargarImagenProductoActual(producto.ImagenBytes);
 
             var existente =
                 carritoCentral.FirstOrDefault(
@@ -242,9 +242,9 @@ namespace FarmaciaPOS
         // MOSTRAR IMAGEN DEL PRODUCTO
         // =========================================
 
-        private void CargarImagenProductoActual(string ruta)
+        private void CargarImagenProductoActual(byte[]? imagenBytes)
         {
-            if (string.IsNullOrWhiteSpace(ruta))
+            if (imagenBytes == null || imagenBytes.Length == 0)
             {
                 imgProductoActual.Source = null;
                 return;
@@ -252,9 +252,16 @@ namespace FarmaciaPOS
 
             try
             {
-                imgProductoActual.Source =
-                    new System.Windows.Media.Imaging.BitmapImage(
-                        new Uri(ruta));
+                using var stream = new System.IO.MemoryStream(imagenBytes);
+
+                var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                imgProductoActual.Source = bitmap;
             }
             catch
             {
@@ -934,7 +941,7 @@ namespace FarmaciaPOS
 
             // ✅ Mostrar nombre e imagen del producto agregado
             txtNombreProductoActual.Text = producto.Nombre;
-            CargarImagenProductoActual(producto.ImagenURL);
+            CargarImagenProductoActual(producto.ImagenBytes);
 
             ActualizarCarritoCentral();
         }

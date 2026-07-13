@@ -711,15 +711,7 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0"
-                                       Text="Así se ven los productos en el punto de venta (solo referencia visual, no interactivo)"
-                                       FontSize="12"
-                                       Foreground="#94A3B8"
-                                       FontStyle="Italic"
-                                       VerticalAlignment="Center"
-                                       Margin="6,0"
-                                       TextWrapping="Wrap"/>
-
+                            
                             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
 
                                 <ItemsControl x:Name="icCatalogoVista">

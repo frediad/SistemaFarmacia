@@ -456,107 +456,108 @@
         <!-- ========================================= -->
 
         <Border Grid.Row="1"
+        Background="White"
+        BorderBrush="#E2E8F0"
+        BorderThickness="0,0,0,1">
+
+    <Grid Margin="15,0">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="130"/>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Código o Nombre:"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Foreground="#374151"
+                   VerticalAlignment="Center"/>
+
+        <TextBox x:Name="txtCodigoProducto"
+                 Grid.Column="1"
+                 Height="38"
+                 FontSize="18"
+                 VerticalContentAlignment="Center"
+                 Margin="0,0,10,0"
+                 Padding="8,0"
+                 BorderBrush="#CBD5E1"
+                 KeyDown="txtCodigoProducto_KeyDown">
+            <TextBox.Template>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="White"
+                            BorderBrush="#CBD5E1"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="8,0"/>
+                    </Border>
+                </ControlTemplate>
+            </TextBox.Template>
+        </TextBox>
+
+        <TextBlock x:Name="txtNombreProductoActual"
+                   Grid.Column="2"
+                   Text=""
+                   FontSize="14"
+                   FontWeight="Bold"
+                   Foreground="#2563EB"
+                   VerticalAlignment="Center"
+                   Margin="0,0,10,0"
+                   TextTrimming="CharacterEllipsis"/>
+
+        <Border Grid.Column="3"
                 Background="White"
-                BorderBrush="#E2E8F0"
-                BorderThickness="0,0,0,1">
+                BorderBrush="#CBD5E1"
+                BorderThickness="1"
+                CornerRadius="8"
+                Margin="0,4,10,4">
 
-            <Grid Margin="15,0">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="130"/>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="200"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Text="Código o Nombre:"
-                           FontSize="16"
-                           FontWeight="Bold"
-                           Foreground="#374151"
-                           VerticalAlignment="Center"/>
-
-                <TextBox x:Name="txtCodigoProducto"
-                         Grid.Column="1"
-                         Height="38"
-                         FontSize="18"
-                         VerticalContentAlignment="Center"
-                         Margin="0,0,10,0"
-                         Padding="8,0"
-                         BorderBrush="#CBD5E1"
-                         KeyDown="txtCodigoProducto_KeyDown">
-                    <TextBox.Template>
-                        <ControlTemplate TargetType="TextBox">
-                            <Border Background="White"
-                                    BorderBrush="#CBD5E1"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                <ScrollViewer x:Name="PART_ContentHost"
-                                              Margin="8,0"/>
-                            </Border>
-                        </ControlTemplate>
-                    </TextBox.Template>
-                </TextBox>
-
-                <TextBlock x:Name="txtNombreProductoActual"
-                           Grid.Column="2"
-                           Text=""
-                           FontSize="14"
-                           FontWeight="Bold"
-                           Foreground="#2563EB"
-                           VerticalAlignment="Center"
-                           Margin="0,0,10,0"
-                           TextTrimming="CharacterEllipsis"/>
-
-                <Border Grid.Column="3"
-                        Background="White"
-                        BorderBrush="#CBD5E1"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Margin="0,8,10,8">
-
-                    <Image x:Name="imgProductoActual"
-                           Stretch="Uniform"
-                           Margin="4"
-                           Height="70"
-                           Width="70"/>
-
-                </Border>
-
-                <Button Grid.Column="4"
-                        Content="📷 Lector Barras"
-                        Height="38"
-                        FontSize="13"
-                        FontWeight="Bold"
-                        Background="#EFF6FF"
-                        Foreground="#2563EB"
-                        BorderThickness="1"
-                        BorderBrush="#BFDBFE"
-                        Cursor="Hand">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="b"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8">
-                                <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="b"
-                                            Property="Background"
-                                            Value="#DBEAFE"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-
-            </Grid>
+            <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
+                   x:Name="imgProductoActual"
+                   Stretch="Uniform"
+                   Margin="4"
+                   Height="110"
+                   Width="110"/>
 
         </Border>
+
+        <Button Grid.Column="4"
+                Content="📷 Lector Barras"
+                Height="38"
+                FontSize="13"
+                FontWeight="Bold"
+                Background="#EFF6FF"
+                Foreground="#2563EB"
+                BorderThickness="1"
+                BorderBrush="#BFDBFE"
+                Cursor="Hand">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b"
+                                    Property="Background"
+                                    Value="#DBEAFE"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+    </Grid>
+
+</Border>
 
         <!-- ========================================= -->
         <!-- CONTENIDO PRINCIPAL                       -->
@@ -1056,8 +1057,8 @@
                                     <DataTemplate>
                                       
                                         <!-- TARJETA DE PRODUCTO -->
-                                        <Border Width="120"
-                                                Height="145"
+                                        <Border Width="160"
+                                                Height="200"
                                                 Margin="5"
                                                 Background="White"
                                                 BorderBrush="#E2E8F0"
@@ -1087,7 +1088,7 @@
                                             <Grid>
 
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition Height="75"/>
+                                                    <RowDefinition Height="115"/>
                                                     <RowDefinition Height="*"/>
                                                 </Grid.RowDefinitions>
 
@@ -1097,30 +1098,30 @@
 
                                                     <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                                            Stretch="Uniform"
-                                                           Margin="8"/>
+                                                           Margin="10"/>
 
                                                 </Border>
 
                                                 <!-- INFO -->
                                                 <StackPanel Grid.Row="1"
-                                                            Margin="8,4">
+                                                            Margin="10,6">
 
                                                     <TextBlock Text="{Binding Nombre}"
-                                                               FontSize="11"
+                                                               FontSize="13"
                                                                FontWeight="Bold"
                                                                Foreground="#1E293B"
                                                                TextWrapping="Wrap"
-                                                               MaxHeight="30"
+                                                               MaxHeight="36"
                                                                TextTrimming="CharacterEllipsis"/>
 
                                                     <TextBlock Text="{Binding PrecioVenta, StringFormat=C}"
-                                                               FontSize="13"
+                                                               FontSize="15"
                                                                FontWeight="Bold"
                                                                Foreground="#2563EB"
-                                                               Margin="0,3,0,0"/>
+                                                               Margin="0,4,0,0"/>
 
                                                     <TextBlock Text="{Binding Stock, StringFormat='Stock: {0}'}"
-                                                               FontSize="10"
+                                                               FontSize="11"
                                                                Foreground="#94A3B8"/>
 
                                                 </StackPanel>
@@ -1153,7 +1154,7 @@
               Margin="8,0">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="1"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>

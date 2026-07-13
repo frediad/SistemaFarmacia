@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Web;
 
 namespace FarmaciaPOS.Helpers
 {
     public static class CorreoHelper
     {
-        // Abre el cliente de correo predeterminado (Outlook, Gmail vía navegador si está configurado, etc.)
-        // con el mensaje ya redactado, para que el usuario lo revise y presione Enviar.
-        public static void AbrirCorreoPedido(string destinatario, string asunto, string cuerpo)
+        // =========================================
+        // ✅ ABRIR GMAIL EN EL NAVEGADOR CON EL
+        //    CORREO YA REDACTADO
+        // =========================================
+
+        public static void AbrirCorreoPedido(
+            string destinatario,
+            string asunto,
+            string cuerpo)
         {
             if (string.IsNullOrWhiteSpace(destinatario))
-                throw new Exception("El proveedor no tiene un correo electrónico registrado.");
+                throw new Exception("El proveedor no tiene correo registrado.");
 
-            try
+            // ✅ Construye la URL de Gmail con los parámetros codificados
+            string urlGmail =
+                "https://mail.google.com/mail/?view=cm" +
+                "&fs=1" +
+                $"&to={Uri.EscapeDataString(destinatario)}" +
+                $"&su={Uri.EscapeDataString(asunto)}" +
+                $"&body={Uri.EscapeDataString(cuerpo)}";
+
+            // ✅ Abre la URL en el navegador predeterminado
+            Process.Start(new ProcessStartInfo
             {
-                string cuerpoNormalizado = cuerpo.Replace("\r\n", "\n").Replace("\n", "\r\n");
-
-                string mailto =
-                    $"mailto:{Uri.EscapeDataString(destinatario)}" +
-                    $"?subject={Uri.EscapeDataString(asunto)}" +
-                    $"&body={Uri.EscapeDataString(cuerpoNormalizado)}";
-
-                var psi = new ProcessStartInfo(mailto)
-                {
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(
-                    "No se pudo abrir el cliente de correo. Verifica que tengas una aplicación de correo " +
-                    "predeterminada configurada en Windows (Outlook, etc.).", ex);
-            }
+                FileName = urlGmail,
+                UseShellExecute = true
+            });
         }
     }
 }

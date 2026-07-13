@@ -162,52 +162,93 @@ namespace FarmaciaPOS.Views
             if (string.IsNullOrWhiteSpace(proveedor.Correo))
             {
                 MessageBox.Show(
-                    $"El proveedor \"{proveedor.Nombre}\" no tiene un correo electrónico registrado.\n" +
-                    "Agrégalo desde el módulo de Proveedores antes de continuar.",
+                    $"El proveedor \"{proveedor.Nombre}\" no tiene correo registrado.\n" +
+                    "Agrégalo desde el módulo de Proveedores.",
                     "Falta correo",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 return;
             }
 
-            string metodoPago = (cbMetodoPago.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Transferencia";
+            string metodoPago = (cbMetodoPago.SelectedItem as ComboBoxItem)?
+                .Content.ToString() ?? "Transferencia";
 
-            string asunto = $"Pedido de mercancía — FarmaClick Yatzil ({DateTime.Now:dd/MM/yyyy})";
+            // ✅ Construir asunto y cuerpo
+            string asunto =
+                $"Pedido de mercancía — FarmaClick Yatzil ({DateTime.Now:dd/MM/yyyy})";
 
-            var cuerpo = new StringBuilder();
-            cuerpo.AppendLine($"Estimado(a) {(string.IsNullOrWhiteSpace(proveedor.Contacto) ? proveedor.Nombre : proveedor.Contacto)},");
+            var cuerpo = new System.Text.StringBuilder();
+
+            cuerpo.AppendLine(
+                $"Estimado(a) {(string.IsNullOrWhiteSpace(proveedor.Contacto) ? proveedor.Nombre : proveedor.Nombre)},");
             cuerpo.AppendLine();
-            cuerpo.AppendLine("Por medio del presente solicitamos el siguiente pedido de mercancía:");
+            cuerpo.AppendLine(
+                "Por medio del presente le solicitamos el siguiente pedido de mercancía:");
             cuerpo.AppendLine();
+            cuerpo.AppendLine("--------------------------------------------------");
+            cuerpo.AppendLine("PRODUCTO              CANTIDAD    COSTO U.    SUBTOTAL");
             cuerpo.AppendLine("--------------------------------------------------");
 
             foreach (var item in itemsPedido)
             {
-                cuerpo.AppendLine($"- {item.Nombre}");
-                cuerpo.AppendLine($"   Cantidad: {item.Cantidad}   Costo unitario estimado: {item.CostoUnitario:C}   Subtotal: {item.Subtotal:C}");
+                cuerpo.AppendLine(
+                    $"{item.Nombre,-22} {item.Cantidad,-11} " +
+                    $"{item.CostoUnitario:C,-11} {item.Subtotal:C}");
             }
 
             cuerpo.AppendLine("--------------------------------------------------");
-            cuerpo.AppendLine($"TOTAL ESTIMADO: {itemsPedido.Sum(x => x.Subtotal):C}");
+            cuerpo.AppendLine(
+                $"TOTAL ESTIMADO: {itemsPedido.Sum(x => x.Subtotal):C}");
             cuerpo.AppendLine();
-            cuerpo.AppendLine($"El pago de este pedido se realizará por: {metodoPago}.");
-            cuerpo.AppendLine("Favor de confirmar disponibilidad, precios y tiempo de entrega.");
+            cuerpo.AppendLine(
+                $"Forma de pago: {metodoPago}.");
+            cuerpo.AppendLine(
+                "Favor de confirmar disponibilidad, precios actualizados y tiempo de entrega.");
             cuerpo.AppendLine();
-            cuerpo.AppendLine("Quedamos atentos, saludos.");
+            cuerpo.AppendLine("Quedamos atentos a su respuesta.");
             cuerpo.AppendLine();
+            cuerpo.AppendLine("Atentamente,");
             cuerpo.AppendLine("FarmaClick Yatzil");
 
             try
             {
-                CorreoHelper.AbrirCorreoPedido(proveedor.Correo, asunto, cuerpo.ToString());
+                // ✅ Confirmar antes de abrir Gmail
+                var confirmar = MessageBox.Show(
+                    $"Se abrirá Gmail en tu navegador con el pedido listo para enviar a:\n\n" +
+                    $"📧 {proveedor.Correo}\n\n" +
+                    $"Método de pago: {metodoPago}\n" +
+                    $"Total estimado: {itemsPedido.Sum(x => x.Subtotal):C}\n\n" +
+                    "¿Continuar?",
+                    "Confirmar",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (confirmar != MessageBoxResult.Yes)
+                    return;
+
+                CorreoHelper.AbrirCorreoPedido(
+                    proveedor.Correo,
+                    asunto,
+                    cuerpo.ToString());
+
+                MessageBox.Show(
+                    "✅ Se abrió Gmail en tu navegador.\n" +
+                    "Revisa que el contenido sea correcto y presiona Enviar.",
+                    "Gmail abierto",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                DialogResult = true;
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show(
+                    $"Error al abrir Gmail:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
-
-            DialogResult = true;
         }
     }
 }
