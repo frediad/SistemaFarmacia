@@ -7,10 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 // ==============================
 // CONEXIÓN A SQL SERVER / AZURE SQL
 // ==============================
+string conexionActiva =
+    builder.Configuration["BaseDatosActiva"];
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString(conexionActiva)));
 
 
 // ==============================
