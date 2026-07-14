@@ -761,57 +761,16 @@
                             </StackPanel>
                         </Button>
 
-                        <Button x:Name="btnLateralBascula"
-                                Style="{StaticResource BtnLateral}">
-                            <StackPanel>
-                                <TextBlock Text="⚖️"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Báscula"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#374151"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="F9"
-                                           FontSize="9"
-                                           Foreground="#94A3B8"
-                                           HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button x:Name="btnLateralImporte"
-                                Style="{StaticResource BtnLateral}">
-                            <StackPanel>
-                                <TextBlock Text="💵"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Importe"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#374151"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="F10"
-                                           FontSize="9"
-                                           Foreground="#94A3B8"
-                                           HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
                         <Rectangle Height="1"
                                    Fill="#E2E8F0"
                                    Margin="10,6"/>
 
-                        <Button x:Name="btnLateralCliente"
-                                Style="{StaticResource BtnLateral}">
+                        <Button x:Name="btnClientes"
+                                Style="{StaticResource BtnLateral}"
+                                Click="BtnLateralClientes_Click">
                             <StackPanel>
-                                <TextBlock Text="👤"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Cliente"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#374151"
-                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="👥" FontSize="20" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Clientes" FontSize="10" FontWeight="Bold" Foreground="#374151" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 

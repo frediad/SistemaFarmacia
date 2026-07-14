@@ -76,7 +76,8 @@ namespace FarmaciaPOS
                 btnReportes,      
                 btnConfiguracion,
                 btnCaja,
-                btnDevoluciones);
+                btnDevoluciones,
+                btnClientes);
         }
 
 
@@ -727,6 +728,18 @@ namespace FarmaciaPOS
             }
 
             var ventana = new DevolucionesWindow();
+            ventana.ShowDialog();
+        }
+
+        private void BtnLateralClientes_Click(object sender, RoutedEventArgs e)
+        {
+            if (!PermisosHelper.TieneAcceso("Clientes"))
+            {
+                PermisosHelper.MostrarAccesoDenegado();
+                return;
+            }
+
+            var ventana = new ClientesWindow();
             ventana.ShowDialog();
         }
 

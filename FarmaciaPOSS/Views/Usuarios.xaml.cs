@@ -27,7 +27,10 @@ namespace FarmaciaPOS.Views
             "Usuarios y Roles",
             "Proveedores",
             "FarmaciaConfi",
-            "Devoluciones"
+            "Devoluciones",
+            "Clientes",
+
+
         };
 
         ObservableCollection<ModuloPermiso> listaModulos = new();

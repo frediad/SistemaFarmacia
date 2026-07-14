@@ -16,9 +16,7 @@ namespace FarmaciaPOS.Helpers
                 .Build();
         }
 
-        // Cache del último modo resuelto en "Ambas", para no probar la conexión
-        // en cada consulta (sería muy lento). Se recalcula una vez por sesión de la app,
-        // o al llamar ForzarReevaluacion().
+        
         private static string? _cacheConexionResuelta;
 
         public static void ForzarReevaluacion()

@@ -52,7 +52,8 @@ namespace FarmaciaPOS.Helpers
             System.Windows.Controls.Button btnReportes,
             System.Windows.Controls.Button btnConfiguracion,
             System.Windows.Controls.Button btnCaja,
-            System.Windows.Controls.Button btnDevoluciones)
+            System.Windows.Controls.Button btnDevoluciones,
+            System.Windows.Controls.Button btnClientes)
         {
             // Administrador ve todo
             if (Sesion.RolId == 1)
@@ -81,7 +82,10 @@ namespace FarmaciaPOS.Helpers
                 btnCaja.Visibility = Visibility.Collapsed;
 
             if (!TieneAcceso("Devoluciones"))
-                btnCaja.Visibility = Visibility.Collapsed;
+                btnDevoluciones.Visibility = Visibility.Collapsed;
+
+            if (!TieneAcceso("Clientes"))
+                btnClientes.Visibility = Visibility.Collapsed;
         }
 
         // =========================================
