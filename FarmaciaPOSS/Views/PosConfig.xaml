@@ -65,6 +65,10 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="87*"/>
+            <ColumnDefinition Width="13*"/>
+        </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="65"/>
@@ -72,7 +76,7 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Border Background="#1E3A8A" Grid.Row="0">
+        <Border Background="#1E3A8A" Grid.Row="0" Grid.ColumnSpan="2">
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -109,7 +113,7 @@
         </Border>
 
         <!-- PESTAÑAS -->
-        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="15">
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="15,15,15,15" Grid.ColumnSpan="2">
 
             <!-- ===================================== -->
             <!-- IMPRESORA DE TICKETS                   -->

@@ -9,13 +9,17 @@
         Background="#F4F6F9">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="224*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- Encabezado -->
         <Border Background="#1565C0"
                 Height="80"
-                VerticalAlignment="Top">
+                VerticalAlignment="Top" Grid.ColumnSpan="2">
 
-            <TextBlock Text="Dashboard de ventas"
+            <TextBlock Text="Estadisticas"
                        Foreground="White"
                        FontSize="28"
                        FontWeight="Bold"
@@ -25,8 +29,8 @@
         </Border>
 
         <!-- Botones -->
-        <StackPanel Margin="0,120,0,0"
-                    HorizontalAlignment="Center">
+        <StackPanel Margin="246,120,0,0"
+                    HorizontalAlignment="Left" Grid.Column="1">
 
             <Button x:Name="btnCaducidades"
                     Width="400"
