@@ -260,7 +260,9 @@
                                                 CornerRadius="10"
                                                 Background="#EEF3EE"
                                                 HorizontalAlignment="Center"
-                                                VerticalAlignment="Center">
+                                                VerticalAlignment="Center"
+                                                Cursor="Hand"
+                                                MouseLeftButtonDown="ImagenProducto_Click">
                                             <Image Source="{Binding ImagenURL}"
                                                    Stretch="UniformToFill"
                                                    Width="42" Height="42"/>
@@ -337,6 +339,27 @@
                     Style="{StaticResource BotonModerno}"
                     Click="btnRegresar_Click"/>
 
+        </Grid>
+
+        <!-- ================== VISOR DE IMAGEN AMPLIADA ================== -->
+        <Grid x:Name="overlayImagen"
+              Background="#CC000000"
+              Visibility="Collapsed"
+              MouseLeftButtonUp="overlayImagen_Click">
+
+            <Image x:Name="imgAmpliada"
+                   Stretch="Uniform"
+                   MaxWidth="500"
+                   MaxHeight="500"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+            <TextBlock Text="Clic para cerrar"
+                       Foreground="White"
+                       FontSize="13"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,0,30"/>
         </Grid>
 
     </Grid>

@@ -2,6 +2,9 @@
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Data.SqlClient;
 using FarmaciaPOS.Helpers;
 
@@ -38,18 +41,27 @@ namespace FarmaciaPOS.Views
 
                     string query = @"
                     SELECT
-                        CodigoBarras,
-                        Nombre,
-                        Caducidad,
-                        DATEDIFF(DAY, GETDATE(), Caducidad) AS DiasRestantes,
-                        Stock,
+                        p.CodigoBarras,
+                        p.Nombre,
+                        img.RutaImagen AS ImagenURL,
+                        p.Caducidad,
+                        DATEDIFF(DAY, GETDATE(), p.Caducidad) AS DiasRestantes,
+                        p.Stock,
                         CASE
-                            WHEN DATEDIFF(DAY, GETDATE(), Caducidad) <= 7
-                                THEN 'URGENTE'
-                            ELSE 'PRÓXIMO'
+                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) < 0
+                                THEN 'CADUCADO'
+                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) <= 30
+                                THEN 'PRÓXIMO A CADUCAR'
+                            ELSE 'NO CADUCADO'
                         END AS Estado
-                    FROM Productos
-                    ORDER BY Caducidad ASC";
+                    FROM Productos p
+                    OUTER APPLY (
+                        SELECT TOP 1 ip.RutaImagen
+                        FROM ImagenesProducto ip
+                        WHERE ip.ProductoId = p.Id
+                        ORDER BY ip.Orden ASC
+                    ) img
+                    ORDER BY p.Caducidad ASC";
 
                     SqlDataAdapter da = new SqlDataAdapter(query, con);
                     da.Fill(dt);
@@ -99,6 +111,42 @@ namespace FarmaciaPOS.Views
         private void btnRegresar_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        // =========================================
+        // VISOR DE IMAGEN AMPLIADA
+        // =========================================
+
+        private void ImagenProducto_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not FrameworkElement elemento)
+                return;
+
+            if (elemento.DataContext is not DataRowView fila)
+                return;
+
+            if (fila["ImagenURL"] == DBNull.Value)
+                return;
+
+            string ruta = fila["ImagenURL"].ToString();
+
+            if (string.IsNullOrWhiteSpace(ruta))
+                return;
+
+            try
+            {
+                imgAmpliada.Source = new BitmapImage(new Uri(ruta));
+                overlayImagen.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo cargar la imagen:\n" + ex.Message);
+            }
+        }
+
+        private void overlayImagen_Click(object sender, MouseButtonEventArgs e)
+        {
+            overlayImagen.Visibility = Visibility.Collapsed;
         }
     }
 }
