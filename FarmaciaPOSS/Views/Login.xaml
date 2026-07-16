@@ -296,13 +296,11 @@
                             Style="{StaticResource BtnLoginPrincipal}"
                             Click="BtnLogin_Click"/>
 
-                    <TextBlock Text="Sistema de punto de venta farmacéutico"
-                               FontSize="11"
-                               Foreground="#CBD5E1"
-                               HorizontalAlignment="Center"
-                               Margin="0,26,0,0"/>
+                              
 
                 </StackPanel>
+                
+                
 
             </Border>
 
