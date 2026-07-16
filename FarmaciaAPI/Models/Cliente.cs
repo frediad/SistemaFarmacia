@@ -12,6 +12,12 @@
 
         public string Direccion { get; set; } = string.Empty;
 
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public string RFC { get; set; } = string.Empty;
+        public decimal LimiteCredito { get; set; }
+        public decimal SaldoActual { get; set; }
+        public DateTime FechaRegistro { get; set; }
+        public bool Activo { get; set; }
+
+        public decimal CreditoDisponible => LimiteCredito - SaldoActual;
     }
 }
