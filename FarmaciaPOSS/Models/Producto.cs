@@ -54,5 +54,17 @@ namespace FarmaciaPOS.Models
         public byte[]? ImagenBytes { get; set; }
 
         public bool Activo { get; set; }
+
+        public string NombreCategoria { get; set; } = "";
+
+        public string EstadoStock
+        {
+            get
+            {
+                if (Stock <= 0) return "Agotado";
+                if (StockMinimo > 0 && Stock <= StockMinimo) return "Bajo";
+                return "Normal";
+            }
+        }
     }
 }

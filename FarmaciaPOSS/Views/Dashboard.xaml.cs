@@ -311,8 +311,8 @@ namespace FarmaciaPOS
         }
 
         private void BtnCantidad_Click(
-            object sender,
-            RoutedEventArgs e)
+    object sender,
+    RoutedEventArgs e)
         {
             var seleccionado =
                 dgCarritoCentral.SelectedItem
@@ -325,21 +325,28 @@ namespace FarmaciaPOS
                 return;
             }
 
-            string input =
-                Microsoft.VisualBasic.Interaction
-                .InputBox(
-                    "Nueva cantidad:",
-                    "Cambiar cantidad",
-                    seleccionado.Cantidad.ToString());
+            
+            var producto = productos.FirstOrDefault(p => p.Id == seleccionado.ProductoId);
 
-            if (int.TryParse(input, out int nuevaCant)
-                && nuevaCant > 0)
+            if (producto == null)
             {
-                seleccionado.Cantidad = nuevaCant;
+                MessageBox.Show("No se encontró la información del producto");
+                return;
+            }
+
+            var ventana = new CantidadWindow(producto)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true)
+            {
+                seleccionado.Cantidad = ventana.CantidadSeleccionada;
                 ActualizarCarritoCentral();
             }
         }
-
         private void BtnPrecio_Click(object sender, RoutedEventArgs e)
         {
             var seleccionado = dgCarritoCentral.SelectedItem as VentaItem;

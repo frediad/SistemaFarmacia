@@ -76,7 +76,7 @@
                     <ColumnDefinition Width="110"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="👥 La leidy"
+                <TextBlock Text="👥 Clientes"
                            Foreground="White"
                            FontSize="22"
                            FontWeight="Bold"
