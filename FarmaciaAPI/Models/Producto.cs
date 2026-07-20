@@ -29,11 +29,7 @@
         public int StockMinimo { get; set; }
 
         public int? SubCategoriaId { get; set; }
-<<<<<<< Updated upstream
-        
-=======
-        public object SubcategoriaId { get; set; }
->>>>>>> Stashed changes
+
         public DateTime? Caducidad { get; set; }
 
         public string ImagenURL { get; set; } = string.Empty;
