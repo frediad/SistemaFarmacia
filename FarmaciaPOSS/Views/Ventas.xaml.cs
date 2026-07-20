@@ -22,11 +22,14 @@ namespace FarmaciaPOS.Views
 
             dgCarrito.ItemsSource = carrito;
 
+<<<<<<< Updated upstream
             CargarProductos();
             CargarCategoriasCatalogo();
             CargarCatalogo();
             ActualizarTotales();
            
+=======
+>>>>>>> Stashed changes
         }
 
         // =========================================
@@ -250,7 +253,13 @@ namespace FarmaciaPOS.Views
         // ✅ TOTALES
         // =========================================
 
+<<<<<<< Updated upstream
         private void ActualizarTotales()
+=======
+        private void txtBuscarProducto_TextChanged(
+            object sender,
+            TextChangedEventArgs e)
+>>>>>>> Stashed changes
         {
             decimal total = carrito.Sum(x => x.Subtotal);
 
@@ -409,12 +418,43 @@ namespace FarmaciaPOS.Views
                     $"Total: {total:C}\n\nIngrese el monto recibido:",
                     "Cobrar");
 
+<<<<<<< Updated upstream
             if (!decimal.TryParse(inputPago, out decimal pago))
             {
                 MessageBox.Show("Monto inválido.");
                 return;
+=======
+        // =========================================
+        // ATAJOS DE TECLADO
+        // =========================================
+
+        private void VentasWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.F3:
+                    BtnAgregarCantidad_Click(sender, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+
+                case Key.F9:
+                    BtnGenerarTicket_Click(sender, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+
+                case Key.F10:
+                    BtnCobrar_Click(sender, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+
+                case Key.F11:
+                    BtnCancelar_Click(sender, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+>>>>>>> Stashed changes
             }
 
+<<<<<<< Updated upstream
             if (pago < total)
             {
                 MessageBox.Show("El pago es insuficiente.");
@@ -608,6 +648,18 @@ namespace FarmaciaPOS.Views
                     this.Close();
                     break;
             }
+=======
+        private void VentasWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            VentasWindow_KeyDown(sender, e);
+>>>>>>> Stashed changes
         }
+
+
+
+
+
+
+
     }
 }
