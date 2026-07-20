@@ -7,6 +7,7 @@
         public string NumeroPedido { get; set; } = "";
 
         public string ClienteNombre { get; set; } = "";
+        public string ClienteCorreo { get; set; } = "";
 
         public DateTime FechaPedido { get; set; }
 

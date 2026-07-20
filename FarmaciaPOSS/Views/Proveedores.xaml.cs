@@ -213,5 +213,10 @@ namespace FarmaciaPOS.Views
 
             ventana.ShowDialog();
         }
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

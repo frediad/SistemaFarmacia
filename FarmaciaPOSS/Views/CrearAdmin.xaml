@@ -1,0 +1,172 @@
+﻿<Window x:Class="FarmaciaPOS.Views.CrearAdmin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Crear Usuario Administrador"
+        Height="750"
+        Width="480"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="TxtAdmin" TargetType="TextBox">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#2563EB"/>
+                                <Setter TargetName="border" Property="Background" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PwdAdmin" TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#2563EB"/>
+                                <Setter TargetName="border" Property="Background" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnCrearAdmin" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Background="White" CornerRadius="16" Margin="14">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.15" BlurRadius="24" ShadowDepth="4"/>
+        </Border.Effect>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+            <StackPanel Margin="30,28">
+
+                <TextBlock Text="👤 Crear Usuario Administrador"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+
+                <TextBlock Text="Este será el primer usuario del sistema. Solo puedes crear uno; después esta opción se ocultará."
+                           FontSize="12"
+                           Foreground="#94A3B8"
+                           TextWrapping="Wrap"
+                           Margin="0,6,0,24"/>
+
+                <Border x:Name="borderError"
+                        Background="#FEE2E2"
+                        CornerRadius="8"
+                        Padding="12,10"
+                        Margin="0,0,0,16"
+                        Visibility="Collapsed">
+                    <TextBlock x:Name="txtError"
+                               Foreground="#DC2626"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <TextBlock Text="NOMBRE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <TextBox x:Name="txtNombreCompleto" Height="44" Style="{StaticResource TxtAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="APELLIDO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <TextBox x:Name="txtApellido" Height="44" Style="{StaticResource TxtAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="CORREO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <TextBox x:Name="txtCorreo" Height="44" Style="{StaticResource TxtAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="TELÉFONO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <TextBox x:Name="txtTelefono" Height="44" Style="{StaticResource TxtAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="NOMBRE DE USUARIO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <TextBox x:Name="txtUsuario" Height="44" Style="{StaticResource TxtAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="CONTRASEÑA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <PasswordBox x:Name="txtPassword" Height="44" Style="{StaticResource PwdAdmin}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="CONFIRMAR CONTRASEÑA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                <PasswordBox x:Name="txtPasswordConfirmar" Height="44" Style="{StaticResource PwdAdmin}" Margin="0,0,0,26"/>
+
+                <Button Content="Crear Administrador"
+                        Height="48"
+                        Style="{StaticResource BtnCrearAdmin}"
+                        Click="BtnCrear_Click"/>
+
+                <Button Content="Cancelar"
+                        Height="40"
+                        Background="Transparent"
+                        Foreground="#64748B"
+                        FontSize="13"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Margin="0,10,0,0"
+                        Click="BtnCancelar_Click"/>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+    </Border>
+
+</Window>

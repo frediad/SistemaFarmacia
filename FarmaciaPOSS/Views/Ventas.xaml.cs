@@ -26,6 +26,7 @@ namespace FarmaciaPOS.Views
             CargarCategoriasCatalogo();
             CargarCatalogo();
             ActualizarTotales();
+           
         }
 
         // =========================================
@@ -86,11 +87,12 @@ namespace FarmaciaPOS.Views
         {
             pnlCategorias.Children.Clear();
 
+            // Botón "Todos"
             var btnTodos = new Button
             {
                 Content = "🏠 Todos",
                 Style = (Style)FindResource("BtnCategoriaActiva"),
-                Tag = 0
+                Tag = new FiltroCatalogo { Tipo = "Todos", Id = 0 }
             };
             btnTodos.Click += BtnCategoria_Click;
             pnlCategorias.Children.Add(btnTodos);
@@ -100,37 +102,96 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
-            string query = "SELECT * FROM Categorias ORDER BY Nombre";
-            SqlCommand cmd = new SqlCommand(query, conn);
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            // 1. Cargar categorías
+            var categorias = new List<(int Id, string Nombre)>();
+            string queryCat = "SELECT * FROM Categorias ORDER BY Nombre";
+            SqlCommand cmdCat = new SqlCommand(queryCat, conn);
+            using (SqlDataReader readerCat = cmdCat.ExecuteReader())
             {
-                var btn = new Button
+                while (readerCat.Read())
                 {
-                    Content = reader["Nombre"].ToString(),
+                    categorias.Add((
+                        Convert.ToInt32(readerCat["Id"]),
+                        readerCat["Nombre"].ToString()));
+                }
+            }
+
+            // 2. Cargar subcategorías, agrupadas por CategoriaId
+            var subcategoriasPorCategoria = new Dictionary<int, List<(int Id, string Nombre)>>();
+            string querySub = "SELECT * FROM Subcategorias ORDER BY Nombre";
+            SqlCommand cmdSub = new SqlCommand(querySub, conn);
+            using (SqlDataReader readerSub = cmdSub.ExecuteReader())
+            {
+                while (readerSub.Read())
+                {
+                    int categoriaId = Convert.ToInt32(readerSub["CategoriaId"]);
+                    int subId = Convert.ToInt32(readerSub["Id"]);
+                    string nombreSub = readerSub["Nombre"].ToString();
+
+                    if (!subcategoriasPorCategoria.ContainsKey(categoriaId))
+                        subcategoriasPorCategoria[categoriaId] = new List<(int Id, string Nombre)>();
+
+                    subcategoriasPorCategoria[categoriaId].Add((subId, nombreSub));
+                }
+            }
+
+            // 3. Generar botones: cada categoría seguida de sus subcategorías (si tiene)
+            foreach (var cat in categorias)
+            {
+                var btnCat = new Button
+                {
+                    Content = cat.Nombre,
                     Style = (Style)FindResource("BtnCategoria"),
-                    Tag = Convert.ToInt32(reader["Id"])
+                    Tag = new FiltroCatalogo { Tipo = "Categoria", Id = cat.Id }
                 };
-                btn.Click += BtnCategoria_Click;
-                pnlCategorias.Children.Add(btn);
+                btnCat.Click += BtnCategoria_Click;
+                pnlCategorias.Children.Add(btnCat);
+
+                if (subcategoriasPorCategoria.TryGetValue(cat.Id, out var subs))
+                {
+                    foreach (var sub in subs)
+                    {
+                        var btnSub = new Button
+                        {
+                            Content = "" + sub.Nombre,
+                            Style = (Style)FindResource("BtnCategoria"),
+                            Tag = new FiltroCatalogo { Tipo = "Subcategoria", Id = sub.Id }
+                        };
+                        btnSub.Click += BtnCategoria_Click;
+                        pnlCategorias.Children.Add(btnSub);
+                    }
+                }
             }
         }
 
         private void BtnCategoria_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
-            int categoriaId = Convert.ToInt32(btn?.Tag ?? 0);
+            var filtro = btn?.Tag as FiltroCatalogo;
 
+            // Resaltar botón activo
             foreach (Button b in pnlCategorias.Children.OfType<Button>())
+            {
                 b.Style = (Style)FindResource("BtnCategoria");
-
+            }
             btn!.Style = (Style)FindResource("BtnCategoriaActiva");
 
-            icProductosCatalogo.ItemsSource =
-                categoriaId == 0
-                    ? productos
-                    : productos.Where(p => p.CategoriaId == categoriaId).ToList();
+            if (filtro == null || filtro.Tipo == "Todos")
+            {
+                icProductosCatalogo.ItemsSource = productos;
+            }
+            else if (filtro.Tipo == "Categoria")
+            {
+                icProductosCatalogo.ItemsSource = productos
+                    .Where(p => p.CategoriaId == filtro.Id)
+                    .ToList();
+            }
+            else if (filtro.Tipo == "Subcategoria")
+            {
+                icProductosCatalogo.ItemsSource = productos
+                    .Where(p => p.SubcategoriaId == filtro.Id)
+                    .ToList();
+            }
         }
 
         private void CargarCatalogo()
@@ -216,25 +277,39 @@ namespace FarmaciaPOS.Views
             ActualizarTotales();
         }
 
-        private void BtnCantidad_Click(object sender, RoutedEventArgs e)
+        private void BtnCantidad_Click(
+             object sender,
+             RoutedEventArgs e)
         {
-            var seleccionado = dgCarrito.SelectedItem as VentaItem;
+            var seleccionado =
+                dgCarrito.SelectedItem
+                as VentaItem;
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto de la lista");
+                MessageBox.Show(
+                    "Selecciona un producto de la lista");
                 return;
             }
 
-            string input =
-                Microsoft.VisualBasic.Interaction.InputBox(
-                    "Nueva cantidad:",
-                    "Cambiar cantidad",
-                    seleccionado.Cantidad.ToString());
+            var producto = productos.FirstOrDefault(p => p.Id == seleccionado.ProductoId);
 
-            if (int.TryParse(input, out int nuevaCant) && nuevaCant > 0)
+            if (producto == null)
             {
-                seleccionado.Cantidad = nuevaCant;
+                MessageBox.Show("No se encontró la información del producto");
+                return;
+            }
+
+            var ventana = new CantidadWindow(producto)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true)
+            {
+                seleccionado.Cantidad = ventana.CantidadSeleccionada;
                 ActualizarTotales();
             }
         }

@@ -120,15 +120,29 @@
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel>
+                                <Border Grid.Column="0"
+                                        Background="#F1F5F9"
+                                        CornerRadius="8,8,0,0">
+                                    <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
+                                           Stretch="Uniform"
+                                           Height="80"
+                                           Width="80"
+                                           Margin="10"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0">
                                     <TextBlock Text="{Binding Nombre}"
                                                FontSize="14"
                                                FontWeight="Bold"
-                                               Foreground="#1E293B"/>
+                                               Foreground="#1E293B"
+                                               TextWrapping="Wrap"/>
                                     <TextBlock Text="{Binding CodigoBarras}"
                                                FontSize="11"
                                                Foreground="#94A3B8"/>
@@ -137,12 +151,13 @@
                                                Foreground="#94A3B8"/>
                                 </StackPanel>
 
-                                <TextBlock Grid.Column="1"
+                                <TextBlock Grid.Column="2"
                                            Text="{Binding PrecioVenta, StringFormat=C}"
                                            FontSize="16"
                                            FontWeight="Bold"
                                            Foreground="#2563EB"
-                                           VerticalAlignment="Center"/>
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,10,0"/>
 
                             </Grid>
 
