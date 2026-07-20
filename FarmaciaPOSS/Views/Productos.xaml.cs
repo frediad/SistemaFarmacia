@@ -29,12 +29,13 @@ namespace FarmaciaPOS.Views
         {
             InitializeComponent();
 
-            dgProductos.AlternationCount = 2; // habilita filas alternadas
+            dgProductos.AlternationCount = 2; 
 
-            CargarCategorias();        // primero, para mapear nombres
+            CargarCategorias();        
             CargarProductos();
             CargarTodasSubcategorias();
-            CargarCategoriasFiltro();  // construye la barra de categorías
+            CargarCategoriasFiltro();  
+
         }
 
         // =========================================
