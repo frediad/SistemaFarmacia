@@ -148,19 +148,13 @@
             </Setter>
         </Style>
 
-<<<<<<< Updated upstream
+
         <!-- ===================================== -->
         <!-- ESTILO BOTONES ACCIÓN INFERIOR         -->
         <!-- ===================================== -->
-=======
-                <TextBox x:Name="txtBuscar"
-                         Height="40"
-                         FontSize="16"
-                         Text="Buscar productos... "
-                         VerticalContentAlignment="Center"
-                         TextChanged="txtBuscarProducto_TextChanged"
-                         KeyDown="txtBuscar_KeyDown"/>
->>>>>>> Stashed changes
+
+              
+
 
         <Style x:Key="BtnAccion" TargetType="Button">
             <Setter Property="Background" Value="White"/>

@@ -9,10 +9,9 @@
         public string RutaImagen { get; set; } = string.Empty;
 
         public int Orden { get; set; }
-<<<<<<< Updated upstream
+
 
         public byte[]? ImagenData { get; set; }
-=======
->>>>>>> Stashed changes
+
     }
 }

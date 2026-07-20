@@ -146,7 +146,7 @@
                            Foreground="White"
                            VerticalAlignment="Center"/>
 
-<<<<<<< Updated upstream
+
                 <Border Grid.Column="1"
                         Background="White"
                         CornerRadius="8"
@@ -208,18 +208,7 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-=======
-                <TextBox x:Name="txtBuscar"
-                         Grid.Column="1"
-                         Height="45"
-                         FontSize="18"
-                         VerticalContentAlignment="Center"
-                         Text="Buscar producto..."
-                         Foreground="Gray"
-                         TextChanged="txtBuscar_TextChanged"
-                         GotFocus="TxtBuscar_GotFocus"
-                         LostFocus="TxtBuscar_LostFocus"/>
->>>>>>> Stashed changes
+               
 
             </Grid>
 
@@ -286,12 +275,10 @@
                                    FontWeight="Bold"
                                    Margin="0,0,0,15"/>
 
-                        <!-- ===================================== -->
-<<<<<<< Updated upstream
-                        <!-- CARRUSEL DE 3 IMÁGENES                -->
-=======
+
+
                         <!-- ✅ CARRUSEL DE 3 IMÁGENES              -->
->>>>>>> Stashed changes
+
                         <!-- ===================================== -->
 
                         <Border Background="#F8FAFC"
@@ -309,11 +296,10 @@
                                     <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
 
-<<<<<<< Updated upstream
-=======
+
+
                                 <!-- FLECHA IZQUIERDA -->
 
->>>>>>> Stashed changes
                                 <Button Grid.Column="0"
                                         x:Name="btnImagenAnterior"
                                         Content="‹"
@@ -322,22 +308,20 @@
                                         BorderThickness="0"
                                         VerticalAlignment="Center"
                                         Click="BtnImagenAnterior_Click"/>
-<<<<<<< Updated upstream
-=======
+
 
                                 <!-- IMAGEN ACTUAL -->
->>>>>>> Stashed changes
+
 
                                 <Grid Grid.Column="1">
 
                                     <Image x:Name="imgProductoPreview"
                                            Stretch="Uniform"
                                            Margin="10,10,10,30"/>
-<<<<<<< Updated upstream
-=======
+
 
                                     <!-- BOTÓN CÁMARA (overlay) -->
->>>>>>> Stashed changes
+
 
                                     <Button x:Name="btnCargarImagen"
                                             Width="50"
@@ -354,11 +338,10 @@
                                                    Foreground="White"/>
                                     </Button>
 
-<<<<<<< Updated upstream
-=======
-                                    <!-- INDICADOR DE POSICIÓN (1/3, 2/3, 3/3) -->
 
->>>>>>> Stashed changes
+                           <!-- INDICADOR DE POSICIÓN (1/3, 2/3, 3/3) -->
+
+
                                     <TextBlock x:Name="txtIndicadorImagen"
                                                Text="1 / 3"
                                                FontSize="13"
@@ -368,11 +351,10 @@
                                                VerticalAlignment="Bottom"
                                                Margin="0,0,0,5"/>
 
-<<<<<<< Updated upstream
-=======
+
                                     <!-- BOTÓN ELIMINAR IMAGEN ACTUAL -->
 
->>>>>>> Stashed changes
+
                                     <Button x:Name="btnEliminarImagen"
                                             Content="✕"
                                             Width="24"
@@ -390,11 +372,9 @@
 
                                 </Grid>
 
-<<<<<<< Updated upstream
-=======
                                 <!-- FLECHA DERECHA -->
 
->>>>>>> Stashed changes
+
                                 <Button Grid.Column="2"
                                         x:Name="btnImagenSiguiente"
                                         Content="›"
@@ -407,10 +387,8 @@
                             </Grid>
 
                         </Border>
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
                         <!-- NOMBRE -->
 
                         <TextBlock Text="Nombre"
