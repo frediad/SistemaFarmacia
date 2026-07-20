@@ -53,7 +53,14 @@ namespace FarmaciaPOS.Views
                             WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) <= 30
                                 THEN 'PRÓXIMO A CADUCAR'
                             ELSE 'NO CADUCADO'
-                        END AS Estado
+                        END AS Estado,
+                        CASE
+                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) < 0
+                                THEN 0
+                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) <= 30
+                                THEN 1
+                            ELSE 2
+                        END AS OrdenEstado
                     FROM Productos p
                     OUTER APPLY (
                         SELECT TOP 1 ip.RutaImagen
@@ -61,7 +68,7 @@ namespace FarmaciaPOS.Views
                         WHERE ip.ProductoId = p.Id
                         ORDER BY ip.Orden ASC
                     ) img
-                    ORDER BY p.Caducidad ASC";
+                    ORDER BY OrdenEstado ASC, p.Caducidad ASC";
 
                     SqlDataAdapter da = new SqlDataAdapter(query, con);
                     da.Fill(dt);

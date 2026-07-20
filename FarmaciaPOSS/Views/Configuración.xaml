@@ -221,7 +221,7 @@
                                FontSize="15"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Graficas de ganancisa "
+                    <TextBlock Text="Graficas de ganancias "
                                FontSize="11"
                                Foreground="#94A3B8"
                                HorizontalAlignment="Center"
