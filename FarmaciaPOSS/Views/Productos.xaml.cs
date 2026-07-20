@@ -15,7 +15,7 @@ namespace FarmaciaPOS.Views
         List<Subcategoria> todasSubcategorias = new();
         List<Producto> listaCompletaProductos = new();
 
-        // ✅ NUEVO — categorías y filtro de la barra
+        // Categorías y filtro de la barra
         List<Categoria> categoriasCache = new();
         int categoriaFiltroActual = 0; // 0 = "Todos"
 
@@ -29,12 +29,12 @@ namespace FarmaciaPOS.Views
         {
             InitializeComponent();
 
-            dgProductos.AlternationCount = 2; // ✅ habilita filas alternadas
+            dgProductos.AlternationCount = 2; // habilita filas alternadas
 
-            CargarCategorias();        // ✅ primero, para mapear nombres
+            CargarCategorias();        // primero, para mapear nombres
             CargarProductos();
             CargarTodasSubcategorias();
-            CargarCategoriasFiltro();  // ✅ construye la barra de categorías
+            CargarCategoriasFiltro();  // construye la barra de categorías
         }
 
         // =========================================
@@ -88,26 +88,18 @@ namespace FarmaciaPOS.Views
                         : null,
                     Activo = Convert.ToBoolean(reader["Activo"]),
 
-
-                    // ✅ nuevo — nombre de categoría legible para la tabla
+                    // Nombre de categoría legible para la tabla
                     NombreCategoria = categoriasCache
                         .FirstOrDefault(c => c.Id == catId)?.Nombre ?? "Sin categoría"
-
-                   
-
- 
- 
-
                 });
             }
 
-
             listaCompletaProductos = lista;
-            AplicarFiltros(); // ✅ respeta el filtro de categoría/búsqueda activo al recargar
+            AplicarFiltros(); // respeta el filtro de categoría/búsqueda activo al recargar
         }
 
         // =========================================
-        // ✅ BARRA DE CATEGORÍAS (FILTRO)
+        // BARRA DE CATEGORÍAS (FILTRO)
         // =========================================
 
         private void CargarCategoriasFiltro()
@@ -161,7 +153,7 @@ namespace FarmaciaPOS.Views
             AplicarFiltros();
         }
 
-        // ✅ NUEVO — combina texto de búsqueda + categoría seleccionada
+        // Combina texto de búsqueda + categoría seleccionada
         private void AplicarFiltros()
         {
             string texto = (txtBuscar.Text == "Buscar producto...") ? "" : txtBuscar.Text.Trim().ToLower();
@@ -180,37 +172,7 @@ namespace FarmaciaPOS.Views
 
             dgProductos.ItemsSource = resultado;
             icCatalogoVista.ItemsSource = resultado;
-
-            dgProductos.ItemsSource = lista;
-
-            listaCompletaProductos = lista;
-
         }
-
-        // =========================================
-        // BUSCAR PRODUCTOS
-        // =========================================
-
-        private void txtBuscar_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (txtBuscar.Text == "Buscar producto...")
-                return;
-
-            string texto = txtBuscar.Text.Trim().ToLower();
-
-            if (string.IsNullOrWhiteSpace(texto))
-            {
-                dgProductos.ItemsSource = listaCompletaProductos;
-                return;
-            }
-
-            dgProductos.ItemsSource = listaCompletaProductos
-                .Where(p =>
-                    p.Nombre.ToLower().Contains(texto) ||
-                    p.CodigoBarras.ToLower().Contains(texto))
-                .ToList();
-        }
-
 
         // =========================================
         // CARGAR CATEGORIAS
@@ -243,7 +205,7 @@ namespace FarmaciaPOS.Views
             cbCategorias.DisplayMemberPath = "Nombre";
             cbCategorias.SelectedValuePath = "Id";
 
-            categoriasCache = lista; // ✅ nuevo
+            categoriasCache = lista;
         }
 
         // =========================================
@@ -299,7 +261,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ AGREGAR NUEVA CATEGORÍA
+        // AGREGAR NUEVA CATEGORÍA
         // =========================================
 
         private void BtnNuevaCategoria_Click(object sender, RoutedEventArgs e)
@@ -339,7 +301,7 @@ namespace FarmaciaPOS.Views
             int nuevaCategoriaId = Convert.ToInt32(cmd.ExecuteScalar());
 
             CargarCategorias();
-            CargarCategoriasFiltro(); // ✅ refresca también la barra de filtro
+            CargarCategoriasFiltro(); // refresca también la barra de filtro
 
             cbCategorias.SelectedValue = nuevaCategoriaId;
 
@@ -347,7 +309,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ AGREGAR NUEVA SUBCATEGORÍA
+        // AGREGAR NUEVA SUBCATEGORÍA
         // =========================================
 
         private void BtnNuevaSubcategoria_Click(object sender, RoutedEventArgs e)
@@ -420,37 +382,23 @@ namespace FarmaciaPOS.Views
 
                 conn.Open();
 
-                string query = "";
+                string query;
+                bool esProductoNuevo = productoId == 0;
 
-                if (productoId == 0)
+                if (esProductoNuevo)
                 {
                     query =
                     @"INSERT INTO Productos
                     (
                         CodigoBarras, Nombre, Descripcion, CategoriaId, SubcategoriaId,
                         PrecioCompra, PrecioVenta, Precio2, CantidadMayoreo2, Precio3, CantidadMayoreo3,
-                        Stock, StockMinimo, ImagenURL,Activo, FechaCreacion
+                        Stock, StockMinimo, ImagenURL, Activo, FechaCreacion
                     )
                     VALUES
                     (
-
                         @CodigoBarras, @Nombre, @Descripcion, @CategoriaId, @SubcategoriaId,
                         @PrecioCompra, @PrecioVenta, @Precio2, @CantidadMayoreo2, @Precio3, @CantidadMayoreo3,
                         @Stock, @StockMinimo, @ImagenURL, @Activo, GETDATE()
-
-                        @CodigoBarras,
-                        @Nombre,
-                        @Descripcion,
-                        @CategoriaId,
-                        @SubcategoriaId,
-                        @PrecioCompra,
-                        @PrecioVenta,
-                        @Stock,
-                        @StockMinimo,
-                        @ImagenURL,
-                        @Activo,
-                        GETDATE()
-
                     );
                     SELECT SCOPE_IDENTITY();";
                 }
@@ -471,7 +419,7 @@ namespace FarmaciaPOS.Views
                         CantidadMayoreo3 = @CantidadMayoreo3,
                         Stock = @Stock,
                         StockMinimo = @StockMinimo,
-                        ImagenURL = @ImagenURL,                      
+                        ImagenURL = @ImagenURL,
                         Activo = @Activo
                     WHERE Id = @Id";
                 }
@@ -503,35 +451,7 @@ namespace FarmaciaPOS.Views
                 cmd.Parameters.AddWithValue("@ImagenURL", "");
                 cmd.Parameters.AddWithValue("@Activo", chkActivo.IsChecked ?? true);
 
-                bool esProductoNuevo = productoId == 0;
-
-
                 if (!esProductoNuevo)
-
-                cmd.Parameters.AddWithValue(
-                    "@Stock",
-                    int.Parse(
-                        txtStock.Text));
-
-
-                cmd.Parameters.AddWithValue(
-                    "@StockMinimo",
-                    int.Parse(
-                        txtStockMinimo.Text));
-
-                cmd.Parameters.AddWithValue(
-                    "@ImagenURL",
-                     "");
-
-               
-
-                cmd.Parameters.AddWithValue(
-                    "@Activo",
-                    chkActivo.IsChecked
-                    ?? true);
-
-                if (productoId != 0)
-
                 {
                     cmd.Parameters.AddWithValue("@Id", productoId);
                     cmd.ExecuteNonQuery();
@@ -604,21 +524,8 @@ namespace FarmaciaPOS.Views
 
                 chkActivo.IsChecked = producto.Activo;
 
-
+                // Cargar lotes del producto seleccionado
                 CargarLotes();
-
-                txtStockMinimo.Text =
-                    producto.StockMinimo
-                    .ToString();
-
-         
-
-                chkActivo.IsChecked =
-                    producto.Activo;
-
-                // ✅ Cargar lotes del producto seleccionado
-                CargarLotes();
-
 
                 CargarImagenesProducto(producto.Id);
             }
@@ -658,7 +565,6 @@ namespace FarmaciaPOS.Views
             txtStock.Clear();
             txtStockMinimo.Clear();
 
-
             imgProductoPreview.Source = null;
 
             cbCategorias.SelectedIndex = -1;
@@ -676,9 +582,7 @@ namespace FarmaciaPOS.Views
             imgProductoPreview.Source = null;
             txtIndicadorImagen.Text = "0 / 0";
 
-
             imagenesPendientes.Clear();
-
         }
 
         // =========================================
@@ -737,20 +641,10 @@ namespace FarmaciaPOS.Views
         // CARGAR IMÁGENES DEL PRODUCTO SELECCIONADO
         // =========================================
 
-
-        List<ImagenProducto> imagenesProductoActual = new();
-        int indiceImagenActual = 0;
-        const int MAX_IMAGENES = 3;
-
-        // =========================================
-        // ✅ CARGAR IMÁGENES DEL PRODUCTO SELECCIONADO
-        // =========================================
-
         private void CargarImagenesProducto(int idProducto)
         {
             imagenesProductoActual.Clear();
             indiceImagenActual = 0;
-
 
             if (idProducto == 0)
             {
@@ -779,16 +673,11 @@ namespace FarmaciaPOS.Views
                 {
                     Id = Convert.ToInt32(reader["Id"]),
                     ProductoId = Convert.ToInt32(reader["ProductoId"]),
-
                     RutaImagen = reader["RutaImagen"]?.ToString() ?? "",
                     Orden = Convert.ToInt32(reader["Orden"]),
                     ImagenData = reader["ImagenData"] != DBNull.Value
                         ? (byte[])reader["ImagenData"]
                         : null
-
-                    RutaImagen = reader["RutaImagen"].ToString() ?? "",
-                    Orden = Convert.ToInt32(reader["Orden"])
-
                 });
             }
 
@@ -796,9 +685,8 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ MOSTRAR LA IMAGEN SEGÚN EL ÍNDICE ACTUAL
+        // MOSTRAR LA IMAGEN SEGÚN EL ÍNDICE ACTUAL
         // =========================================
-
 
         private void MostrarImagenActual()
         {
@@ -811,24 +699,15 @@ namespace FarmaciaPOS.Views
 
             var imagen = imagenesProductoActual[indiceImagenActual];
 
-
             imgProductoPreview.Source = BytesABitmap(imagen.ImagenData);
-
-            try
-            {
-                imgProductoPreview.Source =
-                    new System.Windows.Media.Imaging.BitmapImage(
-                        new Uri(imagen.RutaImagen));
-            }
-            catch
-            {
-                imgProductoPreview.Source = null;
-            }
-
 
             txtIndicadorImagen.Text =
                 $"{indiceImagenActual + 1} / {imagenesProductoActual.Count}";
         }
+
+        // =========================================
+        // MOSTRAR IMÁGENES PENDIENTES (producto aún no guardado)
+        // =========================================
 
         private void MostrarImagenesPendientes()
         {
@@ -872,6 +751,10 @@ namespace FarmaciaPOS.Views
             }
         }
 
+        // =========================================
+        // NAVEGAR ENTRE IMÁGENES
+        // =========================================
+
         private void BtnImagenAnterior_Click(object sender, RoutedEventArgs e)
         {
             if (productoId == 0)
@@ -886,14 +769,6 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-
-        // =========================================
-        // ✅ NAVEGAR ENTRE IMÁGENES
-        // =========================================
-
-        private void BtnImagenAnterior_Click(object sender, RoutedEventArgs e)
-        {
-
             if (imagenesProductoActual.Count == 0)
                 return;
 
@@ -907,7 +782,6 @@ namespace FarmaciaPOS.Views
 
         private void BtnImagenSiguiente_Click(object sender, RoutedEventArgs e)
         {
-
             if (productoId == 0)
             {
                 if (imagenesPendientes.Count == 0)
@@ -918,7 +792,6 @@ namespace FarmaciaPOS.Views
                 MostrarImagenesPendientes();
                 return;
             }
-
 
             if (imagenesProductoActual.Count == 0)
                 return;
@@ -931,6 +804,9 @@ namespace FarmaciaPOS.Views
             MostrarImagenActual();
         }
 
+        // =========================================
+        // CARGAR NUEVA IMAGEN (máximo 3, con o sin producto guardado)
+        // =========================================
 
         private void BtnCargarImagen_Click(object sender, RoutedEventArgs e)
         {
@@ -939,21 +815,6 @@ namespace FarmaciaPOS.Views
                 : imagenesProductoActual.Count;
 
             if (totalImagenesActuales >= MAX_IMAGENES)
-
-        // =========================================
-        // ✅ CARGAR NUEVA IMAGEN (máximo 3)
-        // =========================================
-
-        private void BtnCargarImagen_Click(object sender, RoutedEventArgs e)
-        {
-            if (productoId == 0)
-            {
-                MessageBox.Show("Primero guarda el producto antes de agregar imágenes");
-                return;
-            }
-
-            if (imagenesProductoActual.Count >= MAX_IMAGENES)
-
             {
                 MessageBox.Show($"Ya tienes el máximo de {MAX_IMAGENES} imágenes para este producto");
                 return;
@@ -963,7 +824,6 @@ namespace FarmaciaPOS.Views
             {
                 Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp"
             };
-
 
             if (dialog.ShowDialog() != true)
                 return;
@@ -1028,6 +888,10 @@ namespace FarmaciaPOS.Views
             cmd.ExecuteNonQuery();
         }
 
+        // =========================================
+        // ELIMINAR IMAGEN ACTUAL (pendiente o ya guardada)
+        // =========================================
+
         private void BtnEliminarImagen_Click(object sender, RoutedEventArgs e)
         {
             if (productoId == 0)
@@ -1052,49 +916,6 @@ namespace FarmaciaPOS.Views
 
             if (imagenesProductoActual.Count == 0)
                 return;
-
-
-            if (dialog.ShowDialog() == true)
-            {
-                GuardarImagenEnBD(productoId, dialog.FileName);
-                CargarImagenesProducto(productoId);
-
-                // Mover al índice de la imagen recién agregada
-                indiceImagenActual = imagenesProductoActual.Count - 1;
-                MostrarImagenActual();
-            }
-        }
-
-        private void GuardarImagenEnBD(int idProducto, string ruta)
-        {
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            int siguienteOrden = imagenesProductoActual.Count + 1;
-
-            string query =
-            @"INSERT INTO ImagenesProducto (ProductoId, RutaImagen, Orden)
-              VALUES (@ProductoId, @RutaImagen, @Orden)";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@ProductoId", idProducto);
-            cmd.Parameters.AddWithValue("@RutaImagen", ruta);
-            cmd.Parameters.AddWithValue("@Orden", siguienteOrden);
-
-            cmd.ExecuteNonQuery();
-        }
-
-        // =========================================
-        // ✅ ELIMINAR IMAGEN ACTUAL
-        // =========================================
-
-        private void BtnEliminarImagen_Click(object sender, RoutedEventArgs e)
-        {
-            if (imagenesProductoActual.Count == 0)
-                return;
-
 
             var imagenAEliminar = imagenesProductoActual[indiceImagenActual];
 
@@ -1121,6 +942,7 @@ namespace FarmaciaPOS.Views
 
             CargarImagenesProducto(productoId);
         }
+
         private void BtnGenerarClave_Click(
             object sender,
             RoutedEventArgs e)
