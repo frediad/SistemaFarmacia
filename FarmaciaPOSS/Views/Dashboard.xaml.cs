@@ -93,6 +93,7 @@ namespace FarmaciaPOS
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
+                // ✅ Productos, precios, stock, categorías y subcategorías
                 CargarProductos();
                 CargarCategoriasCatalogo();
 
@@ -121,6 +122,9 @@ namespace FarmaciaPOS
                         CargarImagenProductoActual(productoMostrado.ImagenBytes);
                     }
                 }
+
+                // ✅ Refresca permisos del menú (por si cambiaron el rol/permisos del usuario)
+                AplicarPermisosEnMenu();
 
                 ActualizarCarritoCentral();
             }
@@ -159,7 +163,8 @@ namespace FarmaciaPOS
             WHERE img.ProductoId = p.Id
             ORDER BY img.Orden) AS PrimeraImagenData
             FROM Productos p
-            WHERE p.Activo = 1";
+            WHERE p.Activo = 1
+            ORDER BY p.Nombre";
 
             SqlCommand cmd =
                 new SqlCommand(query, conn);
