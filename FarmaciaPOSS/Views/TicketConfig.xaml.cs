@@ -57,9 +57,15 @@ namespace FarmaciaPOS.Views
                         reader["Telefono"]
                         .ToString();
 
+                    txtCorreo.Text =
+                       reader["Correo"]
+                       .ToString();
+
                     txtMensaje.Text =
                         reader["MensajeTicket"]
                         .ToString();
+
+                   
                 }
             }
             catch (Exception ex)
@@ -108,7 +114,8 @@ namespace FarmaciaPOS.Views
                         RFC,
                         Direccion,
                         Telefono,
-                        MensajeTicket
+                        MensajeTicket,
+                        Correo
                     )
                     VALUES
                     (
@@ -116,7 +123,9 @@ namespace FarmaciaPOS.Views
                         @RFC,
                         @Direccion,
                         @Telefono,
-                        @Mensaje
+                        @Mensaje,
+                        @Correo
+ 
                     )";
                 }
                 else
@@ -130,7 +139,8 @@ namespace FarmaciaPOS.Views
                         RFC = @RFC,
                         Direccion = @Direccion,
                         Telefono = @Telefono,
-                        MensajeTicket = @Mensaje";
+                        MensajeTicket = @Mensaje
+                        Correo = @Correo";
                 }
 
                 SqlCommand cmd =
@@ -155,6 +165,10 @@ namespace FarmaciaPOS.Views
                 cmd.Parameters.AddWithValue(
                     "@Mensaje",
                     txtMensaje.Text);
+
+                cmd.Parameters.AddWithValue(
+                    "@Correo",
+                    txtCorreo.Text);
 
                 cmd.ExecuteNonQuery();
 
@@ -198,7 +212,9 @@ namespace FarmaciaPOS.Views
                 ? "Tel: —"
                 : $"Tel: {txtTelefono.Text}";
 
-            previewCorreo.Text = txtCorreo.Text;
+            previewCorreo.Text = string.IsNullOrWhiteSpace(txtCorreo.Text)
+                ? "Correo"
+                : txtCorreo.Text;
 
             previewMensaje.Text = string.IsNullOrWhiteSpace(txtMensaje.Text)
                 ? "¡Gracias por su compra!"
