@@ -4,68 +4,145 @@
         Title="Configuración Farmacia"
         Height="550"
         Width="900"
+        Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#F4F6F9">
+        Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="BtnModuloEstadisticas" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="24,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="12"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000"
+                                                  Opacity="0.10"
+                                                  BlurRadius="12"
+                                                  ShadowDepth="2"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.90"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.78"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnRegresarModulo" TargetType="Button" BasedOn="{StaticResource BtnModuloEstadisticas}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+    </Window.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="224*"/>
-        </Grid.ColumnDefinitions>
 
-        <!-- Encabezado -->
-        <Border Background="#1565C0"
-                Height="80"
-                VerticalAlignment="Top" Grid.ColumnSpan="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <TextBlock Text="Estadisticas"
-                       Foreground="White"
-                       FontSize="28"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+        <!-- ========================================= -->
+        <!-- HEADER                                    -->
+        <!-- ========================================= -->
+
+        <Border Grid.Row="0">
+            
+           
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#1E3A8A" Offset="0"/>
+                    <GradientStop Color="#1E40AF" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+
+                <TextBlock Text="📊 Estadísticas"
+                           Foreground="White"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Control de caducidades y análisis de ventas"
+                           Foreground="#BFDBFE"
+                           FontSize="13"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+
+            </StackPanel>
 
         </Border>
 
-        <!-- Botones -->
-        <StackPanel Margin="246,120,0,0"
-                    HorizontalAlignment="Left" Grid.Column="1">
+        <!-- ========================================= -->
+        <!-- CONTENIDO                                 -->
+        <!-- ========================================= -->
 
-            <Button x:Name="btnCaducidades"
-                    Width="400"
-                    Height="60"
-                    Margin="0,10"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Background="#43A047"
-                    Foreground="White"
-                    Click="btnCaducidades_Click"
-                    Content="📅 Productos por Caducar"/>
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="16"
+                Margin="60,40">
 
-            <Button x:Name="btnGraficas"
-                    Width="400"
-                    Height="60"
-                    Margin="0,10"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Background="#2196F3"
-                    Foreground="White"
-                    Click="btnGraficas_Click"
-                    Content="📊 Gráficas de Ventas"/>
+            <Border.Effect>
+                <DropShadowEffect Color="#000000"
+                                  Opacity="0.06"
+                                  BlurRadius="16"
+                                  ShadowDepth="2"/>
+            </Border.Effect>
 
-            <Button x:Name="btnRegresar"
-                    Width="400"
-                    Height="60"
-                    Margin="0,25"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Background="#757575"
-                    Foreground="White"
-                    Click="btnRegresar_Click"
-                    Content="⬅ Regresar"/>
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Width="420">
 
-        </StackPanel>
+                <Button x:Name="btnCaducidades"
+                        Height="64"
+                        Margin="0,10"
+                        FontSize="17"
+                        Background="#16A34A"
+                        Style="{StaticResource BtnModuloEstadisticas}"
+                        Click="btnCaducidades_Click"
+                        Content="📅  Productos por Caducar"/>
+
+                <Button x:Name="btnGraficas"
+                        Height="64"
+                        Margin="0,10"
+                        FontSize="17"
+                        Background="#2563EB"
+                        Style="{StaticResource BtnModuloEstadisticas}"
+                        Click="btnGraficas_Click"
+                        Content="📊  Gráficas de Ventas"/>
+
+                <Button x:Name="btnRegresar"
+                        Height="52"
+                        Margin="0,30,0,0"
+                        FontSize="15"
+                        Background="#64748B"
+                        Style="{StaticResource BtnRegresarModulo}"
+                        Click="btnRegresar_Click"
+                        Content="⬅ Regresar"/>
+
+            </StackPanel>
+
+        </Border>
 
     </Grid>
 

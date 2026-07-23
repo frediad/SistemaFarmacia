@@ -4,6 +4,7 @@
         Title="Productos por Caducar"
         Height="680"
         Width="1200"
+        Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F1F4F9"
@@ -29,6 +30,9 @@
                 <DataTrigger Binding="{Binding Estado}" Value="NO CADUCADO">
                     <Setter Property="Background" Value="#E4F7E9"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="SIN LOTE REGISTRADO">
+                    <Setter Property="Background" Value="#ECEFF1"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -45,6 +49,9 @@
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Estado}" Value="NO CADUCADO">
                     <Setter Property="Foreground" Value="#2E7D32"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Estado}" Value="SIN LOTE REGISTRADO">
+                    <Setter Property="Foreground" Value="#607D8B"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -210,18 +217,19 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0" Text="Imagen" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                     <TextBlock Grid.Column="1" Text="Código" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                     <TextBlock Grid.Column="2" Text="Producto" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="3" Text="Caducidad" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="4" Text="Días Restantes" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="5" Text="Stock" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Column="6" Text="Estado" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="Lote" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="Caducidad" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="Días Restantes" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="6" Text="Cant. en Lote" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="7" Text="Estado" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                 </Grid>
             </Border>
-
             <!-- ================== TABLA ================== -->
             <Border Grid.Row="2"
                     Background="White"
@@ -252,20 +260,28 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
                                         <!-- Imagen -->
                                         <Border Grid.Column="0"
-                                                Width="46" Height="46"
+                                                Width="60" Height="60"
                                                 CornerRadius="10"
                                                 Background="#EEF3EE"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 Cursor="Hand"
                                                 MouseLeftButtonDown="ImagenProducto_Click">
-                                            <Image Source="{Binding ImagenURL}"
+
+                                            <Border.Clip>
+                                                <RectangleGeometry Rect="0,0,60,60" RadiusX="10" RadiusY="10"/>
+                                            </Border.Clip>
+
+                                            <Image Source="{Binding ImagenData, Converter={StaticResource ByteArrayToImageConverter}}"
                                                    Stretch="UniformToFill"
-                                                   Width="42" Height="42"/>
+                                                   Width="60"
+                                                   Height="60"/>
+
                                         </Border>
 
                                         <!-- Código -->
@@ -287,8 +303,17 @@
                                                    VerticalAlignment="Center"
                                                    TextTrimming="CharacterEllipsis"/>
 
-                                        <!-- Caducidad -->
+                                        <!-- Lote -->
                                         <TextBlock Grid.Column="3"
+                                                   Text="{Binding NumeroLote}"
+                                                   FontSize="13"
+                                                   Foreground="#37474F"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+
+                                        <!-- Caducidad -->
+                                        <TextBlock Grid.Column="4"
                                                    Text="{Binding Caducidad, StringFormat=dd/MM/yyyy}"
                                                    FontSize="13"
                                                    Foreground="#37474F"
@@ -296,15 +321,15 @@
                                                    VerticalAlignment="Center"/>
 
                                         <!-- Días Restantes -->
-                                        <TextBlock Grid.Column="4"
+                                        <TextBlock Grid.Column="5"
                                                    Text="{Binding DiasRestantes}"
                                                    FontSize="13"
                                                    Foreground="#37474F"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"/>
 
-                                        <!-- Stock -->
-                                        <TextBlock Grid.Column="5"
+                                        <!-- Cant. en Lote -->
+                                        <TextBlock Grid.Column="6"
                                                    Text="{Binding Stock}"
                                                    FontSize="13"
                                                    Foreground="#37474F"
@@ -312,9 +337,10 @@
                                                    VerticalAlignment="Center"/>
 
                                         <!-- Estado -->
-                                        <Border Grid.Column="6"
+                                        <Border Grid.Column="7"
                                                 Style="{StaticResource EstadoStyle}">
                                             <TextBlock Text="{Binding Estado}"
+                                                       FontSize="10"
                                                        Style="{StaticResource EstadoTextoStyle}"/>
                                         </Border>
 
@@ -335,7 +361,7 @@
                     Height="44"
                     Content="⬅  Regresar"
                     HorizontalAlignment="Right"
-                    Background="#616161"
+                    Background="#DC2626"
                     Style="{StaticResource BotonModerno}"
                     Click="btnRegresar_Click"/>
 

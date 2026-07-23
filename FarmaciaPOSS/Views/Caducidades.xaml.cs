@@ -3,7 +3,6 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Data.SqlClient;
 using FarmaciaPOS.Helpers;
@@ -40,28 +39,33 @@ namespace FarmaciaPOS.Views
                     con.Open();
 
                     string query = @"
-                    SELECT
-                        p.CodigoBarras,
-                        p.Nombre,
-                        img.RutaImagen AS ImagenURL,
-                        p.Caducidad,
-                        DATEDIFF(DAY, GETDATE(), p.Caducidad) AS DiasRestantes,
-                        p.Stock,
-                        CASE
-                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) < 0
-                                THEN 'CADUCADO'
-                            WHEN DATEDIFF(DAY, GETDATE(), p.Caducidad) <= 30
-                                THEN 'PRÓXIMO A CADUCAR'
-                            ELSE 'NO CADUCADO'
-                        END AS Estado
-                    FROM Productos p
-                    OUTER APPLY (
-                        SELECT TOP 1 ip.RutaImagen
-                        FROM ImagenesProducto ip
-                        WHERE ip.ProductoId = p.Id
-                        ORDER BY ip.Orden ASC
-                    ) img
-                    ORDER BY p.Caducidad ASC";
+                     SELECT
+                             p.CodigoBarras,
+                             p.Nombre,
+                             ISNULL(l.NumeroLote, '—') AS NumeroLote,
+                             l.FechaCaducidad AS Caducidad,
+                             CASE
+                                WHEN l.FechaCaducidad IS NULL THEN NULL
+                                ELSE DATEDIFF(DAY, GETDATE(), l.FechaCaducidad)
+                             END AS DiasRestantes,
+                             l.Cantidad AS Stock,
+                             CASE
+                                WHEN l.FechaCaducidad IS NULL
+                                    THEN 'SIN LOTE REGISTRADO'
+                                WHEN DATEDIFF(DAY, GETDATE(), l.FechaCaducidad) < 0
+                                    THEN 'CADUCADO'
+                                WHEN DATEDIFF(DAY, GETDATE(), l.FechaCaducidad) <= 30
+                                    THEN 'PRÓXIMO A CADUCAR'
+                                ELSE 'NO CADUCADO'
+                             END AS Estado,
+                             (SELECT TOP 1 img.ImagenData
+                             FROM ImagenesProducto img
+                             WHERE img.ProductoId = p.Id
+                             ORDER BY img.Orden) AS ImagenData
+                             FROM Productos p
+                             LEFT JOIN LotesProductos l ON l.ProductoId = p.Id
+                             WHERE p.Activo = 1
+                             ORDER BY p.Nombre ASC, l.FechaCaducidad ASC";
 
                     SqlDataAdapter da = new SqlDataAdapter(query, con);
                     da.Fill(dt);
@@ -119,28 +123,58 @@ namespace FarmaciaPOS.Views
 
         private void ImagenProducto_Click(object sender, MouseButtonEventArgs e)
         {
-            if (sender is not FrameworkElement elemento)
-                return;
-
-            if (elemento.DataContext is not DataRowView fila)
-                return;
-
-            if (fila["ImagenURL"] == DBNull.Value)
-                return;
-
-            string ruta = fila["ImagenURL"].ToString();
-
-            if (string.IsNullOrWhiteSpace(ruta))
-                return;
-
             try
             {
-                imgAmpliada.Source = new BitmapImage(new Uri(ruta));
+                if (sender is not FrameworkElement elemento)
+                    return;
+
+                if (elemento.DataContext is not DataRowView fila)
+                    return;
+
+                if (fila["ImagenData"] == DBNull.Value)
+                    return;
+
+                byte[] bytes = (byte[])fila["ImagenData"];
+
+                var bitmap = BytesABitmap(bytes);
+
+                if (bitmap == null)
+                    return;
+
+                imgAmpliada.Source = bitmap;
                 overlayImagen.Visibility = Visibility.Visible;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar la imagen:\n" + ex.Message);
+                MessageBox.Show(
+                    "No se pudo mostrar la imagen: " + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private BitmapImage BytesABitmap(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0)
+                return null;
+
+            try
+            {
+                using var stream = new System.IO.MemoryStream(bytes);
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                return bitmap;
+            }
+            catch
+            {
+                return null;
             }
         }
 
