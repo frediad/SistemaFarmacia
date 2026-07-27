@@ -8,7 +8,7 @@ namespace FarmaciaPOS.Views
 {
     public partial class TicketConfigWindow : Window
     {
-       
+
 
         public TicketConfigWindow()
         {
@@ -57,9 +57,15 @@ namespace FarmaciaPOS.Views
                         reader["Telefono"]
                         .ToString();
 
+                    txtCorreo.Text =
+                       reader["Correo"]
+                       .ToString();
+
                     txtMensaje.Text =
                         reader["MensajeTicket"]
                         .ToString();
+
+
                 }
             }
             catch (Exception ex)
@@ -75,8 +81,8 @@ namespace FarmaciaPOS.Views
         // =====================================
 
         private void BtnGuardar_Click(
-            object sender,
-            RoutedEventArgs e)
+    object sender,
+    RoutedEventArgs e)
         {
             try
             {
@@ -103,21 +109,24 @@ namespace FarmaciaPOS.Views
 
                     query =
                     @"INSERT INTO ConfiguracionTicket
-                    (
-                        NombreNegocio,
-                        RFC,
-                        Direccion,
-                        Telefono,
-                        MensajeTicket
-                    )
-                    VALUES
-                    (
-                        @Nombre,
-                        @RFC,
-                        @Direccion,
-                        @Telefono,
-                        @Mensaje
-                    )";
+            (
+                NombreNegocio,
+                RFC,
+                Direccion,
+                Telefono,
+                MensajeTicket,
+                Correo
+            )
+            VALUES
+            (
+                @Nombre,
+                @RFC,
+                @Direccion,
+                @Telefono,
+                @Mensaje,
+                @Correo
+
+            )";
                 }
                 else
                 {
@@ -125,12 +134,14 @@ namespace FarmaciaPOS.Views
 
                     query =
                     @"UPDATE ConfiguracionTicket
-                      SET
-                        NombreNegocio = @Nombre,
-                        RFC = @RFC,
-                        Direccion = @Direccion,
-                        Telefono = @Telefono,
-                        MensajeTicket = @Mensaje";
+                    SET
+                    NombreNegocio = @Nombre,
+                    RFC = @RFC,
+                    Direccion = @Direccion,
+                    Telefono = @Telefono,
+                    Correo = @Correo,
+                    MensajeTicket = @Mensaje";
+
                 }
 
                 SqlCommand cmd =
@@ -155,6 +166,10 @@ namespace FarmaciaPOS.Views
                 cmd.Parameters.AddWithValue(
                     "@Mensaje",
                     txtMensaje.Text);
+
+                cmd.Parameters.AddWithValue(
+                    "@Correo",
+                    txtCorreo.Text);
 
                 cmd.ExecuteNonQuery();
 
@@ -198,11 +213,18 @@ namespace FarmaciaPOS.Views
                 ? "Tel: —"
                 : $"Tel: {txtTelefono.Text}";
 
-            previewCorreo.Text = txtCorreo.Text;
+            previewCorreo.Text = string.IsNullOrWhiteSpace(txtCorreo.Text)
+                ? "Correo"
+                : txtCorreo.Text;
 
             previewMensaje.Text = string.IsNullOrWhiteSpace(txtMensaje.Text)
                 ? "¡Gracias por su compra!"
                 : txtMensaje.Text;
+        }
+
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

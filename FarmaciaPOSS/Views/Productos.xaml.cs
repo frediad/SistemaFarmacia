@@ -17,7 +17,7 @@ namespace FarmaciaPOS.Views
 
         // Categorías y filtro de la barra
         List<Categoria> categoriasCache = new();
-        int categoriaFiltroActual = 0; // 0 = "Todos"
+        FiltroCatalogo filtroFiltroActual = new FiltroCatalogo { Tipo = "Todos", Id = 0 }; 
 
         // Carrusel de imágenes
         List<ImagenProducto> imagenesProductoActual = new();
@@ -34,7 +34,9 @@ namespace FarmaciaPOS.Views
             CargarCategorias();        
             CargarProductos();
             CargarTodasSubcategorias();
-            CargarCategoriasFiltro();  
+            CargarCategoriasFiltro();
+
+        
 
         }
 
@@ -100,7 +102,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // BARRA DE CATEGORÍAS (FILTRO)
+        // BARRA DE CATEGORÍAS (FILTRO) //PENDIENTE
         // =========================================
 
         private void CargarCategoriasFiltro()
@@ -110,29 +112,56 @@ namespace FarmaciaPOS.Views
             var btnTodos = new Button
             {
                 Content = "🏠 Todos",
-                Style = (Style)FindResource("BtnCategoriaActiva"),
-                Tag = 0
+                Style = (Style)FindResource(filtroFiltroActual.Tipo == "Todos" ? "BtnCategoriaActiva" : "BtnCategoria"),
+                Tag = new FiltroCatalogo { Tipo = "Todos", Id = 0 }
             };
             btnTodos.Click += BtnCategoriaFiltro_Click;
             pnlCategoriasFiltro.Children.Add(btnTodos);
 
+            // Subcategorías agrupadas por CategoriaId (ya cargadas en todasSubcategorias)
+            var subcategoriasPorCategoria = todasSubcategorias
+                .GroupBy(s => s.CategoriaId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
             foreach (var categoria in categoriasCache)
             {
-                var btn = new Button
+                bool esCategoriaActiva =
+                    filtroFiltroActual.Tipo == "Categoria" && filtroFiltroActual.Id == categoria.Id;
+
+                var btnCat = new Button
                 {
                     Content = categoria.Nombre,
-                    Style = (Style)FindResource("BtnCategoria"),
-                    Tag = categoria.Id
+                    Style = (Style)FindResource(esCategoriaActiva ? "BtnCategoriaActiva" : "BtnCategoria"),
+                    Tag = new FiltroCatalogo { Tipo = "Categoria", Id = categoria.Id }
                 };
-                btn.Click += BtnCategoriaFiltro_Click;
-                pnlCategoriasFiltro.Children.Add(btn);
+                btnCat.Click += BtnCategoriaFiltro_Click;
+                pnlCategoriasFiltro.Children.Add(btnCat);
+
+                if (subcategoriasPorCategoria.TryGetValue(categoria.Id, out var subs))
+                {
+                    foreach (var sub in subs)
+                    {
+                        bool esSubActiva =
+                            filtroFiltroActual.Tipo == "Subcategoria" && filtroFiltroActual.Id == sub.Id;
+
+                        var btnSub = new Button
+                        {
+                            Content = "" + sub.Nombre,
+                            Style = (Style)FindResource(esSubActiva ? "BtnCategoriaActiva" : "BtnCategoria"),
+                            Tag = new FiltroCatalogo { Tipo = "Subcategoria", Id = sub.Id }
+                        };
+                        btnSub.Click += BtnCategoriaFiltro_Click;
+                        pnlCategoriasFiltro.Children.Add(btnSub);
+                    }
+                }
             }
         }
-
         private void BtnCategoriaFiltro_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
-            categoriaFiltroActual = Convert.ToInt32(btn?.Tag ?? 0);
+            var filtro = btn?.Tag as FiltroCatalogo;
+
+            filtroFiltroActual = filtro ?? new FiltroCatalogo { Tipo = "Todos", Id = 0 };
 
             foreach (Button b in pnlCategoriasFiltro.Children.OfType<Button>())
                 b.Style = (Style)FindResource("BtnCategoria");
@@ -155,14 +184,17 @@ namespace FarmaciaPOS.Views
         }
 
         // Combina texto de búsqueda + categoría seleccionada
+
         private void AplicarFiltros()
         {
             string texto = (txtBuscar.Text == "Buscar producto...") ? "" : txtBuscar.Text.Trim().ToLower();
 
             var filtrados = listaCompletaProductos.AsEnumerable();
 
-            if (categoriaFiltroActual != 0)
-                filtrados = filtrados.Where(p => p.CategoriaId == categoriaFiltroActual);
+            if (filtroFiltroActual.Tipo == "Categoria")
+                filtrados = filtrados.Where(p => p.CategoriaId == filtroFiltroActual.Id);
+            else if (filtroFiltroActual.Tipo == "Subcategoria")
+                filtrados = filtrados.Where(p => p.SubcategoriaId == filtroFiltroActual.Id);
 
             if (!string.IsNullOrWhiteSpace(texto))
                 filtrados = filtrados.Where(p =>
@@ -644,45 +676,56 @@ namespace FarmaciaPOS.Views
 
         private void CargarImagenesProducto(int idProducto)
         {
-            imagenesProductoActual.Clear();
-            indiceImagenActual = 0;
-
-            if (idProducto == 0)
+            try
             {
-                MostrarImagenesPendientes();
-                return;
-            }
+                imagenesProductoActual.Clear();
+                indiceImagenActual = 0;
 
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT * FROM ImagenesProducto
-              WHERE ProductoId = @ProductoId
-              ORDER BY Orden";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@ProductoId", idProducto);
-
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                imagenesProductoActual.Add(new ImagenProducto
+                if (idProducto == 0)
                 {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    ProductoId = Convert.ToInt32(reader["ProductoId"]),
-                    RutaImagen = reader["RutaImagen"]?.ToString() ?? "",
-                    Orden = Convert.ToInt32(reader["Orden"]),
-                    ImagenData = reader["ImagenData"] != DBNull.Value
-                        ? (byte[])reader["ImagenData"]
-                        : null
-                });
-            }
+                    MostrarImagenesPendientes();
+                    return;
+                }
 
-            MostrarImagenActual();
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                string query =
+                @"SELECT * FROM ImagenesProducto
+          WHERE ProductoId = @ProductoId
+          ORDER BY Orden";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@ProductoId", idProducto);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    imagenesProductoActual.Add(new ImagenProducto
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        ProductoId = Convert.ToInt32(reader["ProductoId"]),
+                        RutaImagen = reader["RutaImagen"]?.ToString() ?? "",
+                        Orden = Convert.ToInt32(reader["Orden"]),
+                        ImagenData = reader["ImagenData"] != DBNull.Value
+                            ? (byte[])reader["ImagenData"]
+                            : null
+                    });
+                }
+
+                MostrarImagenActual();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "No se pudieron cargar las imágenes: " + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         // =========================================
@@ -857,38 +900,60 @@ namespace FarmaciaPOS.Views
             }
             else
             {
-                GuardarImagenEnBD(productoId, bytes);
-                CargarImagenesProducto(productoId);
+                try
+                {
+                    GuardarImagenEnBD(productoId, bytes);
+                    CargarImagenesProducto(productoId);
 
-                indiceImagenActual = imagenesProductoActual.Count - 1;
-                MostrarImagenActual();
+                    indiceImagenActual = imagenesProductoActual.Count - 1;
+                    MostrarImagenActual();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        "No se pudo guardar la imagen: " + ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
             }
         }
 
         private void GuardarImagenEnBD(int idProducto, byte[] imagenBytes)
         {
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
+            try
+            {
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
 
-            conn.Open();
+                conn.Open();
 
-            string queryConteo = "SELECT COUNT(*) FROM ImagenesProducto WHERE ProductoId = @ProductoId";
-            SqlCommand cmdConteo = new SqlCommand(queryConteo, conn);
-            cmdConteo.Parameters.AddWithValue("@ProductoId", idProducto);
-            int siguienteOrden = Convert.ToInt32(cmdConteo.ExecuteScalar()) + 1;
+                string queryConteo = "SELECT COUNT(*) FROM ImagenesProducto WHERE ProductoId = @ProductoId";
+                SqlCommand cmdConteo = new SqlCommand(queryConteo, conn);
+                cmdConteo.Parameters.AddWithValue("@ProductoId", idProducto);
+                int siguienteOrden = Convert.ToInt32(cmdConteo.ExecuteScalar()) + 1;
 
-            string query =
-            @"INSERT INTO ImagenesProducto (ProductoId, ImagenData, Orden)
-              VALUES (@ProductoId, @ImagenData, @Orden)";
+                string query =
+                @"INSERT INTO ImagenesProducto (ProductoId, ImagenData, RutaImagen, Orden)
+                  VALUES (@ProductoId, @ImagenData, @RutaImagen, @Orden)";
 
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@ProductoId", idProducto);
-            cmd.Parameters.Add("@ImagenData", System.Data.SqlDbType.VarBinary, -1).Value = imagenBytes;
-            cmd.Parameters.AddWithValue("@Orden", siguienteOrden);
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@ProductoId", idProducto);
+                cmd.Parameters.Add("@ImagenData", System.Data.SqlDbType.VarBinary, -1).Value = imagenBytes;
+                cmd.Parameters.AddWithValue("@RutaImagen", "");
+                cmd.Parameters.AddWithValue("@Orden", siguienteOrden);
 
-            cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "No se pudo guardar la imagen: " + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
-
         // =========================================
         // ELIMINAR IMAGEN ACTUAL (pendiente o ya guardada)
         // =========================================

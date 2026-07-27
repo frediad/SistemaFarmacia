@@ -5,6 +5,7 @@
         Title="Dashboard"
         Height="920"
         Width="1420"
+        Icon="/logo-icono.ico"
         MinHeight="680"
         MinWidth="980"
         WindowStartupLocation="CenterScreen"
@@ -90,8 +91,7 @@
             </Setter>
         </Style>
 
-        <!-- Botón de pestaña del menú (Ventas / Ganancias). El color/estado
-             activo-inactivo se controla desde el code-behind. -->
+        <!-- Botón de pestaña del menú (Ventas / Ganancias).  -->
         <Style x:Key="BotonMenuTab" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FontSize" Value="14"/>
