@@ -74,7 +74,7 @@ namespace FarmaciaPOS.Views
 
         private void BtnNegocio_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Información del negocio");
+            new InformacionNegocio().ShowDialog();
         }
 
         // =====================================
@@ -93,7 +93,7 @@ namespace FarmaciaPOS.Views
 
         private void BtnAcerca_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("FarmaciaPOS v1.0");
+            new AcercaDelSistema().ShowDialog();
         }
 
         // =====================================
