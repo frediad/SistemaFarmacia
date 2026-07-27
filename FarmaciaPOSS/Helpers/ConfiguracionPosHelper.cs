@@ -12,7 +12,7 @@ namespace FarmaciaPOS.Helpers
         public string RespaldoCarpeta { get; set; } = "";
         public int RespaldoIntervaloHoras { get; set; } = 24;
         public DateTime? UltimoRespaldo { get; set; }
-        public string ModoConexion { get; set; } = "Local"; // "Local" | "Azure" | "Ambas"
+        public string ModoConexion { get; set; } = "Ambas"; // "Local" | "Azure" | "Ambas"
     }
 
     public static class ConfiguracionPosHelper

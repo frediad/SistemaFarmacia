@@ -227,6 +227,7 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Bottom"
                                Margin="0,0,0,18"/>
+                    
 
                 </Grid>
 
@@ -239,6 +240,7 @@
             <Border Grid.Column="1" Background="White">
 
                 <StackPanel Width="360"
+                           
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
 
@@ -295,6 +297,21 @@
                             Height="50"
                             Style="{StaticResource BtnLoginPrincipal}"
                             Click="BtnLogin_Click"/>
+                    <TextBlock x:Name="txtCrearAdmin"
+                               Text="¿No tienes cuenta? Crear usuario administrador"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="#2563EB"
+                               HorizontalAlignment="Center"
+                               Margin="0,18,0,0"
+                               Cursor="Hand"
+                               Visibility="Visible"
+                               MouseLeftButtonUp="TxtCrearAdmin_Click"/>
+                        
+                   
+                    
+                    
+                    
 
                               
 

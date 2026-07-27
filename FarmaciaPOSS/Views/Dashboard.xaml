@@ -8,7 +8,8 @@
         Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8"
-        PreviewKeyDown="DashboardWindow_PreviewKeyDown">
+        PreviewKeyDown="DashboardWindow_PreviewKeyDown"
+        Closing="MainWindow_Closing">
 
     <Window.Resources>
 
@@ -416,8 +417,48 @@
 
                     </StackPanel>
 
+                    <!-- ✅ BOTÓN ACTUALIZAR -->
+                    <Button x:Name="btnActualizar"
+                            Content="🔄 Actualizar"
+                            Width="100"
+                            Height="38"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Background="#EFF6FF"
+                            Foreground="#2563EB"
+                            BorderThickness="1"
+                            BorderBrush="#BFDBFE"
+                            Cursor="Hand"
+                            Margin="0,0,10,0"
+                            Click="BtnActualizar_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="b"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="b"
+                                                Property="Background"
+                                                Value="#DBEAFE"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="b"
+                                                Property="Background"
+                                                Value="#BFDBFE"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
                     <Button Content="⏻ Salir"
-                            Width="90"
+                            Width="80"
                             Height="38"
                             FontSize="14"
                             FontWeight="Bold"
@@ -432,13 +473,13 @@
                                         Background="{TemplateBinding Background}"
                                         CornerRadius="8">
                                     <ContentPresenter HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
+                                      VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter TargetName="b"
-                                                Property="Background"
-                                                Value="#B91C1C"/>
+                                Property="Background"
+                                Value="#B91C1C"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -446,6 +487,7 @@
                     </Button>
 
                 </StackPanel>
+
 
             </Grid>
 
@@ -654,25 +696,6 @@
                             </StackPanel>
                         </Button>
 
-                        <Button x:Name="btnLateralEliminar"
-                                Style="{StaticResource BtnLateral}"
-                                Click="BtnEliminar_Click">
-                            <StackPanel>
-                                <TextBlock Text="🗑️"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Remover"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#374151"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="F7"
-                                           FontSize="9"
-                                           Foreground="#94A3B8"
-                                           HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
                         <Button x:Name="btnCantidad"
                                 Style="{StaticResource BtnLateral}"
                                 Click="BtnCantidad_Click">
@@ -686,6 +709,25 @@
                                            Foreground="#374151"
                                            HorizontalAlignment="Center"/>
                                 <TextBlock Text="F6"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="btnLateralEliminar"
+                                Style="{StaticResource BtnLateral}"
+                                Click="BtnEliminar_Click">
+                            <StackPanel>
+                                <TextBlock Text="🗑️"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Remover"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="#374151"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="F7"
                                            FontSize="9"
                                            Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
@@ -785,7 +827,7 @@
                 <StackPanel VerticalAlignment="Top"
                             Margin="12,16">
 
-                    <TextBlock Text="PRODUCTO ACTUAL"
+                    <TextBlock Text="Producto"
                                FontSize="11"
                                FontWeight="Bold"
                                Foreground="#94A3B8"
@@ -956,15 +998,6 @@
                                     Width="120"
                                     Height="36"
                                     Margin="4,0"/>
-
-                            <Button x:Name="btnPagar"
-                                    Content="🖨️ Ticket"
-                                    Style="{StaticResource BtnAccion}"
-                                    Width="110"
-                                    Height="36"
-                                    Margin="4,0"
-                                    Click="BtnPagar_Click"/>
-
                         </StackPanel>
 
                     </Border>

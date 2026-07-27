@@ -13,6 +13,6 @@
         public DateTime FechaRegistro { get; set; }
         public bool Activo { get; set; }
 
-        public decimal CreditoDisponible => LimiteCredito - SaldoActual;
+        public DateTime FechaRegistro { get; set; } = DateTime.Now;
     }
 }

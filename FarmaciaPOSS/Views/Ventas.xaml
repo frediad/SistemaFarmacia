@@ -148,9 +148,13 @@
             </Setter>
         </Style>
 
+
         <!-- ===================================== -->
         <!-- ESTILO BOTONES ACCIÓN INFERIOR         -->
         <!-- ===================================== -->
+
+              
+
 
         <Style x:Key="BtnAccion" TargetType="Button">
             <Setter Property="Background" Value="White"/>

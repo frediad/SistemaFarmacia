@@ -13,6 +13,9 @@ namespace FarmaciaPOS.Views
         public LoginWindow()
         {
             InitializeComponent();
+            VerificarSiMostrarCrearAdmin();
+
+
         }
 
         private void BtnLogin_Click(
@@ -99,6 +102,35 @@ namespace FarmaciaPOS.Views
             using var sha256 = System.Security.Cryptography.SHA256.Create();
             byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
+        }
+        private void VerificarSiMostrarCrearAdmin()
+        {
+            try
+            {
+                bool existeAdmin = UsuarioSetupHelper.ExisteAdministrador();
+                txtCrearAdmin.Visibility = existeAdmin ? Visibility.Collapsed : Visibility.Visible;
+            }
+            catch
+            {
+                // Si falla la conexión a BD en este punto, oculta la opción por seguridad
+                txtCrearAdmin.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void TxtCrearAdmin_Click(object sender, MouseButtonEventArgs e)
+        {
+            var ventana = new CrearAdmin
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true && ventana.UsuarioCreado)
+            {
+                // ✅ Oculta la opción de inmediato tras crear el admin, sin esperar a reabrir la ventana
+                txtCrearAdmin.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

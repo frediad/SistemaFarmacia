@@ -10,6 +10,8 @@
 
         public int Orden { get; set; }
 
+
         public byte[]? ImagenData { get; set; }
+
     }
 }
