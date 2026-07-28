@@ -158,7 +158,8 @@
                           FontSize="14"
                           CanUserAddRows="False"
                           GridLinesVisibility="Horizontal"
-                          HorizontalGridLinesBrush="#F1F5F9">
+                          HorizontalGridLinesBrush="#F1F5F9"
+                          CellEditEnding="dgItemsPedido_CellEditEnding">
 
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
