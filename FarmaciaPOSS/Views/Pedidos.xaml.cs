@@ -30,8 +30,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
@@ -201,11 +200,10 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     "No se pudieron cargar los productos del pedido: " + ex.Message,
                     "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    this);
             }
         }
 
@@ -218,8 +216,7 @@ namespace FarmaciaPOS.Views
         {
             if (pedidoSeleccionadoId == 0 || pedidoSeleccionado == null)
             {
-                MessageBox.Show("Selecciona un pedido primero",
-                    "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MensajeHelper.Advertencia("Selecciona un pedido primero", "Aviso", this);
                 return;
             }
 
@@ -246,32 +243,26 @@ namespace FarmaciaPOS.Views
 
                 pedidoSeleccionado.EstadoPedido = nuevoEstado;
 
-                MessageBox.Show(
-                    $"Estado cambiado a: {nuevoEstado}",
-                    "Actualizado",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                MensajeHelper.Exito($"Estado cambiado a: {nuevoEstado}", "Actualizado", this);
 
                 if (!string.IsNullOrWhiteSpace(pedidoSeleccionado.ClienteCorreo))
                 {
-                    var notificar = MessageBox.Show(
+                    bool notificar = MensajeHelper.Confirmar(
                         $"¿Deseas notificar al cliente por correo?\n\n" +
                         $"📧 {pedidoSeleccionado.ClienteCorreo}\n" +
                         $"Estado nuevo: {nuevoEstado}",
                         "Notificar cliente",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
+                        this);
 
-                    if (notificar == MessageBoxResult.Yes)
+                    if (notificar)
                         EnviarCorreoEstado(pedidoSeleccionado, nuevoEstado);
                 }
                 else
                 {
-                    MessageBox.Show(
+                    MensajeHelper.Advertencia(
                         "El cliente no tiene correo registrado — no se puede enviar notificación.",
                         "Sin correo",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                        this);
                 }
 
                 // ✅ Recargar preservando filtro actual — ahora sí refresca visualmente
@@ -294,8 +285,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
@@ -404,11 +394,10 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     $"Error al abrir Gmail:\n{ex.Message}",
                     "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    this);
             }
         }
 

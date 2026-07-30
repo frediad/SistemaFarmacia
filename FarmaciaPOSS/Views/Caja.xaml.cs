@@ -242,13 +242,12 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
-            // Entradas y salidas manuales
             string queryMovs =
             @"SELECT
-                ISNULL(SUM(CASE WHEN TipoMovimiento = 'ENTRADA' THEN Monto ELSE 0 END), 0) AS TotalEntradas,
-                ISNULL(SUM(CASE WHEN TipoMovimiento = 'SALIDA' THEN Monto ELSE 0 END), 0) AS TotalSalidas
-              FROM MovimientosCaja
-              WHERE CajaId = @CajaId";
+        ISNULL(SUM(CASE WHEN TipoMovimiento = 'ENTRADA' THEN Monto ELSE 0 END), 0) AS TotalEntradas,
+        ISNULL(SUM(CASE WHEN TipoMovimiento = 'SALIDA' THEN Monto ELSE 0 END), 0) AS TotalSalidas
+        FROM MovimientosCaja
+        WHERE CajaId = @CajaId";
 
             SqlCommand cmdMovs = new SqlCommand(queryMovs, conn);
             cmdMovs.Parameters.AddWithValue("@CajaId", cajaActualId);
@@ -264,36 +263,46 @@ namespace FarmaciaPOS.Views
                 }
             }
 
-            // ✅ Ventas en efectivo desde que se abrió la caja
-            // NOTA: asume que tu tabla Ventas tiene una columna "MetodoPago" con valor 'Efectivo'.
-            // Si tu columna se llama distinto, ajusta el nombre aquí.
-            decimal ventasEfectivo = 0;
+            // ✅ Ventas desglosadas por método de pago desde que se abrió la caja
+            decimal ventasEfectivo = 0, ventasTarjeta = 0, ventasTransferencia = 0;
 
             try
             {
                 string queryVentas =
-                @"SELECT ISNULL(SUM(Total), 0) AS TotalEfectivo
-                  FROM Ventas
-                  WHERE Fecha >= @FechaApertura
-                  AND Estado = 'Completada'
-                  AND MetodoPago = 'Efectivo'";
+                @"SELECT
+            ISNULL(SUM(CASE WHEN MetodoPago = 'Efectivo' THEN Total ELSE 0 END), 0) AS Efectivo,
+            ISNULL(SUM(CASE WHEN MetodoPago = 'Tarjeta' THEN Total ELSE 0 END), 0) AS Tarjeta,
+            ISNULL(SUM(CASE WHEN MetodoPago = 'Transferencia' THEN Total ELSE 0 END), 0) AS Transferencia
+              FROM Ventas
+              WHERE Fecha >= @FechaApertura
+              AND Estado = 'Completada'";
 
                 SqlCommand cmdVentas = new SqlCommand(queryVentas, conn);
                 cmdVentas.Parameters.AddWithValue("@FechaApertura", fechaAperturaActual);
 
-                var resultado = cmdVentas.ExecuteScalar();
-                ventasEfectivo = resultado != null ? Convert.ToDecimal(resultado) : 0;
+                using SqlDataReader readerVentas = cmdVentas.ExecuteReader();
+                if (readerVentas.Read())
+                {
+                    ventasEfectivo = Convert.ToDecimal(readerVentas["Efectivo"]);
+                    ventasTarjeta = Convert.ToDecimal(readerVentas["Tarjeta"]);
+                    ventasTransferencia = Convert.ToDecimal(readerVentas["Transferencia"]);
+                }
             }
             catch
             {
-                // Si la columna MetodoPago no existe todavía, se omite este dato sin romper la ventana
                 ventasEfectivo = 0;
+                ventasTarjeta = 0;
+                ventasTransferencia = 0;
             }
 
+            // ✅ Solo el efectivo afecta el efectivo físico esperado en el cajón.
+            // Tarjeta/Transferencia son solo informativas — el dinero no pasa por la caja física.
             decimal totalEsperado = montoInicialActual + ventasEfectivo + totalEntradas - totalSalidas;
 
             txtResumenInicial.Text = montoInicialActual.ToString("C");
             txtResumenVentasEfectivo.Text = ventasEfectivo.ToString("C");
+            txtResumenVentasTarjeta.Text = ventasTarjeta.ToString("C");
+            txtResumenVentasTransferencia.Text = ventasTransferencia.ToString("C");
             txtResumenEntradas.Text = totalEntradas.ToString("C");
             txtResumenSalidas.Text = totalSalidas.ToString("C");
             txtResumenEsperado.Text = totalEsperado.ToString("C");
@@ -311,7 +320,6 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-            // Limpia el conteo anterior
             txtCant1000.Text = "0";
             txtCant500.Text = "0";
             txtCant200.Text = "0";
@@ -324,13 +332,16 @@ namespace FarmaciaPOS.Views
             txtCant1.Text = "0";
             txtCant050.Text = "0";
 
-            // Extrae el total esperado ya calculado en el resumen en vivo
             string textoEsperado = txtResumenEsperado.Text.Replace("$", "").Replace(",", "");
             decimal.TryParse(textoEsperado, out decimal esperado);
 
             txtCorteEsperado.Text = esperado.ToString("C");
             txtCorteContado.Text = "$0.00";
             txtCorteDiferencia.Text = "$0.00";
+
+            // ✅ Refleja en el overlay lo que ya se calculó en el resumen en vivo
+            txtCorteTarjeta.Text = txtResumenVentasTarjeta.Text;
+            txtCorteTransferencia.Text = txtResumenVentasTransferencia.Text;
 
             overlayCorte.Visibility = Visibility.Visible;
         }

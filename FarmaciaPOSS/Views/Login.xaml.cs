@@ -72,9 +72,13 @@ namespace FarmaciaPOS.Views
                 Sesion.Rol =
                     reader["Rol"].ToString();
 
-                MainWindow main =
-                    new MainWindow();
+                reader.Close();
 
+                // ✅ Apertura de caja obligatoria antes de entrar al dashboard
+                var ventanaCaja = new AbrirCajaWindow();
+                ventanaCaja.ShowDialog();
+
+                MainWindow main = new MainWindow();
                 main.Show();
 
                 this.Close();

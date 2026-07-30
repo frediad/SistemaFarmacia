@@ -672,7 +672,7 @@ namespace FarmaciaPOS
             ProductosWindow ventana =
                 new ProductosWindow();
 
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnVentas_Click(
@@ -688,7 +688,7 @@ namespace FarmaciaPOS
             VentasWindow ventas =
                 new VentasWindow();
 
-            ventas.ShowDialog();
+            ventas.Show();
         }
 
         private void BtnInventario_Click(
@@ -704,7 +704,7 @@ namespace FarmaciaPOS
             InventarioWindow inventario =
                 new InventarioWindow();
 
-            inventario.ShowDialog();
+            inventario.Show();
         }
 
         private void BtnReportes_Click(
@@ -720,7 +720,7 @@ namespace FarmaciaPOS
             ReportesWindow reporte =
                 new ReportesWindow();
 
-            reporte.ShowDialog();
+            reporte.Show();
         }
 
         private void BtnPedidos_Click(
@@ -736,7 +736,7 @@ namespace FarmaciaPOS
             PedidosWindow pedidos =
                 new PedidosWindow();
 
-            pedidos.ShowDialog();
+            pedidos.Show();
         }
 
         private void BtnConfiguracion_Click(
@@ -752,7 +752,7 @@ namespace FarmaciaPOS
             ConfiguracionWindow configuracion
                 = new ConfiguracionWindow();
 
-            configuracion.ShowDialog();
+            configuracion.Show();
 
         }
 
@@ -769,7 +769,7 @@ namespace FarmaciaPOS
             CajaWindow caja =
                 new CajaWindow();
 
-            caja.ShowDialog();
+            caja.Show();
         }
 
         private void BtnLateralDevoluciones_Click(object sender, RoutedEventArgs e)
@@ -781,7 +781,7 @@ namespace FarmaciaPOS
             }
 
             var ventana = new DevolucionesWindow();
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnLateralClientes_Click(object sender, RoutedEventArgs e)
@@ -793,7 +793,7 @@ namespace FarmaciaPOS
             }
 
             var ventana = new ClientesWindow();
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnSalir_Click(

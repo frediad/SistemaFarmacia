@@ -323,7 +323,7 @@
                                 Padding="18"
                                 Margin="0,0,0,15">
 
-                            <UniformGrid Columns="5">
+                            <UniformGrid Columns="7">
 
                                 <StackPanel Margin="6,0" HorizontalAlignment="Center">
                                     <TextBlock Text="MONTO INICIAL" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
@@ -331,8 +331,18 @@
                                 </StackPanel>
 
                                 <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="VENTAS EFECTIVO" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="VENTAS EFECT." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
                                     <TextBlock x:Name="txtResumenVentasEfectivo" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                               
+                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                                    <TextBlock Text="VENTAS TARJETA" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtResumenVentasTarjeta" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                                    <TextBlock Text="VENTAS TRANSF." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtResumenVentasTransferencia" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="6,0" HorizontalAlignment="Center">
@@ -661,6 +671,34 @@
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
+
+
+                            <Border Background="#F0F9FF"
+                                    BorderBrush="#BAE6FD"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="16"
+                                    Margin="0,0,0,18">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="TOTAL VENTAS CON TARJETA" FontSize="11" FontWeight="Bold" Foreground="#0369A1" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="txtCorteTarjeta" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                        <TextBlock Text="TOTAL POR TRANSFERENCIA" FontSize="11" FontWeight="Bold" Foreground="#0369A1" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="txtCorteTransferencia" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+
+                                </Grid>
+
+                            </Border>
 
                             <Button Grid.Column="2"
                                     Content="✅ Confirmar Corte y Cerrar Caja"
