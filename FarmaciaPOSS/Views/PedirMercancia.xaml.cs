@@ -74,7 +74,16 @@ namespace FarmaciaPOS.Views
             using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
             conn.Open();
 
-            string query = "SELECT * FROM Productos WHERE Activo = 1 ORDER BY Nombre";
+            string query =
+            @"SELECT p.*,
+            (SELECT TOP 1 img.ImagenData
+            FROM ImagenesProducto img
+            WHERE img.ProductoId = p.Id
+            ORDER BY img.Orden) AS PrimeraImagenData
+            FROM Productos p
+            WHERE p.Activo = 1
+            ORDER BY p.Nombre";
+
             SqlCommand cmd = new SqlCommand(query, conn);
             SqlDataReader reader = cmd.ExecuteReader();
 
@@ -87,7 +96,10 @@ namespace FarmaciaPOS.Views
                     CodigoBarras = reader["CodigoBarras"].ToString(),
                     Stock = Convert.ToInt32(reader["Stock"]),
                     PrecioCompra = Convert.ToDecimal(reader["PrecioCompra"]),
-                    ImagenURL = reader["ImagenURL"].ToString(),
+                    PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
+                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
+                        ? (byte[])reader["PrimeraImagenData"]
+                        : null,
                 });
             }
         }
@@ -123,11 +135,17 @@ namespace FarmaciaPOS.Views
                 {
                     Nombre = producto.Nombre,
                     Cantidad = 1,
-                    CostoUnitario = producto.PrecioCompra
+                    CostoUnitario = producto.PrecioVenta
                 });
             }
 
             ActualizarTotal();
+        }
+
+        private void dgItemsPedido_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            // Espera a que el binding aplique el nuevo valor antes de recalcular
+            Dispatcher.BeginInvoke(new Action(ActualizarTotal));
         }
 
         private void BtnQuitarItem_Click(object sender, RoutedEventArgs e)

@@ -6,47 +6,92 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FarmaciaPOS.Views
 {
     public partial class Cobrar : Window
     {
         private readonly ObservableCollection<VentaItem> carrito;
-        private readonly decimal subtotal;
         private readonly decimal total;
 
         public bool VentaCompletada { get; private set; } = false;
 
-        public Cobrar(ObservableCollection<VentaItem> carritoActual)
+        public Cobrar(ObservableCollection<VentaItem> carritoVenta)
         {
             InitializeComponent();
 
-            carrito = carritoActual;
-            dgResumenCobro.ItemsSource = carrito;
+            carrito = carritoVenta;
 
-            subtotal = carrito.Sum(x => x.Subtotal);
-            total = subtotal;
+            dgResumenVenta.ItemsSource = carrito;
 
-            txtSubtotalCobro.Text = subtotal.ToString("C");
-            txtTotalCobro.Text = total.ToString("C");
+            total = carrito.Sum(x => x.Subtotal);
+
+            txtTotalCobrar.Text = total.ToString("C");
 
             Loaded += (s, e) => txtMontoRecibido.Focus();
         }
 
-        private void txtMontoRecibido_TextChanged(object sender, TextChangedEventArgs e)
+        // =========================================
+        // MÉTODO DE PAGO
+        // =========================================
+
+        private void cbMetodoPago_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (decimal.TryParse(txtMontoRecibido.Text, out decimal pago) && pago >= 0)
+            if (txtMontoRecibido == null || txtEtiquetaMonto == null || txtCambioCobrar == null)
+                return;
+
+            string metodo = (cbMetodoPago.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Efectivo";
+
+            if (metodo == "Efectivo")
             {
-                decimal cambio = pago - total;
-                txtCambioCobro.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00";
+                txtEtiquetaMonto.Text = "MONTO RECIBIDO";
+                txtMontoRecibido.IsEnabled = true;
+                txtMontoRecibido.Text = "";
+                txtCambioCobrar.Text = "$0.00";
+                txtMontoRecibido.Focus();
             }
             else
             {
-                txtCambioCobro.Text = "$0.00";
+                txtEtiquetaMonto.Text = "MONTO A COBRAR";
+                txtMontoRecibido.IsEnabled = false;
+                txtMontoRecibido.Text = total.ToString("0.00");
+                txtCambioCobrar.Text = "$0.00";
             }
         }
 
-        private void BtnConfirmarCobro_Click(object sender, RoutedEventArgs e)
+        private void txtMontoRecibido_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string metodo = (cbMetodoPago.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Efectivo";
+
+            if (metodo != "Efectivo")
+            {
+                txtCambioCobrar.Text = "$0.00";
+                return;
+            }
+
+            if (decimal.TryParse(txtMontoRecibido.Text, out decimal pago) && pago >= 0)
+            {
+                decimal cambio = pago - total;
+                txtCambioCobrar.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00";
+            }
+            else
+            {
+                txtCambioCobrar.Text = "$0.00";
+            }
+        }
+
+        private void txtMontoRecibido_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                BtnConfirmarVenta_Click(sender, new RoutedEventArgs());
+        }
+
+        // =========================================
+        // CONFIRMAR VENTA
+        // =========================================
+
+        private void BtnConfirmarVenta_Click(object sender, RoutedEventArgs e)
         {
             if (carrito.Count == 0)
             {
@@ -54,20 +99,32 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-            if (!decimal.TryParse(txtMontoRecibido.Text, out decimal pago))
-            {
-                MessageBox.Show("Ingresa un monto válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            string metodoPago = (cbMetodoPago.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Efectivo";
 
-            if (pago < total)
-            {
-                MessageBox.Show("El pago es insuficiente.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            decimal pago;
+            decimal cambio;
 
-            decimal cambio = pago - total;
-            string folio = $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
+            if (metodoPago == "Efectivo")
+            {
+                if (!decimal.TryParse(txtMontoRecibido.Text, out pago))
+                {
+                    MessageBox.Show("Ingresa un monto válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (pago < total)
+                {
+                    MessageBox.Show("El pago es insuficiente.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                cambio = pago - total;
+            }
+            else
+            {
+                pago = total;
+                cambio = 0;
+            }
 
             using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
             conn.Open();
@@ -76,17 +133,21 @@ namespace FarmaciaPOS.Views
 
             try
             {
+                string folio = $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
+
                 string sqlVenta =
                 @"INSERT INTO Ventas
                 (Folio, Fecha, Subtotal, Descuento, Total, MetodoPago, Estado, UsuarioId)
                 VALUES
-                (@Folio, GETDATE(), @Subtotal, 0, @Total, 'Efectivo', 'Completada', @UsuarioId);
+                (@Folio, GETDATE(), @Subtotal, 0, @Total, @MetodoPago, 'Completada', @UsuarioId);
+
                 SELECT SCOPE_IDENTITY();";
 
                 SqlCommand cmdVenta = new SqlCommand(sqlVenta, conn, trans);
                 cmdVenta.Parameters.AddWithValue("@Folio", folio);
-                cmdVenta.Parameters.AddWithValue("@Subtotal", subtotal);
+                cmdVenta.Parameters.AddWithValue("@Subtotal", total);
                 cmdVenta.Parameters.AddWithValue("@Total", total);
+                cmdVenta.Parameters.AddWithValue("@MetodoPago", metodoPago);
                 cmdVenta.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
 
                 int ventaId = Convert.ToInt32(cmdVenta.ExecuteScalar());
@@ -94,11 +155,11 @@ namespace FarmaciaPOS.Views
                 foreach (var item in carrito)
                 {
                     SqlCommand cmdDetalle = new SqlCommand(
-                        @"INSERT INTO DetalleVentas
-                        (VentaId, ProductoId, Cantidad, PrecioUnitario, Subtotal)
-                        VALUES
-                        (@VentaId, @ProductoId, @Cantidad, @Precio, @Subtotal)",
-                        conn, trans);
+                    @"INSERT INTO DetalleVentas
+                    (VentaId, ProductoId, Cantidad, PrecioUnitario, Subtotal)
+                    VALUES
+                    (@VentaId, @ProductoId, @Cantidad, @Precio, @Subtotal)",
+                    conn, trans);
 
                     cmdDetalle.Parameters.AddWithValue("@VentaId", ventaId);
                     cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
@@ -108,8 +169,8 @@ namespace FarmaciaPOS.Views
                     cmdDetalle.ExecuteNonQuery();
 
                     SqlCommand cmdStock = new SqlCommand(
-                        @"UPDATE Productos SET Stock = Stock - @Cantidad WHERE Id = @ProductoId",
-                        conn, trans);
+                    @"UPDATE Productos SET Stock = Stock - @Cantidad WHERE Id = @ProductoId",
+                    conn, trans);
 
                     cmdStock.Parameters.AddWithValue("@Cantidad", item.Cantidad);
                     cmdStock.Parameters.AddWithValue("@ProductoId", item.ProductoId);
@@ -117,27 +178,31 @@ namespace FarmaciaPOS.Views
                 }
 
                 trans.Commit();
+
+                VentaCompletada = true;
+
+                MessageBox.Show(
+                    $"✅ Venta registrada correctamente.\n\nFolio: {folio}\nMétodo: {metodoPago}\nCambio: {cambio:C}",
+                    "Venta exitosa",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                PreguntarEImprimirTicket(folio, pago, cambio);
+
+                DialogResult = true;
             }
             catch (Exception ex)
             {
                 trans.Rollback();
-                MessageBox.Show("No se pudo registrar la venta: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show("Error al registrar la venta: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            MessageBox.Show(
-                $"✅ Venta realizada\n\nTotal:  {total:C}\nPago:   {pago:C}\nCambio: {cambio:C}",
-                "Venta exitosa",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-
-            PreguntarImprimirTicket(folio, pago, cambio);
-
-            VentaCompletada = true;
-            DialogResult = true;
         }
 
-        private void PreguntarImprimirTicket(string folio, decimal pago, decimal cambio)
+        // =========================================
+        // IMPRIMIR TICKET
+        // =========================================
+
+        private void PreguntarEImprimirTicket(string folio, decimal pago, decimal cambio)
         {
             var resultado = MessageBox.Show(
                 "¿Deseas imprimir el ticket de esta venta?",
@@ -153,7 +218,7 @@ namespace FarmaciaPOS.Views
             if (string.IsNullOrWhiteSpace(config.ImpresoraTicket))
             {
                 MessageBox.Show(
-                    "No hay ninguna impresora de tickets configurada. Ve a Configuración para asignar una.",
+                    "No hay una impresora configurada. Ve a Configuración para asignar una.",
                     "Impresora no configurada",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -167,8 +232,7 @@ namespace FarmaciaPOS.Views
                     folio,
                     Sesion.NombreUsuario,
                     carrito,
-                    subtotal,
-  
+                    total,
                     total,
                     pago,
                     cambio);
@@ -176,10 +240,10 @@ namespace FarmaciaPOS.Views
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "La venta se registró correctamente, pero no se pudo imprimir el ticket: " + ex.Message,
+                    "No se pudo imprimir el ticket: " + ex.Message,
                     "Error de impresión",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                    MessageBoxImage.Error);
             }
         }
 

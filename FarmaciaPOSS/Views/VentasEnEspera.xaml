@@ -115,6 +115,43 @@
                            Margin="0,2,0,12"/>
             </StackPanel>
 
+            <Border x:Name="borderVentaActual"
+                    Background="#EFF6FF"
+                    BorderBrush="#BFDBFE"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="12"
+                    Margin="0,0,0,12"
+                    Visibility="Collapsed">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="🛒 Tienes una venta en curso"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#1E40AF"/>
+                        <TextBlock x:Name="txtResumenVentaActual"
+                                   Text="0 producto(s) — Total: $0.00"
+                                   FontSize="12"
+                                   Foreground="#3B82F6"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Content="💾 Guardar en espera"
+                            Height="34"
+                            Padding="10,0"
+                            Style="{StaticResource BtnRecuperar}"
+                            Click="BtnGuardarVentaActual_Click"/>
+
+                </Grid>
+
+            </Border>
+
             <Grid Grid.Row="1">
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">

@@ -469,7 +469,7 @@
                                     BorderThickness="0"
                                     Cursor="Hand"
                                     ToolTip="Agregar nueva categoría"
-                                    Click="BtnNuevaCategoria_Click">
+                                    Click="BtnGestionarCategorias_Click">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border Background="{TemplateBinding Background}" CornerRadius="8">
@@ -510,7 +510,7 @@
                                     BorderThickness="0"
                                     Cursor="Hand"
                                     ToolTip="Agregar nueva subcategoría"
-                                    Click="BtnNuevaSubcategoria_Click">
+                                    Click="BtnGestionarCategorias_Click">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border Background="{TemplateBinding Background}" CornerRadius="8">

@@ -976,32 +976,7 @@
 
                     </Border>
 
-                    <!-- ACCIONES ADICIONALES -->
-                    <Border Grid.Row="2"
-                            Background="#F8FAFC"
-                            BorderBrush="#E2E8F0"
-                            BorderThickness="1,1,1,1"
-                            CornerRadius="0,0,10,10">
-
-                        <StackPanel Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="10,0">
-
-                            <Button Content="↩ Cambiar"
-                                    Style="{StaticResource BtnAccion}"
-                                    Width="110"
-                                    Height="36"
-                                    Margin="4,0"/>
-
-                            <Button Content="↩ Devolución"
-                                    Style="{StaticResource BtnAccion}"
-                                    Width="120"
-                                    Height="36"
-                                    Margin="4,0"/>
-                        </StackPanel>
-
-                    </Border>
-
+                    
                 </Grid>
 
                 <!-- ===================================== -->

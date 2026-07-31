@@ -1,0 +1,150 @@
+﻿<Window x:Class="FarmaciaPOS.Views.AbrirCajaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Apertura de Caja"
+        Height="480"
+        Width="460"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="TxtAbrirCaja" TargetType="TextBox">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#2563EB"/>
+                                <Setter TargetName="border" Property="Background" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnAbrirCajaPrincipal" TargetType="Button">
+            <Setter Property="Background" Value="#16A34A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Background="White" CornerRadius="16" Margin="14">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.2" BlurRadius="30" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid Margin="30,26">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="🧾 Apertura de Caja"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+                <TextBlock Text="Debes abrir (o confirmar) la caja para continuar"
+                           FontSize="13"
+                           Foreground="#94A3B8"
+                           Margin="0,4,0,20"/>
+            </StackPanel>
+
+            <!-- ===== PANEL: NO HAY CAJA ABIERTA ===== -->
+            <StackPanel x:Name="pnlAbrirNueva" Grid.Row="1" Visibility="Collapsed">
+
+                <TextBlock Text="MONTO INICIAL"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           Foreground="#94A3B8"
+                           Margin="2,0,0,6"/>
+
+                <TextBox x:Name="txtMontoInicial"
+                         Height="52"
+                         Style="{StaticResource TxtAbrirCaja}"
+                         Margin="0,0,0,20"/>
+
+                <Button Content="🔓 ABRIR CAJA E INICIAR"
+                        Height="50"
+                        Style="{StaticResource BtnAbrirCajaPrincipal}"
+                        Click="BtnAbrirCaja_Click"/>
+
+            </StackPanel>
+
+            <!-- ===== PANEL: YA HAY CAJA ABIERTA ===== -->
+            <StackPanel x:Name="pnlCajaYaAbierta" Grid.Row="1" Visibility="Collapsed">
+
+                <Border Background="#EFF6FF"
+                        BorderBrush="#BFDBFE"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16"
+                        Margin="0,0,0,20">
+
+                    <StackPanel>
+                        <TextBlock Text="Ya hay una caja abierta"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="#1E40AF"/>
+                        <TextBlock x:Name="txtInfoCajaAbierta"
+                                   Text=""
+                                   FontSize="13"
+                                   Foreground="#3B82F6"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+
+                </Border>
+
+                <Button Content="✅ CONTINUAR CON ESTA CAJA"
+                        Height="50"
+                        Style="{StaticResource BtnAbrirCajaPrincipal}"
+                        Click="BtnContinuar_Click"/>
+
+            </StackPanel>
+
+        </Grid>
+
+    </Border>
+
+</Window>

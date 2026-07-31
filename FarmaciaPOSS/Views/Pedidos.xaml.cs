@@ -3,6 +3,7 @@ using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -12,13 +13,15 @@ namespace FarmaciaPOS.Views
 {
     public partial class PedidosWindow : Window
     {
-        List<PedidoView> listaTodosLosPedidos = new();
+        ObservableCollection<PedidoView> listaTodosLosPedidos = new();
         int pedidoSeleccionadoId = 0;
         PedidoView? pedidoSeleccionado = null;
 
         public PedidosWindow()
         {
             InitializeComponent();
+
+            dgPedidos.ItemsSource = listaTodosLosPedidos;
 
             try
             {
@@ -27,8 +30,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
@@ -86,8 +88,6 @@ namespace FarmaciaPOS.Views
                     Observaciones = reader["Observaciones"].ToString() ?? ""
                 });
             }
-
-            dgPedidos.ItemsSource = listaTodosLosPedidos;
         }
 
         // =========================================
@@ -156,40 +156,55 @@ namespace FarmaciaPOS.Views
 
         private void CargarDetallePedido(int idPedido)
         {
-            List<DetallePedidoView> lista = new();
-
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT
-                pr.Nombre AS NombreProducto,
-                dp.Cantidad,
-                dp.Precio,
-                dp.Subtotal
-              FROM DetallePedidos dp
-              INNER JOIN Productos pr ON dp.ProductoId = pr.Id
-              WHERE dp.PedidoId = @PedidoId";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@PedidoId", idPedido);
-
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                lista.Add(new DetallePedidoView
-                {
-                    NombreProducto = reader["NombreProducto"].ToString() ?? "",
-                    Cantidad = Convert.ToInt32(reader["Cantidad"]),
-                    Precio = Convert.ToDecimal(reader["Precio"]),
-                    Subtotal = Convert.ToDecimal(reader["Subtotal"])
-                });
-            }
+                List<DetallePedidoView> lista = new();
 
-            dgDetallePedido.ItemsSource = lista;
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                string query =
+                @"SELECT
+                    pr.Nombre AS NombreProducto,
+                    dp.Cantidad,
+                    dp.Precio,
+                    dp.Subtotal
+                  FROM DetallePedidos dp
+                  INNER JOIN Productos pr ON dp.ProductoId = pr.Id
+                  WHERE dp.PedidoId = @PedidoId";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@PedidoId", idPedido);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    lista.Add(new DetallePedidoView
+                    {
+                        NombreProducto = reader["NombreProducto"].ToString() ?? "",
+                        Cantidad = Convert.ToInt32(reader["Cantidad"]),
+                        Precio = Convert.ToDecimal(reader["Precio"]),
+                        Subtotal = Convert.ToDecimal(reader["Subtotal"])
+                    });
+                }
+
+                dgDetallePedido.ItemsSource = lista;
+
+                if (lista.Count == 0)
+                {
+                    Debug.WriteLine($"El pedido #{idPedido} no tiene productos en DetallePedidos.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error(
+                    "No se pudieron cargar los productos del pedido: " + ex.Message,
+                    "Error",
+                    this);
+            }
         }
 
         // =========================================
@@ -201,8 +216,7 @@ namespace FarmaciaPOS.Views
         {
             if (pedidoSeleccionadoId == 0 || pedidoSeleccionado == null)
             {
-                MessageBox.Show("Selecciona un pedido primero",
-                    "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MensajeHelper.Advertencia("Selecciona un pedido primero", "Aviso", this);
                 return;
             }
 
@@ -213,7 +227,6 @@ namespace FarmaciaPOS.Views
 
             try
             {
-                // ✅ Actualizar estado en BD
                 using SqlConnection conn =
                     new SqlConnection(DatabaseHelper.ConnectionString);
 
@@ -228,48 +241,51 @@ namespace FarmaciaPOS.Views
 
                 cmd.ExecuteNonQuery();
 
-                // ✅ Actualizar el objeto local
                 pedidoSeleccionado.EstadoPedido = nuevoEstado;
 
-                MessageBox.Show(
-                    $"Estado cambiado a: {nuevoEstado}",
-                    "Actualizado",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                MensajeHelper.Exito($"Estado cambiado a: {nuevoEstado}", "Actualizado", this);
 
-                // ✅ Preguntar si desea notificar al cliente por correo
                 if (!string.IsNullOrWhiteSpace(pedidoSeleccionado.ClienteCorreo))
                 {
-                    var notificar = MessageBox.Show(
+                    bool notificar = MensajeHelper.Confirmar(
                         $"¿Deseas notificar al cliente por correo?\n\n" +
                         $"📧 {pedidoSeleccionado.ClienteCorreo}\n" +
                         $"Estado nuevo: {nuevoEstado}",
                         "Notificar cliente",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
+                        this);
 
-                    if (notificar == MessageBoxResult.Yes)
+                    if (notificar)
                         EnviarCorreoEstado(pedidoSeleccionado, nuevoEstado);
                 }
                 else
                 {
-                    MessageBox.Show(
+                    MensajeHelper.Advertencia(
                         "El cliente no tiene correo registrado — no se puede enviar notificación.",
                         "Sin correo",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                        this);
                 }
 
-                // Recargar preservando filtro actual
+                // ✅ Recargar preservando filtro actual — ahora sí refresca visualmente
                 string estadoFiltro = (cbEstado.SelectedItem as ComboBoxItem)?
                     .Content.ToString() ?? "";
 
+                int idPedidoActual = pedidoSeleccionadoId;
+
                 CargarPedidos(estadoFiltro);
+
+                // ✅ Reselecciona el mismo pedido si sigue visible tras el filtro,
+                // para que el panel de detalle también se refresque solo
+                var pedidoActualizado = listaTodosLosPedidos
+                    .FirstOrDefault(p => p.Id == idPedidoActual);
+
+                if (pedidoActualizado != null)
+                {
+                    dgPedidos.SelectedItem = pedidoActualizado;
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
@@ -363,7 +379,6 @@ namespace FarmaciaPOS.Views
 
             try
             {
-                // ✅ Construir URL de Gmail con el correo ya redactado
                 string urlGmail =
                     "https://mail.google.com/mail/?view=cm" +
                     "&fs=1" +
@@ -379,11 +394,10 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     $"Error al abrir Gmail:\n{ex.Message}",
                     "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    this);
             }
         }
 

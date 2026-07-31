@@ -230,7 +230,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ TOTALES — CORREGIDO
+        // TOTALES
         // =========================================
 
         private void ActualizarTotales()
@@ -273,7 +273,7 @@ namespace FarmaciaPOS.Views
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -287,7 +287,7 @@ namespace FarmaciaPOS.Views
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -296,7 +296,7 @@ namespace FarmaciaPOS.Views
 
             if (producto == null)
             {
-                MessageBox.Show("No se encontró la información del producto");
+                MensajeHelper.Error("No se encontró la información del producto", "Error", this);
                 return;
             }
 
@@ -317,7 +317,7 @@ namespace FarmaciaPOS.Views
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -340,7 +340,7 @@ namespace FarmaciaPOS.Views
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto para eliminar");
+                MensajeHelper.Advertencia("Selecciona un producto para eliminar", "Aviso", this);
                 return;
             }
 
@@ -353,13 +353,12 @@ namespace FarmaciaPOS.Views
             if (carrito.Count == 0)
                 return;
 
-            var confirmar = MessageBox.Show(
+            bool confirmar = MensajeHelper.Confirmar(
                 "¿Cancelar la venta actual? Se perderán los productos del ticket.",
                 "Confirmar",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                this);
 
-            if (confirmar == MessageBoxResult.Yes)
+            if (confirmar)
             {
                 carrito.Clear();
                 ActualizarTotales();
@@ -370,136 +369,40 @@ namespace FarmaciaPOS.Views
         {
             if (carrito.Count == 0)
             {
-                MessageBox.Show("No hay productos en el ticket");
+                MensajeHelper.Advertencia("No hay productos en el ticket", "Aviso", this);
                 return;
             }
 
-            MessageBox.Show(
+            MensajeHelper.Info(
                 "Función de impresión de ticket pendiente.",
                 "Generar Ticket",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                this);
         }
 
         // =========================================
-        // ✅ COBRAR — CORREGIDO
+        // ✅ COBRAR — ahora usa CobrarWindow, igual que el dashboard
         // =========================================
 
         private void BtnCobrar_Click(object sender, RoutedEventArgs e)
         {
             if (carrito.Count == 0)
             {
-                MessageBox.Show(
-                    "No hay productos en el carrito.",
-                    "Aviso",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MensajeHelper.Advertencia("No hay productos en el carrito.", "Aviso", this);
                 return;
             }
 
-            decimal total = carrito.Sum(x => x.Subtotal);
-
-            string inputPago =
-                Microsoft.VisualBasic.Interaction.InputBox(
-                    $"Total: {total:C}\n\nIngrese el monto recibido:",
-                    "Cobrar");
-
-            if (!decimal.TryParse(inputPago, out decimal pago) || pago < total)
+            var ventana = new Cobrar(carrito)
             {
-                MessageBox.Show("Monto insuficiente o inválido");
-                return;
-            }
+                Owner = this
+            };
 
-            decimal cambio = pago - total;
+            bool? resultado = ventana.ShowDialog();
 
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            SqlTransaction trans = conn.BeginTransaction();
-
-            try
+            if (resultado == true && ventana.VentaCompletada)
             {
-                decimal subtotal = carrito.Sum(x => x.Subtotal);
-                decimal iva = subtotal * 0.16m;
-                string folio = $"VTA-{DateTime.Now:yyyyMMddHHmmss}";
-
-                string sqlVenta =
-                @"INSERT INTO Ventas
-                (
-                    Folio, Fecha, Subtotal, IVA,
-                    Descuento, Total, MetodoPago, Estado, UsuarioId
-                )
-                VALUES
-                (
-                    @Folio, GETDATE(), @Subtotal, @IVA,
-                    0, @Total, 'Efectivo', 'Completada', @UsuarioId
-                );
-                SELECT SCOPE_IDENTITY();";
-
-                SqlCommand cmdVenta =
-                    new SqlCommand(sqlVenta, conn, trans);
-
-                cmdVenta.Parameters.AddWithValue("@Folio", folio);
-                cmdVenta.Parameters.AddWithValue("@Subtotal", subtotal);
-                cmdVenta.Parameters.AddWithValue("@IVA", iva);
-                cmdVenta.Parameters.AddWithValue("@Total", subtotal + iva);
-                cmdVenta.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
-
-                int ventaId = Convert.ToInt32(cmdVenta.ExecuteScalar());
-
-                foreach (var item in carrito)
-                {
-                    SqlCommand cmdDetalle =
-                        new SqlCommand(
-                        @"INSERT INTO DetalleVentas
-                        (VentaId, ProductoId, Cantidad, PrecioUnitario, Subtotal)
-                        VALUES
-                        (@VentaId, @ProductoId, @Cantidad, @Precio, @Subtotal)",
-                        conn, trans);
-
-                    cmdDetalle.Parameters.AddWithValue("@VentaId", ventaId);
-                    cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
-                    cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                    cmdDetalle.Parameters.AddWithValue("@Precio", item.Precio);
-                    cmdDetalle.Parameters.AddWithValue("@Subtotal", item.Subtotal);
-
-                    cmdDetalle.ExecuteNonQuery();
-
-                    SqlCommand cmdStock =
-                        new SqlCommand(
-                        @"UPDATE Productos
-                          SET Stock = Stock - @Cantidad
-                          WHERE Id = @ProductoId",
-                        conn, trans);
-
-                    cmdStock.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                    cmdStock.Parameters.AddWithValue("@ProductoId", item.ProductoId);
-
-                    cmdStock.ExecuteNonQuery();
-                }
-
-                trans.Commit();
-
-                // ✅ Ahora pago y cambio sí están definidos aquí
-                txtPago.Text = pago.ToString("C");
-                txtCambio.Text = cambio.ToString("C");
-
-                MessageBox.Show(
-                    $"✅ Venta registrada\n\nTotal:  {total:C}\nPago:   {pago:C}\nCambio: {cambio:C}",
-                    "Venta exitosa",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
                 carrito.Clear();
                 ActualizarTotales();
                 CargarProductos();
-            }
-            catch (Exception ex)
-            {
-                trans.Rollback();
-                MessageBox.Show(ex.Message);
             }
         }
 
@@ -580,7 +483,5 @@ namespace FarmaciaPOS.Views
                     break;
             }
         }
-
-       
     }
 }

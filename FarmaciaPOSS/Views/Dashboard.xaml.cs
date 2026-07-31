@@ -510,40 +510,14 @@ namespace FarmaciaPOS
         }
 
         private List<VentaEnEspera> ventasEnEspera = new();
-        private int contadorEspera = 0;
+
         private void BtnEspera_Click(
             object sender,
             RoutedEventArgs e)
         {
-            if (carritoCentral.Count == 0)
-            {
-                // No hay nada que poner en espera → mostrar la lista para recuperar una
-                AbrirVentasEnEspera();
-                return;
-            }
-
-            VentaEnEspera ventaEspera = new VentaEnEspera
-            {
-                Id = ++contadorEspera,
-                Referencia = $"VE-{DateTime.Now:yyyyMMddHHmmss}",
-                Items = carritoCentral.ToList()
-            };
-
-            ventasEnEspera.Add(ventaEspera);
-
-            carritoCentral.Clear();
-            ActualizarCarritoCentral();
-
-            txtNombreProductoActual.Text = "";
-            imgProductoActual.Source = null;
-
-            ActualizarBadgeEspera();
-
-            MessageBox.Show(
-                $"Venta \"{ventaEspera.Referencia}\" puesta en espera",
-                "En espera",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            // ✅ Siempre abre la lista, sin importar si el carrito tiene productos o no.
+            // Guardar la venta actual ahora es una acción explícita DENTRO de esa ventana.
+            AbrirVentasEnEspera();
         }
 
         // =========================================
@@ -552,12 +526,25 @@ namespace FarmaciaPOS
 
         private void AbrirVentasEnEspera()
         {
-            var ventana = new VentasEnEsperaWindow(ventasEnEspera)
+            var ventana = new VentasEnEsperaWindow(
+                ventasEnEspera,
+                carritoCentral.ToList())
             {
                 Owner = this
             };
 
             bool? resultado = ventana.ShowDialog();
+
+            // ✅ Si dentro de la ventana se guardó la venta actual, limpiamos el carrito aquí
+            if (ventana.VentaActualGuardada)
+            {
+                carritoCentral.Clear();
+                ActualizarCarritoCentral();
+
+                txtNombreProductoActual.Text = "";
+                imgProductoActual.Source = null;
+                productoActualMostradoId = null;
+            }
 
             if (resultado == true && ventana.VentaSeleccionada != null)
                 RecuperarVentaEnEspera(ventana.VentaSeleccionada);
@@ -574,13 +561,27 @@ namespace FarmaciaPOS
 
             ActualizarCarritoCentral();
 
+            // ✅ Muestra la imagen y nombre del último producto de la venta recuperada,
+            // igual que cuando agregas un producto normalmente
+            if (venta.Items.Count > 0)
+            {
+                var ultimoItem = venta.Items.Last();
+                var producto = productos.FirstOrDefault(p => p.Id == ultimoItem.ProductoId);
+
+                if (producto != null)
+                {
+                    txtNombreProductoActual.Text = producto.Nombre;
+                    CargarImagenProductoActual(producto.ImagenBytes);
+                    productoActualMostradoId = producto.Id;
+                }
+            }
+
             MessageBox.Show(
                 $"Venta \"{venta.Referencia}\" recuperada",
                 "Venta recuperada",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
-
         private void ActualizarBadgeEspera()
         {
             if (ventasEnEspera.Count > 0)
@@ -671,7 +672,7 @@ namespace FarmaciaPOS
             ProductosWindow ventana =
                 new ProductosWindow();
 
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnVentas_Click(
@@ -687,7 +688,7 @@ namespace FarmaciaPOS
             VentasWindow ventas =
                 new VentasWindow();
 
-            ventas.ShowDialog();
+            ventas.Show();
         }
 
         private void BtnInventario_Click(
@@ -703,7 +704,7 @@ namespace FarmaciaPOS
             InventarioWindow inventario =
                 new InventarioWindow();
 
-            inventario.ShowDialog();
+            inventario.Show();
         }
 
         private void BtnReportes_Click(
@@ -719,7 +720,7 @@ namespace FarmaciaPOS
             ReportesWindow reporte =
                 new ReportesWindow();
 
-            reporte.ShowDialog();
+            reporte.Show();
         }
 
         private void BtnPedidos_Click(
@@ -735,7 +736,7 @@ namespace FarmaciaPOS
             PedidosWindow pedidos =
                 new PedidosWindow();
 
-            pedidos.ShowDialog();
+            pedidos.Show();
         }
 
         private void BtnConfiguracion_Click(
@@ -751,7 +752,7 @@ namespace FarmaciaPOS
             ConfiguracionWindow configuracion
                 = new ConfiguracionWindow();
 
-            configuracion.ShowDialog();
+            configuracion.Show();
 
         }
 
@@ -768,7 +769,7 @@ namespace FarmaciaPOS
             CajaWindow caja =
                 new CajaWindow();
 
-            caja.ShowDialog();
+            caja.Show();
         }
 
         private void BtnLateralDevoluciones_Click(object sender, RoutedEventArgs e)
@@ -780,7 +781,7 @@ namespace FarmaciaPOS
             }
 
             var ventana = new DevolucionesWindow();
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnLateralClientes_Click(object sender, RoutedEventArgs e)
@@ -792,7 +793,7 @@ namespace FarmaciaPOS
             }
 
             var ventana = new ClientesWindow();
-            ventana.ShowDialog();
+            ventana.Show();
         }
 
         private void BtnSalir_Click(
