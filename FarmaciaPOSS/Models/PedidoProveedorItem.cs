@@ -6,7 +6,9 @@ namespace FarmaciaPOS.Models
     public class PedidoProveedorItem : INotifyPropertyChanged
     {
         private int cantidad;
+
         private decimal costoUnitario;
+        public int ProductoId { get; set; }
 
         public string Nombre { get; set; } = string.Empty;
 
@@ -36,9 +38,12 @@ namespace FarmaciaPOS.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        private void OnPropertyChanged(
+            [CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(propertyName));
         }
     }
 }

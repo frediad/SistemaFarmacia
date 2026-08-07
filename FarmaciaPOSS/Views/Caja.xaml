@@ -41,7 +41,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="TxtDenominacion" TargetType="TextBox" BasedOn="{StaticResource TxtCaja}">
+        <Style x:Key="TxtCorteCelda" TargetType="TextBox" BasedOn="{StaticResource TxtCaja}">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
@@ -155,278 +155,208 @@
         </Border>
 
         <!-- ===================================== -->
-        <!-- PESTAÑAS                              -->
+        <!-- ✅ CONTENIDO ÚNICO (ya sin pestañas)   -->
         <!-- ===================================== -->
 
-        <TabControl x:Name="tabCaja"
-                    Grid.Row="1"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Margin="20">
+        <Grid Grid.Row="1" Margin="20,15,20,20">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
             <!-- ===================================== -->
-            <!-- PESTAÑA 1 — CAJA ACTUAL                -->
+            <!-- PANEL IZQUIERDO                       -->
             <!-- ===================================== -->
 
-            <TabItem Header="💵 Caja Actual">
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="22"
+                    Margin="0,0,15,0">
 
-                <Grid Margin="0,15,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="360"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <StackPanel>
 
-                    <!-- ===================================== -->
-                    <!-- PANEL IZQUIERDO                       -->
-                    <!-- ===================================== -->
+                        <!-- APERTURA (visible solo si no hay caja abierta) -->
+                        <StackPanel x:Name="pnlApertura">
 
-                    <Border Grid.Column="0"
-                            Background="White"
-                            CornerRadius="12"
-                            Padding="22"
-                            Margin="0,0,15,0">
+                            <TextBlock Text="💰 Apertura de Caja"
+                                       FontSize="17"
+                                       FontWeight="Bold"
+                                       Foreground="#1E293B"
+                                       Margin="0,0,0,14"/>
 
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="MONTO INICIAL"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#94A3B8"
+                                       Margin="2,0,0,6"/>
 
-                            <StackPanel>
+                            <TextBox x:Name="txtMontoInicial"
+                                     Height="42"
+                                     Style="{StaticResource TxtCaja}"
+                                     Margin="0,0,0,14"/>
 
-                                <!-- APERTURA (visible solo si no hay caja abierta) -->
-                                <StackPanel x:Name="pnlApertura">
+                            <Button x:Name="btnAbrirCaja"
+                                    Content="🔓 ABRIR CAJA"
+                                    Height="46"
+                                    Style="{StaticResource BtnAbrirCajaEstilo}"
+                                    Click="BtnAbrirCaja_Click"/>
 
-                                    <TextBlock Text="💰 Apertura de Caja"
-                                               FontSize="17"
-                                               FontWeight="Bold"
-                                               Foreground="#1E293B"
-                                               Margin="0,0,0,14"/>
+                        </StackPanel>
 
-                                    <TextBlock Text="MONTO INICIAL"
-                                               FontSize="11"
-                                               FontWeight="Bold"
-                                               Foreground="#94A3B8"
-                                               Margin="2,0,0,6"/>
+                        <!-- MOVIMIENTOS (visible solo si hay caja abierta) -->
+                        <StackPanel x:Name="pnlMovimientos" Visibility="Collapsed">
 
-                                    <TextBox x:Name="txtMontoInicial"
-                                             Height="42"
-                                             Style="{StaticResource TxtCaja}"
-                                             Margin="0,0,0,14"/>
+                            <TextBlock Text="🔄 Registrar Movimiento"
+                                       FontSize="17"
+                                       FontWeight="Bold"
+                                       Foreground="#1E293B"
+                                       Margin="0,0,0,14"/>
 
-                                    <Button x:Name="btnAbrirCaja"
-                                            Content="🔓 ABRIR CAJA"
-                                            Height="46"
-                                            Style="{StaticResource BtnAbrirCajaEstilo}"
-                                            Click="BtnAbrirCaja_Click"/>
+                            <TextBlock Text="TIPO DE MOVIMIENTO"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#94A3B8"
+                                       Margin="2,0,0,6"/>
 
-                                </StackPanel>
+                            <ComboBox x:Name="cbTipoMovimiento"
+                                      Height="42"
+                                      Style="{StaticResource CboCaja}"
+                                      Margin="0,0,0,14">
 
-                                <!-- MOVIMIENTOS (visible solo si hay caja abierta) -->
-                                <StackPanel x:Name="pnlMovimientos" Visibility="Collapsed">
+                                <ComboBoxItem Content="ENTRADA"/>
+                                <ComboBoxItem Content="SALIDA"/>
 
-                                    <TextBlock Text="🔄 Registrar Movimiento"
-                                               FontSize="17"
-                                               FontWeight="Bold"
-                                               Foreground="#1E293B"
-                                               Margin="0,0,0,14"/>
+                            </ComboBox>
 
-                                    <TextBlock Text="TIPO DE MOVIMIENTO"
-                                               FontSize="11"
-                                               FontWeight="Bold"
-                                               Foreground="#94A3B8"
-                                               Margin="2,0,0,6"/>
+                            <TextBlock Text="MONTO"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#94A3B8"
+                                       Margin="2,0,0,6"/>
 
-                                    <ComboBox x:Name="cbTipoMovimiento"
-                                              Height="42"
-                                              Style="{StaticResource CboCaja}"
-                                              Margin="0,0,0,14">
+                            <TextBox x:Name="txtMontoMovimiento"
+                                     Height="42"
+                                     Style="{StaticResource TxtCaja}"
+                                     Margin="0,0,0,14"/>
 
-                                        <ComboBoxItem Content="ENTRADA"/>
-                                        <ComboBoxItem Content="SALIDA"/>
+                            <TextBlock Text="MOTIVO"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#94A3B8"
+                                       Margin="2,0,0,6"/>
 
-                                    </ComboBox>
+                            <TextBox x:Name="txtMotivo"
+                                     Height="70"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Style="{StaticResource TxtCaja}"
+                                     Margin="0,0,0,18"/>
 
-                                    <TextBlock Text="MONTO"
-                                               FontSize="11"
-                                               FontWeight="Bold"
-                                               Foreground="#94A3B8"
-                                               Margin="2,0,0,6"/>
+                            <Button Content="📝 REGISTRAR MOVIMIENTO"
+                                    Height="46"
+                                    Style="{StaticResource BtnMovimientoEstilo}"
+                                    Click="BtnMovimiento_Click"/>
 
-                                    <TextBox x:Name="txtMontoMovimiento"
-                                             Height="42"
-                                             Style="{StaticResource TxtCaja}"
-                                             Margin="0,0,0,14"/>
+                            <Separator Margin="0,24" Background="#E2E8F0"/>
 
-                                    <TextBlock Text="MOTIVO"
-                                               FontSize="11"
-                                               FontWeight="Bold"
-                                               Foreground="#94A3B8"
-                                               Margin="2,0,0,6"/>
+                            <Button Content="🧮 REALIZAR CORTE DE CAJA"
+                                    Height="46"
+                                    Style="{StaticResource BtnCorteEstilo}"
+                                    Margin="0,0,0,12"
+                                    Click="BtnAbrirCorte_Click"/>
 
-                                    <TextBox x:Name="txtMotivo"
-                                             Height="70"
-                                             AcceptsReturn="True"
-                                             TextWrapping="Wrap"
-                                             Style="{StaticResource TxtCaja}"
-                                             Margin="0,0,0,18"/>
+                            <Button Content="🔒 CERRAR CAJA SIN CORTE"
+                                    Height="42"
+                                    Background="#94A3B8"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="BtnCerrarCaja_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                                    <Button Content="📝 REGISTRAR MOVIMIENTO"
-                                            Height="46"
-                                            Style="{StaticResource BtnMovimientoEstilo}"
-                                            Click="BtnMovimiento_Click"/>
+                        </StackPanel>
 
-                                    <Separator Margin="0,24" Background="#E2E8F0"/>
+                    </StackPanel>
 
-                                    <Button Content="🧮 REALIZAR CORTE DE CAJA"
-                                            Height="46"
-                                            Style="{StaticResource BtnCorteEstilo}"
-                                            Margin="0,0,0,12"
-                                            Click="BtnAbrirCorte_Click"/>
+                </ScrollViewer>
 
-                                    <Button Content="🔒 CERRAR CAJA SIN CORTE"
-                                            Height="42"
-                                            Background="#94A3B8"
-                                            Foreground="White"
-                                            FontWeight="Bold"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Click="BtnCerrarCaja_Click">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}" CornerRadius="10">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
-
-                                </StackPanel>
-
-                            </StackPanel>
-
-                        </ScrollViewer>
-
-                    </Border>
-
-                    <!-- ===================================== -->
-                    <!-- PANEL DERECHO                         -->
-                    <!-- ===================================== -->
-
-                    <Grid Grid.Column="1">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- RESUMEN EN VIVO -->
-                        <Border Background="#1E293B"
-                                CornerRadius="12"
-                                Padding="18"
-                                Margin="0,0,0,15">
-
-                            <UniformGrid Columns="7">
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="MONTO INICIAL" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenInicial" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="VENTAS EFECT." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenVentasEfectivo" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
-                                </StackPanel>
-                               
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="VENTAS TARJETA" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenVentasTarjeta" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="VENTAS TRANSF." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenVentasTransferencia" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="ENTRADAS" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenEntradas" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="SALIDAS" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenSalidas" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#F87171" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="6,0" HorizontalAlignment="Center">
-                                    <TextBlock Text="TOTAL ESPERADO" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtResumenEsperado" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#60A5FA" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                            </UniformGrid>
-
-                        </Border>
-
-                        <!-- MOVIMIENTOS -->
-                        <Border Grid.Row="1"
-                                Background="White"
-                                CornerRadius="12"
-                                Padding="18">
-
-                            <Grid>
-
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-
-                                <TextBlock Text="Movimientos de la Caja Actual"
-                                           FontSize="18"
-                                           FontWeight="Bold"
-                                           Foreground="#1E293B"
-                                           Margin="0,0,0,12"/>
-
-                                <DataGrid x:Name="dgMovimientos"
-                                          Grid.Row="1"
-                                          AutoGenerateColumns="True"
-                                          IsReadOnly="True"
-                                          HeadersVisibility="Column"
-                                          BorderThickness="0"
-                                          RowHeight="36"
-                                          FontSize="14"
-                                          GridLinesVisibility="Horizontal"
-                                          HorizontalGridLinesBrush="#F1F5F9">
-
-                                    <DataGrid.ColumnHeaderStyle>
-                                        <Style TargetType="DataGridColumnHeader">
-                                            <Setter Property="Background" Value="#F8FAFC"/>
-                                            <Setter Property="Foreground" Value="#64748B"/>
-                                            <Setter Property="FontSize" Value="12"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                            <Setter Property="Padding" Value="10,8"/>
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                        </Style>
-                                    </DataGrid.ColumnHeaderStyle>
-
-                                </DataGrid>
-
-                            </Grid>
-
-                        </Border>
-
-                    </Grid>
-
-                </Grid>
-
-            </TabItem>
+            </Border>
 
             <!-- ===================================== -->
-            <!-- PESTAÑA 2 — HISTORIAL DE CORTES        -->
+            <!-- PANEL DERECHO                         -->
             <!-- ===================================== -->
 
-            <TabItem Header="📜 Historial de Cortes">
+            <Grid Grid.Column="1">
 
-                <Border Background="White"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- RESUMEN EN VIVO -->
+                <Border Background="#1E293B"
                         CornerRadius="12"
                         Padding="18"
-                        Margin="0,15,0,0">
+                        Margin="0,0,0,15">
+
+                    <UniformGrid Columns="7">
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="MONTO INICIAL" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenInicial" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="VENTAS EFECT." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenVentasEfectivo" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="VENTAS TARJETA" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenVentasTarjeta" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="VENTAS TRANSF." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenVentasTransferencia" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="ENTRADAS" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenEntradas" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="SALIDAS" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenSalidas" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#F87171" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0" HorizontalAlignment="Center">
+                            <TextBlock Text="TOTAL ESPERADO" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txtResumenEsperado" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#60A5FA" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                    </UniformGrid>
+
+                </Border>
+
+                <!-- MOVIMIENTOS -->
+                <Border Grid.Row="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="18">
 
                     <Grid>
 
@@ -435,19 +365,19 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Historial de Cortes de Caja"
-                                   FontSize="20"
+                        <TextBlock Text="Movimientos de la Caja Actual"
+                                   FontSize="18"
                                    FontWeight="Bold"
                                    Foreground="#1E293B"
                                    Margin="0,0,0,12"/>
 
-                        <DataGrid x:Name="dgHistorialCortes"
+                        <DataGrid x:Name="dgMovimientos"
                                   Grid.Row="1"
-                                  AutoGenerateColumns="False"
+                                  AutoGenerateColumns="True"
                                   IsReadOnly="True"
                                   HeadersVisibility="Column"
                                   BorderThickness="0"
-                                  RowHeight="38"
+                                  RowHeight="36"
                                   FontSize="14"
                                   GridLinesVisibility="Horizontal"
                                   HorizontalGridLinesBrush="#F1F5F9">
@@ -463,50 +393,18 @@
                                 </Style>
                             </DataGrid.ColumnHeaderStyle>
 
-                            <DataGrid.Columns>
-
-                                <DataGridTextColumn Header="Apertura"
-                                    Binding="{Binding FechaApertura, StringFormat=dd/MM/yyyy HH:mm}"
-                                    Width="150"/>
-
-                                <DataGridTextColumn Header="Cierre"
-                                    Binding="{Binding FechaCierre, StringFormat=dd/MM/yyyy HH:mm}"
-                                    Width="150"/>
-
-                                <DataGridTextColumn Header="Monto Inicial"
-                                    Binding="{Binding MontoInicial, StringFormat=C}"
-                                    Width="130"/>
-
-                                <DataGridTextColumn Header="Esperado"
-                                    Binding="{Binding MontoFinalEsperado, StringFormat=C}"
-                                    Width="130"/>
-
-                                <DataGridTextColumn Header="Contado"
-                                    Binding="{Binding MontoFinalContado, StringFormat=C}"
-                                    Width="130"/>
-
-                                <DataGridTextColumn Header="Diferencia"
-                                    Binding="{Binding Diferencia, StringFormat=C}"
-                                    Width="130"/>
-
-                                <DataGridTextColumn Header="Estado"
-                                    Binding="{Binding Estado}"
-                                    Width="*"/>
-
-                            </DataGrid.Columns>
-
                         </DataGrid>
 
                     </Grid>
 
                 </Border>
 
-            </TabItem>
+            </Grid>
 
-        </TabControl>
+        </Grid>
 
         <!-- ===================================== -->
-        <!-- ✅ OVERLAY: CORTE DE CAJA (ARQUEO)      -->
+        <!-- ✅ OVERLAY: CORTE DE CAJA (ESTILO SICAR) -->
         <!-- ===================================== -->
 
         <Border x:Name="overlayCorte"
@@ -517,8 +415,8 @@
 
             <Border Background="White"
                     CornerRadius="16"
-                    Width="620"
-                    MaxHeight="700"
+                    Width="640"
+                    MaxHeight="620"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Padding="26">
@@ -527,190 +425,116 @@
                     <DropShadowEffect Color="#000000" Opacity="0.25" BlurRadius="30" ShadowDepth="6"/>
                 </Border.Effect>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
 
-                    <StackPanel>
+                    <TextBlock Text="🧮 Corte de Caja"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#1E293B"
+                               Margin="0,0,0,4"/>
 
-                        <TextBlock Text="🧮 Corte de Caja — Arqueo de Efectivo"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Foreground="#1E293B"
-                                   Margin="0,0,0,4"/>
+                    <TextBlock Text="Confirma el efectivo, tarjeta y transferencias recibidas"
+                               FontSize="12"
+                               Foreground="#94A3B8"
+                               Margin="0,0,0,18"/>
 
-                        <TextBlock Text="Cuenta el efectivo físico en caja por billete y moneda"
-                                   FontSize="12"
-                                   Foreground="#94A3B8"
-                                   Margin="0,0,0,18"/>
-
-                        <TextBlock Text="BILLETES"
-                                   FontSize="12"
-                                   FontWeight="Bold"
-                                   Foreground="#2563EB"
-                                   Margin="0,0,0,8"/>
-
-                        <UniformGrid Columns="3" Margin="0,0,0,18">
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$1000" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant1000" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$500" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant500" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$200" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant200" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$100" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant100" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$50" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant50" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$20" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant20" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                        </UniformGrid>
-
-                        <TextBlock Text="MONEDAS"
-                                   FontSize="12"
-                                   FontWeight="Bold"
-                                   Foreground="#2563EB"
-                                   Margin="0,0,0,8"/>
-
-                        <UniformGrid Columns="5" Margin="0,0,0,18">
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$10" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant10" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$5" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant5" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$2" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant2" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$1" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant1" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="4">
-                                <TextBlock Text="$0.50" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/>
-                                <TextBox x:Name="txtCant050" Text="0" Style="{StaticResource TxtDenominacion}" Height="38" TextChanged="Denominacion_TextChanged"/>
-                            </StackPanel>
-
-                        </UniformGrid>
-
-                        <Border Background="#F8FAFC"
-                                CornerRadius="10"
-                                Padding="16"
-                                Margin="0,0,0,18">
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel HorizontalAlignment="Center">
-                                    <TextBlock Text="ESPERADO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtCorteEsperado" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                    <TextBlock Text="CONTADO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtCorteContado" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#2563EB" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                    <TextBlock Text="DIFERENCIA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                                    <TextBlock x:Name="txtCorteDiferencia" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#16A34A" HorizontalAlignment="Center"/>
-                                </StackPanel>
-
-                            </Grid>
-
-                        </Border>
+                    <!-- ===== TABLA DE CORTE ===== -->
+                    <Border Background="#F8FAFC"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="0"
+                            Margin="0,0,0,18">
 
                         <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="42"/>
+                                <RowDefinition Height="48"/>
+                                <RowDefinition Height="48"/>
+                                <RowDefinition Height="48"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="48"/>
+                            </Grid.RowDefinitions>
+
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.3*"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Content="Cancelar"
-                                    Height="46"
-                                    Background="#F1F5F9"
-                                    Foreground="#475569"
-                                    FontWeight="Bold"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Click="BtnCancelarCorte_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
+                            <!-- ENCABEZADOS -->
+                            <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#1E293B" CornerRadius="10,10,0,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="MÉTODO" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="CONTADO" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="CALCULADO" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="DIFERENCIA" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
+                            <!-- EFECTIVO -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="💵 Efectivo" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            <TextBox x:Name="txtContadoEfectivo" Grid.Row="1" Grid.Column="1" Text="0" Width="90" Height="34" Style="{StaticResource TxtCorteCelda}" TextChanged="ContadoCorte_TextChanged"/>
+                            <TextBlock x:Name="txtCalculadoEfectivo" Grid.Row="1" Grid.Column="2" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#374151" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtDiferenciaEfectivo" Grid.Row="1" Grid.Column="3" Text="$0.00" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                            <Border Background="#F0F9FF"
-                                    BorderBrush="#BAE6FD"
-                                    BorderThickness="1"
-                                    CornerRadius="10"
-                                    Padding="16"
-                                    Margin="0,0,0,18">
+                            <!-- TARJETA -->
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="💳 Tarjeta" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            <TextBox x:Name="txtContadoTarjeta" Grid.Row="2" Grid.Column="1" Text="0" Width="90" Height="34" Style="{StaticResource TxtCorteCelda}" TextChanged="ContadoCorte_TextChanged"/>
+                            <TextBlock x:Name="txtCalculadoTarjeta" Grid.Row="2" Grid.Column="2" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#374151" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtDiferenciaTarjeta" Grid.Row="2" Grid.Column="3" Text="$0.00" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                            <!-- TRANSFERENCIA -->
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="🏦 Transferencia" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            <TextBox x:Name="txtContadoTransferencia" Grid.Row="3" Grid.Column="1" Text="0" Width="90" Height="34" Style="{StaticResource TxtCorteCelda}" TextChanged="ContadoCorte_TextChanged"/>
+                            <TextBlock x:Name="txtCalculadoTransferencia" Grid.Row="3" Grid.Column="2" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#374151" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtDiferenciaTransferencia" Grid.Row="3" Grid.Column="3" Text="$0.00" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="TOTAL VENTAS CON TARJETA" FontSize="11" FontWeight="Bold" Foreground="#0369A1" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="txtCorteTarjeta" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Center"/>
-                                    </StackPanel>
+                            <Rectangle Grid.Row="4" Grid.ColumnSpan="4" Fill="#E2E8F0"/>
 
-                                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                        <TextBlock Text="TOTAL POR TRANSFERENCIA" FontSize="11" FontWeight="Bold" Foreground="#0369A1" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="txtCorteTransferencia" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-
-                                </Grid>
-
-                            </Border>
-
-                            <Button Grid.Column="2"
-                                    Content="✅ Confirmar Corte y Cerrar Caja"
-                                    Height="46"
-                                    Style="{StaticResource BtnCerrarCajaEstilo}"
-                                    Click="BtnConfirmarCorte_Click"/>
+                            <!-- TOTAL -->
+                            <Border Grid.Row="5" Grid.ColumnSpan="4" Background="#EFF6FF" CornerRadius="0,0,10,10"/>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="TOTAL" FontSize="15" FontWeight="Bold" Foreground="#1E40AF" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            <TextBlock x:Name="txtCorteContado" Grid.Row="5" Grid.Column="1" Text="$0.00" FontSize="15" FontWeight="Bold" Foreground="#1E40AF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtCorteEsperado" Grid.Row="5" Grid.Column="2" Text="$0.00" FontSize="15" FontWeight="Bold" Foreground="#1E40AF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtCorteDiferencia" Grid.Row="5" Grid.Column="3" Text="$0.00" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         </Grid>
 
-                    </StackPanel>
+                    </Border>
 
-                </ScrollViewer>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Cancelar"
+                                Height="46"
+                                Background="#F1F5F9"
+                                Foreground="#475569"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Click="BtnCancelarCorte_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <Button Grid.Column="2"
+                                Content="✅ Confirmar Corte y Cerrar Caja"
+                                Height="46"
+                                Style="{StaticResource BtnCerrarCajaEstilo}"
+                                Click="BtnConfirmarCorte_Click"/>
+
+                    </Grid>
+
+                </StackPanel>
 
             </Border>
 

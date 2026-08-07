@@ -15,14 +15,23 @@ namespace FarmaciaPOS.Views
         private VentaParaDevolucion ventaActual;
         private List<VentaResumenView> todasLasVentas = new();
 
+        // ✅ Filtros de periodo
+        private DateTime? fechaDesdeFiltro = DateTime.Today;
+        private DateTime? fechaHastaFiltro = DateTime.Today.AddDays(1);
+        private string periodoActivo = "Hoy";
+
         public DevolucionesWindow()
         {
             InitializeComponent();
+
+            dpFechaEspecifica.SelectedDate = null;
+            MarcarBotonActivo(btnFiltroHoy);
+
             CargarVentas();
         }
 
         // =========================================
-        // ✅ CARGAR TODAS LAS VENTAS
+        // ✅ CARGAR VENTAS (con filtro de fecha + rol)
         // =========================================
 
         private void CargarVentas()
@@ -35,12 +44,37 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT Id, Folio, Fecha, Total, Estado, MetodoPago
-              FROM Ventas
-              WHERE Estado IN ('Completada', 'Devuelta')
-              ORDER BY Fecha DESC";
+            @"SELECT
+                v.Id, v.Folio, v.Fecha, v.Total, v.Estado, v.MetodoPago,
+                v.UsuarioId,
+                (U.Nombre + ' ' + U.Apellido) AS Vendedor
+              FROM Ventas v
+              LEFT JOIN Usuarios U ON v.UsuarioId = U.Id
+              WHERE v.Estado IN ('Completada', 'Devuelta')";
+
+            // Filtro de fecha (rango)
+            if (fechaDesdeFiltro.HasValue && fechaHastaFiltro.HasValue)
+                query += " AND v.Fecha >= @Desde AND v.Fecha < @Hasta";
+
+            // Filtro por rol: solo Admin ve todas las ventas
+            bool esAdmin = Sesion.Rol == "Admin";
+
+            if (!esAdmin)
+                query += " AND v.UsuarioId = @UsuarioSesion";
+
+            query += " ORDER BY v.Fecha DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
+
+            if (fechaDesdeFiltro.HasValue && fechaHastaFiltro.HasValue)
+            {
+                cmd.Parameters.AddWithValue("@Desde", fechaDesdeFiltro.Value);
+                cmd.Parameters.AddWithValue("@Hasta", fechaHastaFiltro.Value);
+            }
+
+            if (!esAdmin)
+                cmd.Parameters.AddWithValue("@UsuarioSesion", Sesion.UsuarioId);
+
             SqlDataReader reader = cmd.ExecuteReader();
 
             while (reader.Read())
@@ -52,16 +86,138 @@ namespace FarmaciaPOS.Views
                     Fecha = Convert.ToDateTime(reader["Fecha"]),
                     Total = Convert.ToDecimal(reader["Total"]),
                     Estado = reader["Estado"].ToString() ?? "",
-                    MetodoPago = reader["MetodoPago"].ToString() ?? ""
+                    MetodoPago = reader["MetodoPago"].ToString() ?? "",
+                    UsuarioId = reader["UsuarioId"] != DBNull.Value ? Convert.ToInt32(reader["UsuarioId"]) : 0,
+                    Vendedor = reader["Vendedor"] != DBNull.Value ? reader["Vendedor"].ToString() ?? "" : "—"
                 });
             }
 
             dgVentas.ItemsSource = todasLasVentas;
+
+            ActualizarTextoPeriodo();
+        }
+
+        // =========================================
+        // ✅ BOTONES DE FILTRO POR PERIODO
+        // =========================================
+
+        private void BtnFiltroHoy_Click(object sender, RoutedEventArgs e)
+        {
+            fechaDesdeFiltro = DateTime.Today;
+            fechaHastaFiltro = DateTime.Today.AddDays(1);
+            periodoActivo = "Hoy";
+
+            dpFechaEspecifica.SelectedDate = null;
+
+            MarcarBotonActivo(btnFiltroHoy);
+            CargarVentas();
+        }
+
+        private void BtnFiltroSemana_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+            fechaDesdeFiltro = hoy.AddDays(-diff);
+            fechaHastaFiltro = hoy.AddDays(1);
+            periodoActivo = "Esta Semana";
+
+            dpFechaEspecifica.SelectedDate = null;
+
+            MarcarBotonActivo(btnFiltroSemana);
+            CargarVentas();
+        }
+
+        private void BtnFiltroMes_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+
+            fechaDesdeFiltro = new DateTime(hoy.Year, hoy.Month, 1);
+            fechaHastaFiltro = hoy.AddDays(1);
+            periodoActivo = "Este Mes";
+
+            dpFechaEspecifica.SelectedDate = null;
+
+            MarcarBotonActivo(btnFiltroMes);
+            CargarVentas();
+        }
+
+        private void BtnFiltroAño_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+
+            fechaDesdeFiltro = new DateTime(hoy.Year, 1, 1);
+            fechaHastaFiltro = hoy.AddDays(1);
+            periodoActivo = "Este Año";
+
+            dpFechaEspecifica.SelectedDate = null;
+
+            MarcarBotonActivo(btnFiltroAño);
+            CargarVentas();
+        }
+
+        // =========================================
+        // ✅ FECHA ESPECÍFICA (DatePicker)
+        // =========================================
+
+        private void DpFechaEspecifica_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dpFechaEspecifica.SelectedDate == null)
+                return;
+
+            DateTime fecha = dpFechaEspecifica.SelectedDate.Value.Date;
+
+            fechaDesdeFiltro = fecha;
+            fechaHastaFiltro = fecha.AddDays(1);
+            periodoActivo = fecha.ToString("dd/MM/yyyy");
+
+            MarcarBotonActivo(null); // ninguno de los botones de periodo queda "activo"
+            CargarVentas();
+        }
+
+        private void BtnQuitarFiltroFecha_Click(object sender, RoutedEventArgs e)
+        {
+            fechaDesdeFiltro = null;
+            fechaHastaFiltro = null;
+            periodoActivo = "Todas las fechas";
+
+            dpFechaEspecifica.SelectedDate = null;
+
+            MarcarBotonActivo(null);
+            CargarVentas();
+        }
+
+        // =========================================
+        // ✅ RESALTAR BOTÓN DE PERIODO ACTIVO
+        // =========================================
+
+        private void MarcarBotonActivo(Button? botonActivo)
+        {
+            var botones = new[] { btnFiltroHoy, btnFiltroSemana, btnFiltroMes, btnFiltroAño };
+
+            foreach (var btn in botones)
+            {
+                bool esActivo = btn == botonActivo;
+
+                btn.Background = esActivo
+                    ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x25, 0x63, 0xEB))
+                    : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
+
+                btn.Foreground = esActivo
+                    ? System.Windows.Media.Brushes.White
+                    : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x47, 0x55, 0x69));
+            }
+        }
+
+        private void ActualizarTextoPeriodo()
+        {
+            string alcance = Sesion.Rol == "Admin" ? "todos los vendedores" : "tus ventas";
+            txtPeriodoActivo.Text = $"Mostrando: {periodoActivo} — {alcance} ({todasLasVentas.Count} venta(s))";
         }
 
         // =========================================
         // ✅ BUSCADOR EN TIEMPO REAL
-        // Busca por: ID, Folio, fecha (dd/MM/yyyy)
+        // Busca por: ID, Folio, fecha (dd/MM/yyyy), vendedor
         // =========================================
 
         private void TxtBuscarVenta_TextChanged(
@@ -80,7 +236,8 @@ namespace FarmaciaPOS.Views
                     v.Id.ToString().Contains(texto) ||
                     v.Folio.ToLower().Contains(texto) ||
                     v.Fecha.ToString("dd/MM/yyyy").Contains(texto) ||
-                    v.Total.ToString("C").Contains(texto))
+                    v.Total.ToString("C").Contains(texto) ||
+                    v.Vendedor.ToLower().Contains(texto))
                 .ToList();
         }
 
@@ -387,12 +544,5 @@ namespace FarmaciaPOS.Views
         {
             Close();
         }
-
-        // =========================================
-        // ✅ ACTUALIZAR MONTO AL EDITAR CANTIDAD
-        // =========================================
-
-        private void txtNumeroVenta_KeyDown(object sender, KeyEventArgs e) { }
-        private void BtnBuscarVenta_Click(object sender, RoutedEventArgs e) { }
     }
 }

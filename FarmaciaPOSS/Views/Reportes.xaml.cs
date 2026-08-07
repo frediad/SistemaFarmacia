@@ -14,12 +14,15 @@ namespace FarmaciaPOS.Views
         private DateTime fechaFinActual;
         private string periodoActual = "Hoy";
 
-        // ✅ Rango activo de cada pestaña, usado también al exportar
         private DateTime fechaInicioMasVendidos, fechaFinMasVendidos;
         private DateTime fechaInicioGanancias, fechaFinGanancias;
         private DateTime fechaInicioInventario, fechaFinInventario;
         private DateTime fechaInicioPedidos, fechaFinPedidos;
         private string periodoPedidos = "Hoy";
+
+        // ✅ Nuevo — pestaña de Caja
+        private DateTime fechaInicioCaja, fechaFinCaja;
+        private string periodoCaja = "Hoy";
 
         public class BarraGrafica
         {
@@ -32,16 +35,16 @@ namespace FarmaciaPOS.Views
         {
             InitializeComponent();
 
-            
             CargarSeguro(() => CargarReporte(DateTime.Today, DateTime.Today, "Hoy"), "Ventas");
             CargarSeguro(() => CargarMasVendidos(DateTime.Today, DateTime.Today), "Más Vendidos");
             CargarSeguro(() => CargarGanancias(DateTime.Today, DateTime.Today), "Ganancias");
             CargarSeguro(() => CargarInventario(DateTime.Today, DateTime.Today), "Inventario");
             CargarSeguro(() => CargarPedidos(DateTime.Today, DateTime.Today, "Hoy"), "Pedidos");
+            CargarSeguro(() => CargarCaja(DateTime.Today, DateTime.Today, "Hoy"), "Caja");
         }
 
         // =========================================
-        // ✅ NUEVO — CARGA SEGURA (evita que un error tumbe toda la ventana)
+        // CARGA SEGURA
         // =========================================
 
         private void CargarSeguro(Action accion, string nombreSeccion)
@@ -52,14 +55,66 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     $"No se pudo cargar la sección \"{nombreSeccion}\":\n{ex.Message}\n\n" +
                     "Revisa que la tabla y columnas correspondientes existan en tu base de datos. " +
                     "Las demás pestañas seguirán funcionando normalmente.",
                     "Aviso",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                    this);
             }
+        }
+
+        // =========================================
+        // ✅ RANGO PERSONALIZADO — aplica según la pestaña activa
+        // =========================================
+
+        private void BtnAplicarRango_Click(object sender, RoutedEventArgs e)
+        {
+            if (dpDesde.SelectedDate == null || dpHasta.SelectedDate == null)
+            {
+                MensajeHelper.Advertencia("Selecciona ambas fechas (Desde y Hasta)", "Aviso", this);
+                return;
+            }
+
+            DateTime desde = dpDesde.SelectedDate.Value.Date;
+            DateTime hasta = dpHasta.SelectedDate.Value.Date;
+
+            if (hasta < desde)
+            {
+                MensajeHelper.Advertencia("La fecha 'Hasta' no puede ser anterior a 'Desde'", "Aviso", this);
+                return;
+            }
+
+            string etiqueta = desde == hasta
+                ? desde.ToString("dd-MM-yyyy")
+                : $"{desde:dd-MM-yyyy} al {hasta:dd-MM-yyyy}";
+
+            switch (tabReportes.SelectedIndex)
+            {
+                case 0:
+                    CargarSeguro(() => CargarReporte(desde, hasta, etiqueta), "Ventas");
+                    break;
+                case 1:
+                    CargarSeguro(() => CargarMasVendidos(desde, hasta), "Más Vendidos");
+                    break;
+                case 2:
+                    CargarSeguro(() => CargarGanancias(desde, hasta), "Ganancias");
+                    break;
+                case 3:
+                    CargarSeguro(() => CargarInventario(desde, hasta), "Inventario");
+                    break;
+                case 4:
+                    CargarSeguro(() => CargarPedidos(desde, hasta, etiqueta), "Pedidos");
+                    break;
+                case 5:
+                    CargarSeguro(() => CargarCaja(desde, hasta, etiqueta), "Caja");
+                    break;
+            }
+
+            MensajeHelper.Exito(
+                $"Reporte actualizado para el periodo: {etiqueta}",
+                "Rango aplicado",
+                this);
         }
 
         // =========================================
@@ -82,7 +137,7 @@ namespace FarmaciaPOS.Views
             CargarSeguro(() => CargarReporte(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes"), "Ventas");
         }
 
-        private void BtnAnio_Click(object sender, RoutedEventArgs e)
+        private void BtnAño_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             CargarSeguro(() => CargarReporte(new DateTime(hoy.Year, 1, 1), hoy, "Este Año"), "Ventas");
@@ -108,7 +163,7 @@ namespace FarmaciaPOS.Views
             CargarSeguro(() => CargarMasVendidos(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Más Vendidos");
         }
 
-        private void BtnMasVendidosAnio_Click(object sender, RoutedEventArgs e)
+        private void BtnMasVendidosAño_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             CargarSeguro(() => CargarMasVendidos(new DateTime(hoy.Year, 1, 1), hoy), "Más Vendidos");
@@ -134,7 +189,7 @@ namespace FarmaciaPOS.Views
             CargarSeguro(() => CargarGanancias(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Ganancias");
         }
 
-        private void BtnGananciasAnio_Click(object sender, RoutedEventArgs e)
+        private void BtnGananciasAño_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             CargarSeguro(() => CargarGanancias(new DateTime(hoy.Year, 1, 1), hoy), "Ganancias");
@@ -160,14 +215,14 @@ namespace FarmaciaPOS.Views
             CargarSeguro(() => CargarInventario(new DateTime(hoy.Year, hoy.Month, 1), hoy), "Inventario");
         }
 
-        private void BtnInventarioAnio_Click(object sender, RoutedEventArgs e)
+        private void BtnInventarioAño_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             CargarSeguro(() => CargarInventario(new DateTime(hoy.Year, 1, 1), hoy), "Inventario");
         }
 
         // =========================================
-        // ✅ PESTAÑA PEDIDOS — BOTONES PERIODO
+        // PESTAÑA PEDIDOS — BOTONES PERIODO
         // =========================================
 
         private void BtnPedidosHoy_Click(object sender, RoutedEventArgs e)
@@ -186,10 +241,36 @@ namespace FarmaciaPOS.Views
             CargarSeguro(() => CargarPedidos(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes"), "Pedidos");
         }
 
-        private void BtnPedidosAnio_Click(object sender, RoutedEventArgs e)
+        private void BtnPedidosAño_Click(object sender, RoutedEventArgs e)
         {
             var hoy = DateTime.Today;
             CargarSeguro(() => CargarPedidos(new DateTime(hoy.Year, 1, 1), hoy, "Este Año"), "Pedidos");
+        }
+
+        // =========================================
+        // ✅ PESTAÑA CAJA — BOTONES PERIODO
+        // =========================================
+
+        private void BtnCajaHoy_Click(object sender, RoutedEventArgs e)
+            => CargarSeguro(() => CargarCaja(DateTime.Today, DateTime.Today, "Hoy"), "Caja");
+
+        private void BtnCajaSemana_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            int diff = (7 + (hoy.DayOfWeek - DayOfWeek.Monday)) % 7;
+            CargarSeguro(() => CargarCaja(hoy.AddDays(-diff), hoy, "Esta Semana"), "Caja");
+        }
+
+        private void BtnCajaMes_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            CargarSeguro(() => CargarCaja(new DateTime(hoy.Year, hoy.Month, 1), hoy, "Este Mes"), "Caja");
+        }
+
+        private void BtnCajaAño_Click(object sender, RoutedEventArgs e)
+        {
+            var hoy = DateTime.Today;
+            CargarSeguro(() => CargarCaja(new DateTime(hoy.Year, 1, 1), hoy, "Este Año"), "Caja");
         }
 
         // =========================================
@@ -391,6 +472,7 @@ namespace FarmaciaPOS.Views
 
             CargarSinMovimiento(desde, hasta);
         }
+
         private void CargarSinMovimiento(DateTime desde, DateTime hasta)
         {
             List<ProductoStockItem> lista = new();
@@ -578,10 +660,8 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ PEDIDOS
+        // PEDIDOS
         // =========================================
-        // NOTA: ajusta nombres de tabla/columnas si en tu BD son distintos
-        // ("Pedidos", "Cliente", "Estado", "Total", "Fecha").
 
         private void CargarPedidos(DateTime desde, DateTime hasta, string etiquetaPeriodo)
         {
@@ -637,7 +717,102 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ EXPORTAR — SEGÚN LA PESTAÑA ACTIVA (TODO EN PDF)
+        // ✅ CAJA — quién abrió/cerró y montos
+        // =========================================
+
+        public class ReporteCajaItem
+        {
+            public int Id { get; set; }
+            public string Usuario { get; set; } = "";
+            public DateTime FechaApertura { get; set; }
+            public DateTime? FechaCierre { get; set; }
+            public decimal MontoInicial { get; set; }
+            public decimal MontoFinalEsperado { get; set; }
+            public decimal MontoFinalContado { get; set; }
+            public decimal Diferencia { get; set; }
+            public string Estado { get; set; } = "";
+        }
+
+        private void CargarCaja(DateTime desde, DateTime hasta, string etiquetaPeriodo)
+        {
+            fechaInicioCaja = desde;
+            fechaFinCaja = hasta;
+            periodoCaja = etiquetaPeriodo;
+
+            txtPeriodoCaja.Text = $"Periodo: {etiquetaPeriodo}";
+
+            List<ReporteCajaItem> lista = new();
+
+            using SqlConnection conn =
+                new SqlConnection(DatabaseHelper.ConnectionString);
+
+            conn.Open();
+
+            string query =
+            @"SELECT
+                c.Id,
+                ISNULL(u.Nombre, 'Desconocido') AS Usuario,
+                c.FechaApertura,
+                c.FechaCierre,
+                c.MontoInicial,
+                c.MontoFinalEsperado,
+                c.MontoFinalContado,
+                c.Diferencia,
+                c.Estado
+              FROM Caja c
+              LEFT JOIN Usuarios u ON c.UsuarioId = u.Id
+              WHERE c.FechaApertura >= @Desde AND c.FechaApertura < @Hasta
+              ORDER BY c.FechaApertura DESC";
+
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@Desde", desde.Date);
+            cmd.Parameters.AddWithValue("@Hasta", hasta.Date.AddDays(1));
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                decimal? esperado = reader["MontoFinalEsperado"] != DBNull.Value
+                    ? Convert.ToDecimal(reader["MontoFinalEsperado"]) : null;
+                decimal? contado = reader["MontoFinalContado"] != DBNull.Value
+                    ? Convert.ToDecimal(reader["MontoFinalContado"]) : null;
+                decimal? diferencia = reader["Diferencia"] != DBNull.Value
+                    ? Convert.ToDecimal(reader["Diferencia"]) : null;
+
+                string estadoCrudo = reader["Estado"].ToString() ?? "";
+
+                string estadoTexto =
+                    estadoCrudo != "CERRADA" ? "🟢 Abierta" :
+                    diferencia == null ? "Sin corte" :
+                    diferencia == 0 ? "✅ Cuadre exacto" :
+                    diferencia > 0 ? "🟡 Sobrante" :
+                                     "🔴 Faltante";
+
+                lista.Add(new ReporteCajaItem
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    Usuario = reader["Usuario"].ToString() ?? "",
+                    FechaApertura = Convert.ToDateTime(reader["FechaApertura"]),
+                    FechaCierre = reader["FechaCierre"] != DBNull.Value
+                        ? Convert.ToDateTime(reader["FechaCierre"]) : (DateTime?)null,
+                    MontoInicial = Convert.ToDecimal(reader["MontoInicial"]),
+                    MontoFinalEsperado = esperado ?? 0,
+                    MontoFinalContado = contado ?? 0,
+                    Diferencia = diferencia ?? 0,
+                    Estado = estadoTexto
+                });
+            }
+
+            dgCortesCaja.ItemsSource = lista;
+
+            txtCajaTotalCortes.Text = lista.Count.ToString();
+            txtCajaTotalEsperado.Text = lista.Sum(x => x.MontoFinalEsperado).ToString("C");
+            txtCajaTotalContado.Text = lista.Sum(x => x.MontoFinalContado).ToString("C");
+            txtCajaTotalDiferencia.Text = lista.Sum(x => x.Diferencia).ToString("C");
+        }
+
+        // =========================================
+        // EXPORTAR
         // =========================================
 
         private void BtnExportar_Click(object sender, RoutedEventArgs e)
@@ -665,15 +840,15 @@ namespace FarmaciaPOS.Views
                     case 4:
                         ExportarPedidosPDF();
                         break;
+
+                    case 5:
+                        ExportarCajaPDF();
+                        break;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    "Error al exportar: " + ex.Message,
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MensajeHelper.Error("Error al exportar: " + ex.Message, "Error", this);
             }
         }
 
@@ -689,22 +864,27 @@ namespace FarmaciaPOS.Views
 
             return System.IO.Path.Combine(carpetaDestino, nombreArchivo);
         }
+        private string SanitizarNombreArchivo(string texto)
+        {
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                texto = texto.Replace(c, '-');
+            }
+            return texto;
+        }
 
         private void MostrarExito(string ruta)
         {
-            MessageBox.Show(
-                $"Reporte guardado en:\n{ruta}",
-                "Éxito",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            MensajeHelper.Exito($"Reporte guardado en:\n{ruta}", "Éxito", this);
         }
 
         private void ExportarVentasPDF()
         {
             var resumen = ObtenerResumenCompleto();
 
-            string ruta = RutaReporte("Ventas",$"Reporte_Ventas_{periodoActual.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+            string periodoSeguro = SanitizarNombreArchivo(periodoActual.Replace(" ", "_"));
 
+            string ruta = RutaReporte("Ventas", $"Reporte_Ventas_{periodoSeguro}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
 
             ReportePdfGenerator.GenerarReporte(resumen, ruta, periodoActual);
 
@@ -887,6 +1067,48 @@ namespace FarmaciaPOS.Views
             ("Cancelados", txtPedidosCancelados.Text)
                 },
                 encabezados: new() { "No. Pedido", "Cliente", "Estado", "Total", "Fecha" },
+                filas: filas,
+                rutaArchivo: ruta
+            );
+
+            MostrarExito(ruta);
+        }
+
+        // ✅ Exportar — Caja
+
+        private void ExportarCajaPDF()
+        {
+            var cortes = (dgCortesCaja.ItemsSource as List<ReporteCajaItem>) ?? new();
+
+            var filas = cortes
+                .Select(x => new List<string>
+                {
+                    x.Usuario,
+                    x.FechaApertura.ToString("dd/MM/yyyy HH:mm"),
+                    x.FechaCierre?.ToString("dd/MM/yyyy HH:mm") ?? "—",
+                    x.MontoInicial.ToString("C"),
+                    x.MontoFinalEsperado.ToString("C"),
+                    x.MontoFinalContado.ToString("C"),
+                    x.Diferencia.ToString("C"),
+                    x.Estado
+                })
+                .ToList();
+
+            string ruta = RutaReporte("Caja", $"Reporte_Caja_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+            ReportePdfGenerator.GenerarReporteGenerico(
+                tituloReporte: "Reporte de Caja",
+                periodo: periodoCaja,
+                desde: fechaInicioCaja,
+                hasta: fechaFinCaja,
+                tarjetasResumen: new()
+                {
+                    ("Total de cortes", txtCajaTotalCortes.Text),
+                    ("Total esperado", txtCajaTotalEsperado.Text),
+                    ("Total contado", txtCajaTotalContado.Text),
+                    ("Diferencia total", txtCajaTotalDiferencia.Text)
+                },
+                encabezados: new() { "Usuario", "Apertura", "Cierre", "Monto Inicial", "Esperado", "Contado", "Diferencia", "Estado" },
                 filas: filas,
                 rutaArchivo: ruta
             );

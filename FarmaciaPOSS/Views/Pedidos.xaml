@@ -265,6 +265,11 @@
                                                                      Value="Cancelado">
                                                             <Setter Property="Background" Value="#FEE2E2"/>
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding EstadoPedido}"
+                                                                    Value="Listo para recoger">
+                                                            <Setter Property="Background" Value="#FEE2E2"/>
+                                                        </DataTrigger>
+
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
@@ -281,6 +286,10 @@
                                                             <DataTrigger Binding="{Binding EstadoPedido}"
                                                                          Value="Preparando">
                                                                 <Setter Property="Foreground" Value="#1E40AF"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EstadoPedido}"
+                                                                         Value="Listo para recoger">
+                                                                <Setter Property="Foreground" Value="#F5C527"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding EstadoPedido}"
                                                                          Value="Entregado">
@@ -399,7 +408,8 @@
 
                         <StackPanel>
 
-                            <TextBlock Text="Cambiar Estado"
+                            <TextBlock x:Name="txtTituloCambiarEstado"
+                                       Text="Cambiar Estado"
                                        FontSize="13"
                                        FontWeight="Bold"
                                        Foreground="#1E40AF"
@@ -407,21 +417,33 @@
 
                             <WrapPanel>
 
-                                <Button Content="⏳ Pendiente"
+                                <Button x:Name="btnEstadoPendiente"
+                                        Content="⏳ Pendiente"
                                         Style="{StaticResource BtnEstado}"
                                         Background="#FEF9C3"
                                         Foreground="#92400E"
                                         Tag="Pendiente"
                                         Click="BtnCambiarEstado_Click"/>
 
-                                <Button Content="⚙️ Preparando"
+                                <Button x:Name="btnEstadoPreparando"
+                                        Content="⚙️ Preparando"
                                         Style="{StaticResource BtnEstado}"
                                         Background="#DBEAFE"
                                         Foreground="#1E40AF"
                                         Tag="Preparando"
                                         Click="BtnCambiarEstado_Click"/>
 
-                                <Button Content="✅ Entregado"
+                                <Button x:Name="btnEstadoListoRecoger"
+                                        Content="🛍️ Listo para recoger"
+                                        Style="{StaticResource BtnEstado}"
+                                        Background="#FEE2E2"
+                                        Foreground="#999956"
+                                        Margin="4,4,4,0"
+                                        Tag="Listo para recoger"
+                                        Click="BtnCambiarEstado_Click"/>
+
+                                <Button x:Name="btnEstadoEntregado"
+                                        Content="✅ Entregado"
                                         Style="{StaticResource BtnEstado}"
                                         Background="#DCFCE7"
                                         Foreground="#166534"
@@ -429,7 +451,8 @@
                                         Tag="Entregado"
                                         Click="BtnCambiarEstado_Click"/>
 
-                                <Button Content="❌ Cancelado"
+                                <Button x:Name="btnEstadoCancelado"
+                                        Content="❌ Cancelado"
                                         Style="{StaticResource BtnEstado}"
                                         Background="#FEE2E2"
                                         Foreground="#991B1B"
@@ -438,6 +461,15 @@
                                         Click="BtnCambiarEstado_Click"/>
 
                             </WrapPanel>
+
+                            <!--  aviso visible cuando el pedido ya no se puede modificar -->
+                            <TextBlock x:Name="txtPedidoFinalizado"
+                                       Text="🔒 Este pedido ya está finalizado y no se puede modificar"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="#991B1B"
+                                       Margin="0,8,0,0"
+                                       Visibility="Collapsed"/>
 
                         </StackPanel>
 

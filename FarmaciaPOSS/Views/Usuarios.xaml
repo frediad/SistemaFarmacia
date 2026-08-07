@@ -39,6 +39,29 @@
             </Setter>
         </Style>
 
+        <Style x:Key="BtnIconoPequeno" TargetType="Button">
+            <Setter Property="Background" Value="#EFF6FF"/>
+            <Setter Property="Foreground" Value="#2563EB"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="TxtField" TargetType="TextBox">
             <Setter Property="Height" Value="38"/>
             <Setter Property="FontSize" Value="14"/>
@@ -196,29 +219,56 @@
                                    FontWeight="Bold"
                                    Foreground="#374151"/>
 
-                        <Grid Margin="0,5,0,12">
+                        <!-- ✅ Campo de contraseña con botón mostrar/ocultar -->
+                        <Grid Margin="0,5,0,4">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="42"/>
+                            </Grid.ColumnDefinitions>
 
                             <Border BorderBrush="#CBD5E1"
                                     BorderThickness="1"
                                     CornerRadius="8">
 
-                                <PasswordBox x:Name="txtPassword"
+                                <Grid>
+
+                                    <PasswordBox x:Name="txtPassword"
+                                                 Height="38"
+                                                 FontSize="14"
+                                                 BorderThickness="0"
+                                                 Padding="10,0"
+                                                 PasswordChanged="TxtPassword_PasswordChanged"/>
+
+                                    <TextBox x:Name="txtPasswordVisible"
                                              Height="38"
                                              FontSize="14"
                                              BorderThickness="0"
                                              Padding="10,0"
-                                             PasswordChanged="TxtPassword_PasswordChanged"/>
+                                             VerticalContentAlignment="Center"
+                                             Visibility="Collapsed"
+                                             TextChanged="TxtPasswordVisible_TextChanged"/>
+
+                                    <TextBlock x:Name="txtPlaceholderPassword"
+                                               Text="•••••••• (contraseña guardada)"
+                                               FontSize="12"
+                                               Foreground="#94A3B8"
+                                               IsHitTestVisible="False"
+                                               VerticalAlignment="Center"
+                                               Margin="12,0,0,0"
+                                               Visibility="Collapsed"/>
+
+                                </Grid>
 
                             </Border>
 
-                            <TextBlock x:Name="txtPlaceholderPassword"
-                                       Text="•••••••• (contraseña guardada)"
-                                       FontSize="12"
-                                       Foreground="#94A3B8"
-                                       IsHitTestVisible="False"
-                                       VerticalAlignment="Center"
-                                       Margin="12,0,0,0"
-                                       Visibility="Collapsed"/>
+                            <Button x:Name="btnTogglePassword"
+                                    Grid.Column="1"
+                                    Content="👁"
+                                    Height="38"
+                                    Margin="6,0,0,0"
+                                    Style="{StaticResource BtnIconoPequeno}"
+                                    Click="BtnTogglePassword_Click"/>
 
                         </Grid>
 
@@ -232,21 +282,37 @@
                                    FontWeight="Bold"
                                    Foreground="#374151"/>
 
-                        <Border BorderBrush="#CBD5E1"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Margin="0,5,0,12">
+                        <!-- ✅ Combo de rol + botón para gestionar roles -->
+                        <Grid Margin="0,5,0,12">
 
-                            <ComboBox x:Name="cbRoles"
-                                      Height="36"
-                                      FontSize="14"
-                                      BorderThickness="0"
-                                      Background="Transparent"
-                                      DisplayMemberPath="Nombre"
-                                      SelectedValuePath="Id"
-                                      Padding="8,0"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="42"/>
+                            </Grid.ColumnDefinitions>
 
-                        </Border>
+                            <Border BorderBrush="#CBD5E1"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+
+                                <ComboBox x:Name="cbRoles"
+                                          Height="36"
+                                          FontSize="14"
+                                          BorderThickness="0"
+                                          Background="Transparent"
+                                          DisplayMemberPath="Nombre"
+                                          SelectedValuePath="Id"
+                                          Padding="8,0"/>
+
+                            </Border>
+
+                            <Button Grid.Column="1"
+                                    Content="⚙️"
+                                    Height="38"
+                                    Margin="6,0,0,0"
+                                    Style="{StaticResource BtnIconoPequeno}"
+                                    Click="BtnGestionarRoles_Click"/>
+
+                        </Grid>
 
                         <CheckBox x:Name="chkActivo"
                                   Content="Usuario Activo"
@@ -259,7 +325,9 @@
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
@@ -275,6 +343,13 @@
                                     Background="#2563EB"
                                     Click="BtnGuardar_Click"/>
 
+                            <!-- ✅ NUEVO: botón Actualizar, separado de Guardar -->
+                            <Button Grid.Column="4"
+                                    Content="🔄 Actualizar"
+                                    Style="{StaticResource BtnAccion}"
+                                    Background="#7C3AED"
+                                    Click="BtnActualizar_Click"/>
+
                         </Grid>
 
                         <Button Content="🗑️ Eliminar Usuario"
@@ -289,7 +364,7 @@
             </Border>
 
             <!-- ===================================== -->
-            <!-- ✅ CHECKLIST DE MÓDULOS               -->
+            <!-- CHECKLIST DE MÓDULOS                  -->
             <!-- ===================================== -->
 
             <Border Grid.Column="1"

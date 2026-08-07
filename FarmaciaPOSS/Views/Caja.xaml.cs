@@ -13,13 +13,17 @@ namespace FarmaciaPOS.Views
         DateTime fechaAperturaActual;
         decimal montoInicialActual = 0;
 
+        // ✅ Valores calculados por el sistema, guardados para comparar contra lo "Contado"
+        decimal calculadoEfectivo = 0;
+        decimal calculadoTarjeta = 0;
+        decimal calculadoTransferencia = 0;
+
         public CajaWindow()
         {
             InitializeComponent();
 
             CargarCajaAbierta();
             CargarMovimientos();
-            CargarHistorialCortes();
         }
 
         // =====================================
@@ -33,13 +37,19 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
+            // ✅ Ahora filtra también por Usuario, para que cada quien vea
+            // únicamente la caja que él mismo abrió  y no la más reciente
+            // del sistema en general.
             string query =
             @"SELECT TOP 1 *
               FROM Caja
               WHERE Estado = 'ABIERTA'
+              AND UsuarioId = @UsuarioId
               ORDER BY Id DESC";
 
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+
             SqlDataReader reader = cmd.ExecuteReader();
 
             if (reader.Read())
@@ -48,7 +58,6 @@ namespace FarmaciaPOS.Views
                 fechaAperturaActual = Convert.ToDateTime(reader["FechaApertura"]);
                 montoInicialActual = Convert.ToDecimal(reader["MontoInicial"]);
 
-                // ✅ Muestra el panel de movimientos, oculta el de apertura
                 pnlApertura.Visibility = Visibility.Collapsed;
                 pnlMovimientos.Visibility = Visibility.Visible;
 
@@ -86,22 +95,13 @@ namespace FarmaciaPOS.Views
 
             string query =
             @"INSERT INTO Caja
-            (
-                UsuarioId,
-                FechaApertura,
-                MontoInicial,
-                Estado
-            )
+            (UsuarioId, FechaApertura, MontoInicial, Estado)
             VALUES
-            (
-                @UsuarioId,
-                GETDATE(),
-                @MontoInicial,
-                'ABIERTA'
-            )";
+            (@UsuarioId, @FechaApertura, @MontoInicial, 'ABIERTA')";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+            cmd.Parameters.AddWithValue("@FechaApertura", DateTime.Now);
             cmd.Parameters.AddWithValue("@MontoInicial", monto);
 
             cmd.ExecuteNonQuery();
@@ -147,27 +147,16 @@ namespace FarmaciaPOS.Views
 
             string query =
             @"INSERT INTO MovimientosCaja
-            (
-                CajaId,
-                TipoMovimiento,
-                Monto,
-                Motivo,
-                Fecha
-            )
+            (CajaId, TipoMovimiento, Monto, Motivo, Fecha)
             VALUES
-            (
-                @CajaId,
-                @TipoMovimiento,
-                @Monto,
-                @Motivo,
-                GETDATE()
-            )";
+            (@CajaId, @TipoMovimiento, @Monto, @Motivo, @Fecha)";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@CajaId", cajaActualId);
             cmd.Parameters.AddWithValue("@TipoMovimiento", tipo);
             cmd.Parameters.AddWithValue("@Monto", monto);
             cmd.Parameters.AddWithValue("@Motivo", txtMotivo.Text);
+            cmd.Parameters.AddWithValue("@Fecha", DateTime.Now);
 
             cmd.ExecuteNonQuery();
 
@@ -181,7 +170,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
-        // CARGAR MOVIMIENTOS (solo de la caja actual)
+        // CARGAR MOVIMIENTOS
         // =====================================
 
         private void CargarMovimientos()
@@ -200,11 +189,7 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT
-                TipoMovimiento,
-                Monto,
-                Motivo,
-                Fecha
+            @"SELECT TipoMovimiento, Monto, Motivo, Fecha
               FROM MovimientosCaja
               WHERE CajaId = @CajaId
               ORDER BY Fecha DESC";
@@ -229,7 +214,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
-        // ✅ RESUMEN EN VIVO (estilo Sicar)
+        // RESUMEN EN VIVO
         // =====================================
 
         private void ActualizarResumenEnVivo()
@@ -244,10 +229,10 @@ namespace FarmaciaPOS.Views
 
             string queryMovs =
             @"SELECT
-        ISNULL(SUM(CASE WHEN TipoMovimiento = 'ENTRADA' THEN Monto ELSE 0 END), 0) AS TotalEntradas,
-        ISNULL(SUM(CASE WHEN TipoMovimiento = 'SALIDA' THEN Monto ELSE 0 END), 0) AS TotalSalidas
-        FROM MovimientosCaja
-        WHERE CajaId = @CajaId";
+                ISNULL(SUM(CASE WHEN TipoMovimiento = 'ENTRADA' THEN Monto ELSE 0 END), 0) AS TotalEntradas,
+                ISNULL(SUM(CASE WHEN TipoMovimiento = 'SALIDA' THEN Monto ELSE 0 END), 0) AS TotalSalidas
+              FROM MovimientosCaja
+              WHERE CajaId = @CajaId";
 
             SqlCommand cmdMovs = new SqlCommand(queryMovs, conn);
             cmdMovs.Parameters.AddWithValue("@CajaId", cajaActualId);
@@ -263,19 +248,18 @@ namespace FarmaciaPOS.Views
                 }
             }
 
-            // ✅ Ventas desglosadas por método de pago desde que se abrió la caja
             decimal ventasEfectivo = 0, ventasTarjeta = 0, ventasTransferencia = 0;
 
             try
             {
                 string queryVentas =
                 @"SELECT
-            ISNULL(SUM(CASE WHEN MetodoPago = 'Efectivo' THEN Total ELSE 0 END), 0) AS Efectivo,
-            ISNULL(SUM(CASE WHEN MetodoPago = 'Tarjeta' THEN Total ELSE 0 END), 0) AS Tarjeta,
-            ISNULL(SUM(CASE WHEN MetodoPago = 'Transferencia' THEN Total ELSE 0 END), 0) AS Transferencia
-              FROM Ventas
-              WHERE Fecha >= @FechaApertura
-              AND Estado = 'Completada'";
+                    ISNULL(SUM(CASE WHEN MetodoPago = 'Efectivo' THEN Total ELSE 0 END), 0) AS Efectivo,
+                    ISNULL(SUM(CASE WHEN MetodoPago = 'Tarjeta' THEN Total ELSE 0 END), 0) AS Tarjeta,
+                    ISNULL(SUM(CASE WHEN MetodoPago = 'Transferencia' THEN Total ELSE 0 END), 0) AS Transferencia
+                  FROM Ventas
+                  WHERE Fecha >= @FechaApertura
+                  AND Estado = 'Completada'";
 
                 SqlCommand cmdVentas = new SqlCommand(queryVentas, conn);
                 cmdVentas.Parameters.AddWithValue("@FechaApertura", fechaAperturaActual);
@@ -295,9 +279,14 @@ namespace FarmaciaPOS.Views
                 ventasTransferencia = 0;
             }
 
-            // ✅ Solo el efectivo afecta el efectivo físico esperado en el cajón.
-            // Tarjeta/Transferencia son solo informativas — el dinero no pasa por la caja física.
+            // El efectivo esperado en el cajón incluye monto inicial + entradas/salidas manuales.
+            // Tarjeta y Transferencia no pasan físicamente por la caja, así que no suman aquí.
             decimal totalEsperado = montoInicialActual + ventasEfectivo + totalEntradas - totalSalidas;
+
+            // Guardamos los "calculados" para usarlos en el corte
+            calculadoEfectivo = totalEsperado;
+            calculadoTarjeta = ventasTarjeta;
+            calculadoTransferencia = ventasTransferencia;
 
             txtResumenInicial.Text = montoInicialActual.ToString("C");
             txtResumenVentasEfectivo.Text = ventasEfectivo.ToString("C");
@@ -309,7 +298,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
-        // ✅ ABRIR OVERLAY DE CORTE (ARQUEO)
+        // ✅ ABRIR OVERLAY DE CORTE (ESTILO SICAR)
         // =====================================
 
         private void BtnAbrirCorte_Click(object sender, RoutedEventArgs e)
@@ -320,28 +309,15 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-            txtCant1000.Text = "0";
-            txtCant500.Text = "0";
-            txtCant200.Text = "0";
-            txtCant100.Text = "0";
-            txtCant50.Text = "0";
-            txtCant20.Text = "0";
-            txtCant10.Text = "0";
-            txtCant5.Text = "0";
-            txtCant2.Text = "0";
-            txtCant1.Text = "0";
-            txtCant050.Text = "0";
+            txtContadoEfectivo.Text = "0";
+            txtContadoTarjeta.Text = "0";
+            txtContadoTransferencia.Text = "0";
 
-            string textoEsperado = txtResumenEsperado.Text.Replace("$", "").Replace(",", "");
-            decimal.TryParse(textoEsperado, out decimal esperado);
+            txtCalculadoEfectivo.Text = calculadoEfectivo.ToString("C");
+            txtCalculadoTarjeta.Text = calculadoTarjeta.ToString("C");
+            txtCalculadoTransferencia.Text = calculadoTransferencia.ToString("C");
 
-            txtCorteEsperado.Text = esperado.ToString("C");
-            txtCorteContado.Text = "$0.00";
-            txtCorteDiferencia.Text = "$0.00";
-
-            // ✅ Refleja en el overlay lo que ya se calculó en el resumen en vivo
-            txtCorteTarjeta.Text = txtResumenVentasTarjeta.Text;
-            txtCorteTransferencia.Text = txtResumenVentasTransferencia.Text;
+            ActualizarDiferenciasCorte();
 
             overlayCorte.Visibility = Visibility.Visible;
         }
@@ -352,45 +328,56 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
-        // ✅ CALCULAR TOTAL CONTADO AL CAMBIAR CUALQUIER DENOMINACIÓN
+        // ✅ RECALCULAR DIFERENCIAS AL ESCRIBIR "CONTADO"
         // =====================================
 
-        private void Denominacion_TextChanged(object sender, TextChangedEventArgs e)
+        private void ContadoCorte_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // ✅ Evita el crash: durante InitializeComponent, estos controles
-            // pueden no existir todavía si el TextBox de denominación se construye antes.
             if (txtCorteEsperado == null || txtCorteContado == null || txtCorteDiferencia == null)
                 return;
 
-            int Cant(TextBox txt) => int.TryParse(txt.Text, out int v) ? v : 0;
+            ActualizarDiferenciasCorte();
+        }
 
-            decimal total =
-                Cant(txtCant1000) * 1000m +
-                Cant(txtCant500) * 500m +
-                Cant(txtCant200) * 200m +
-                Cant(txtCant100) * 100m +
-                Cant(txtCant50) * 50m +
-                Cant(txtCant20) * 20m +
-                Cant(txtCant10) * 10m +
-                Cant(txtCant5) * 5m +
-                Cant(txtCant2) * 2m +
-                Cant(txtCant1) * 1m +
-                Cant(txtCant050) * 0.5m;
+        private void ActualizarDiferenciasCorte()
+        {
+            decimal Leer(TextBox txt) => decimal.TryParse(txt.Text, out decimal v) ? v : 0;
 
-            txtCorteContado.Text = total.ToString("C");
+            decimal contadoEfectivo = Leer(txtContadoEfectivo);
+            decimal contadoTarjeta = Leer(txtContadoTarjeta);
+            decimal contadoTransferencia = Leer(txtContadoTransferencia);
 
-            string textoEsperado = txtCorteEsperado.Text.Replace("$", "").Replace(",", "");
-            decimal.TryParse(textoEsperado, out decimal esperado);
+            decimal difEfectivo = contadoEfectivo - calculadoEfectivo;
+            decimal difTarjeta = contadoTarjeta - calculadoTarjeta;
+            decimal difTransferencia = contadoTransferencia - calculadoTransferencia;
 
-            decimal diferencia = total - esperado;
-            txtCorteDiferencia.Text = diferencia.ToString("C");
+            txtDiferenciaEfectivo.Text = difEfectivo.ToString("C");
+            txtDiferenciaTarjeta.Text = difTarjeta.ToString("C");
+            txtDiferenciaTransferencia.Text = difTransferencia.ToString("C");
 
+            PintarDiferencia(txtDiferenciaEfectivo, difEfectivo);
+            PintarDiferencia(txtDiferenciaTarjeta, difTarjeta);
+            PintarDiferencia(txtDiferenciaTransferencia, difTransferencia);
+
+            decimal totalContado = contadoEfectivo + contadoTarjeta + contadoTransferencia;
+            decimal totalCalculado = calculadoEfectivo + calculadoTarjeta + calculadoTransferencia;
+            decimal totalDiferencia = totalContado - totalCalculado;
+
+            txtCorteContado.Text = totalContado.ToString("C");
+            txtCorteEsperado.Text = totalCalculado.ToString("C");
+            txtCorteDiferencia.Text = totalDiferencia.ToString("C");
+
+            PintarDiferencia(txtCorteDiferencia, totalDiferencia);
+        }
+
+        private void PintarDiferencia(TextBlock control, decimal diferencia)
+        {
             if (diferencia == 0)
-                txtCorteDiferencia.Foreground = System.Windows.Media.Brushes.Green;
+                control.Foreground = System.Windows.Media.Brushes.Green;
             else if (diferencia > 0)
-                txtCorteDiferencia.Foreground = System.Windows.Media.Brushes.DarkOrange;
+                control.Foreground = System.Windows.Media.Brushes.DarkOrange;
             else
-                txtCorteDiferencia.Foreground = System.Windows.Media.Brushes.Red;
+                control.Foreground = System.Windows.Media.Brushes.Red;
         }
 
         // =====================================
@@ -432,7 +419,7 @@ namespace FarmaciaPOS.Views
             string query =
             @"UPDATE Caja
               SET
-                FechaCierre = GETDATE(),
+                FechaCierre = @FechaCierre,
                 Estado = 'CERRADA',
                 MontoFinalEsperado = @Esperado,
                 MontoFinalContado = @Contado,
@@ -441,6 +428,7 @@ namespace FarmaciaPOS.Views
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@Id", cajaActualId);
+            cmd.Parameters.AddWithValue("@FechaCierre", DateTime.Now);
             cmd.Parameters.AddWithValue("@Esperado", esperado);
             cmd.Parameters.AddWithValue("@Contado", contado);
             cmd.Parameters.AddWithValue("@Diferencia", diferencia);
@@ -459,7 +447,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =====================================
-        // CERRAR CAJA SIN CORTE (rápido, sin arqueo)
+        // CERRAR CAJA SIN CORTE
         // =====================================
 
         private void BtnCerrarCaja_Click(object sender, RoutedEventArgs e)
@@ -471,7 +459,7 @@ namespace FarmaciaPOS.Views
             }
 
             var confirmar = MessageBox.Show(
-                "Vas a cerrar la caja SIN hacer el arqueo de efectivo.\n" +
+                "Vas a cerrar la caja SIN hacer el corte.\n" +
                 "Se recomienda usar \"Realizar Corte de Caja\" para llevar un control exacto.\n\n" +
                 "¿Deseas continuar de todas formas?",
                 "Confirmar cierre rápido",
@@ -489,12 +477,13 @@ namespace FarmaciaPOS.Views
             string query =
             @"UPDATE Caja
               SET
-                FechaCierre = GETDATE(),
+                FechaCierre = @FechaCierre,
                 Estado = 'CERRADA'
               WHERE Id = @Id";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@Id", cajaActualId);
+            cmd.Parameters.AddWithValue("@FechaCierre", DateTime.Now);
 
             cmd.ExecuteNonQuery();
 
@@ -503,79 +492,9 @@ namespace FarmaciaPOS.Views
             Close();
         }
 
-        // =====================================
-        // ✅ HISTORIAL DE CORTES
-        // =====================================
-
-        private void CargarHistorialCortes()
-        {
-            List<HistorialCorteView> lista = new();
-
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT TOP 100 *
-              FROM Caja
-              WHERE Estado = 'CERRADA'
-              ORDER BY FechaCierre DESC";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                decimal? esperado = reader["MontoFinalEsperado"] != DBNull.Value
-                    ? Convert.ToDecimal(reader["MontoFinalEsperado"]) : null;
-
-                decimal? contado = reader["MontoFinalContado"] != DBNull.Value
-                    ? Convert.ToDecimal(reader["MontoFinalContado"]) : null;
-
-                decimal? diferencia = reader["Diferencia"] != DBNull.Value
-                    ? Convert.ToDecimal(reader["Diferencia"]) : null;
-
-                string estado =
-                    diferencia == null ? "Sin arqueo" :
-                    diferencia == 0 ? "✅ Cuadre exacto" :
-                    diferencia > 0 ? $"🟡 Sobrante" :
-                                     $"🔴 Faltante";
-
-                lista.Add(new HistorialCorteView
-                {
-                    FechaApertura = Convert.ToDateTime(reader["FechaApertura"]),
-                    FechaCierre = reader["FechaCierre"] != DBNull.Value
-                        ? Convert.ToDateTime(reader["FechaCierre"]) : (DateTime?)null,
-                    MontoInicial = Convert.ToDecimal(reader["MontoInicial"]),
-                    MontoFinalEsperado = esperado ?? 0,
-                    MontoFinalContado = contado ?? 0,
-                    Diferencia = diferencia ?? 0,
-                    Estado = estado
-                });
-            }
-
-            dgHistorialCortes.ItemsSource = lista;
-        }
-
         private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
-    }
-
-    // =====================================
-    // ✅ CLASE AUXILIAR PARA EL HISTORIAL
-    // =====================================
-
-    public class HistorialCorteView
-    {
-        public DateTime FechaApertura { get; set; }
-        public DateTime? FechaCierre { get; set; }
-        public decimal MontoInicial { get; set; }
-        public decimal MontoFinalEsperado { get; set; }
-        public decimal MontoFinalContado { get; set; }
-        public decimal Diferencia { get; set; }
-        public string Estado { get; set; } = string.Empty;
     }
 }

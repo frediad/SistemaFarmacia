@@ -15,7 +15,7 @@ namespace FarmaciaPOS.Views
     {
         private List<Producto> productos = new();
 
-        // Compras
+        // Pedido a proveedor (antes "Compras")
         private ObservableCollection<DetalleCompraItem> itemsCompra = new();
 
         // Ajuste
@@ -23,6 +23,10 @@ namespace FarmaciaPOS.Views
 
         // Sugerencia de compra
         private ObservableCollection<SugerenciaCompraItem> sugerencias = new();
+
+        // ✅ Recepción de pedidos
+        private ObservableCollection<DetalleRecepcionItem> itemsRecepcion = new();
+        private int pedidoSeleccionadoId = 0;
 
         public InventarioWindow()
         {
@@ -33,15 +37,18 @@ namespace FarmaciaPOS.Views
             dgItemsCompra.ItemsSource = itemsCompra;
             dgAjuste.ItemsSource = itemsAjuste;
             dgSugerencias.ItemsSource = sugerencias;
+            dgDetalleRecepcion.ItemsSource = itemsRecepcion;
 
-            // ✅ Constructor blindado — si algo falla (red, columna faltante, etc.)
-            // se muestra el error real en vez de cerrar la app sin explicación.
+            // ⚠️ Constructor blindado — usa MessageBox.Show (no MensajeHelper) porque
+            // esta ventana todavía no se ha mostrado en pantalla en este punto; asignarle
+            // Owner a MensajeHelper antes de tiempo provoca un crash de WPF.
             try
             {
                 CargarProductos();
                 CargarProveedores();
                 CargarMovimientos();
                 CargarAlertasStock();
+                CargarPedidosPendientes();
 
                 cbProductoKardex.ItemsSource = productos;
                 cbProductoKardex.DisplayMemberPath = "Nombre";
@@ -99,7 +106,6 @@ namespace FarmaciaPOS.Views
                         ? Convert.ToInt32(reader["StockMinimo"])
                         : 0,
 
-                    // ✅ AGREGADO — antes no se leía, por eso Sugerencia de Compra fallaba
                     Stock = reader["Stock"] != DBNull.Value
                         ? Convert.ToInt32(reader["Stock"])
                         : 0,
@@ -128,7 +134,8 @@ namespace FarmaciaPOS.Views
 
         // =========================================
         // PESTAÑA 1 — MOVIMIENTOS (MODO SUMAR)
-        // No modifica el costo promedio del producto.
+        // Este es el único lugar donde el stock aumenta directamente
+        // sin pasar por un pedido/recepción — para ajustes rápidos manuales.
         // =========================================
 
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
@@ -137,7 +144,7 @@ namespace FarmaciaPOS.Views
             {
                 if (cbProductos.SelectedItem is not Producto productoSeleccionado)
                 {
-                    MessageBox.Show("Selecciona un producto");
+                    MensajeHelper.Advertencia("Selecciona un producto", "Aviso", this);
                     return;
                 }
 
@@ -145,7 +152,7 @@ namespace FarmaciaPOS.Views
 
                 if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad <= 0)
                 {
-                    MessageBox.Show("Ingresa una cantidad válida", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MensajeHelper.Advertencia("Ingresa una cantidad válida", "Aviso", this);
                     return;
                 }
 
@@ -153,11 +160,10 @@ namespace FarmaciaPOS.Views
 
                 if (tipo == "Salida" && cantidad > productoSeleccionado.Stock)
                 {
-                    MessageBox.Show(
+                    MensajeHelper.Advertencia(
                         $"No puedes registrar una salida de {cantidad} unidades.\nStock disponible: {productoSeleccionado.Stock}",
                         "Stock insuficiente",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                        this);
                     return;
                 }
 
@@ -187,7 +193,7 @@ namespace FarmaciaPOS.Views
                 updateCmd.Parameters.AddWithValue("@ProductoId", productoId);
                 updateCmd.ExecuteNonQuery();
 
-                MessageBox.Show("Movimiento guardado correctamente");
+                MensajeHelper.Exito("Movimiento guardado correctamente", "Listo", this);
 
                 txtCantidad.Clear();
                 txtMotivo.Clear();
@@ -198,7 +204,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
@@ -239,8 +245,9 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // PESTAÑA 2 — COMPRAS
-        // Sí actualiza el costo promedio ponderado.
+        // PESTAÑA 2 — PEDIR A PROVEEDOR (antes "Compras")
+        // Ya NO registra una compra ni toca stock/costo directamente.
+        // Solo arma la lista y abre PedirMercanciaWindow.
         // =========================================
 
         private void CargarProveedores()
@@ -326,17 +333,19 @@ namespace FarmaciaPOS.Views
             txtTotalCompra.Text = total.ToString("C");
         }
 
+        // ✅ Ya no registra la compra directo: arma el pedido y abre
+        // PedirMercanciaWindow, sin tocar stock ni costo.
         private void BtnConfirmarCompra_Click(object sender, RoutedEventArgs e)
         {
-            if (cbProveedor.SelectedValue == null)
+            if (cbProveedor.SelectedItem is not Proveedor proveedorSeleccionado)
             {
-                MessageBox.Show("Selecciona un proveedor");
+                MensajeHelper.Advertencia("Selecciona un proveedor", "Aviso", this);
                 return;
             }
 
             if (itemsCompra.Count == 0)
             {
-                MessageBox.Show("Agrega al menos un producto a la compra");
+                MensajeHelper.Advertencia("Agrega al menos un producto al pedido", "Aviso", this);
                 return;
             }
 
@@ -344,120 +353,39 @@ namespace FarmaciaPOS.Views
             {
                 if (item.Cantidad <= 0)
                 {
-                    MessageBox.Show($"\"{item.Nombre}\": la cantidad debe ser mayor a cero");
-                    return;
-                }
-
-                if (item.CostoUnitario <= 0)
-                {
-                    MessageBox.Show($"\"{item.Nombre}\": el costo debe ser mayor a cero");
+                    MensajeHelper.Advertencia($"\"{item.Nombre}\": la cantidad debe ser mayor a cero", "Aviso", this);
                     return;
                 }
             }
 
-            int proveedorId = Convert.ToInt32(cbProveedor.SelectedValue);
-            decimal totalCompra = itemsCompra.Sum(x => x.Subtotal);
-
-            var confirmar = MessageBox.Show(
-                $"Se registrará una compra por {totalCompra:C} con {itemsCompra.Count} producto(s).\n" +
-                "Esto aumentará el stock y actualizará el costo promedio de cada producto.\n\n¿Confirmar?",
-                "Confirmar compra",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (confirmar != MessageBoxResult.Yes)
-                return;
-
-            using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
-            conn.Open();
-
-            string queryCompra =
-            @"INSERT INTO Compras
-            (ProveedorId, NumeroFactura, Fecha, Total, UsuarioId, MetodoPago)
-            VALUES
-            (@ProveedorId, @NumeroFactura, GETDATE(), @Total, @UsuarioId, @MetodoPago);
-            SELECT SCOPE_IDENTITY();";
-
-            SqlCommand cmdCompra = new SqlCommand(queryCompra, conn);
-            cmdCompra.Parameters.AddWithValue("@ProveedorId", proveedorId);
-            cmdCompra.Parameters.AddWithValue("@NumeroFactura",
-                string.IsNullOrWhiteSpace(txtNumeroFactura.Text) ? (object)DBNull.Value : txtNumeroFactura.Text);
-            cmdCompra.Parameters.AddWithValue("@Total", totalCompra);
-            cmdCompra.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
-            cmdCompra.Parameters.AddWithValue("@MetodoPago",
-                (cbMetodoPagoCompra.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Transferencia");
-
-            int compraId = Convert.ToInt32(cmdCompra.ExecuteScalar());
-
-            foreach (var item in itemsCompra)
+            var itemsPedido = itemsCompra.Select(x => new PedidoProveedorItem
             {
-                string queryDetalle =
-                @"INSERT INTO DetalleCompras
-                (CompraId, ProductoId, Cantidad, CostoUnitario)
-                VALUES
-                (@CompraId, @ProductoId, @Cantidad, @CostoUnitario)";
+                ProductoId = x.ProductoId,
+                Nombre = x.Nombre,
+                Cantidad = x.Cantidad,
+                CostoUnitario = x.CostoUnitario
+            }).ToList();
 
-                SqlCommand cmdDetalle = new SqlCommand(queryDetalle, conn);
-                cmdDetalle.Parameters.AddWithValue("@CompraId", compraId);
-                cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
-                cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                cmdDetalle.Parameters.AddWithValue("@CostoUnitario", item.CostoUnitario);
-                cmdDetalle.ExecuteNonQuery();
+            var ventana = new PedirMercanciaWindow(proveedorSeleccionado, itemsPedido)
+            {
+                Owner = this
+            };
 
-                int stockAnterior = item.StockActual;
-                decimal costoAnterior = item.CostoActual;
-                int cantidadComprada = item.Cantidad;
-                decimal costoNuevo = item.CostoUnitario;
+            bool? resultado = ventana.ShowDialog();
 
-                decimal costoPromedio = (stockAnterior + cantidadComprada) == 0
-                    ? costoNuevo
-                    : ((stockAnterior * costoAnterior) + (cantidadComprada * costoNuevo)) / (stockAnterior + cantidadComprada);
+            if (resultado == true)
+            {
+                itemsCompra.Clear();
+                cbProveedor.SelectedIndex = -1;
+                ActualizarTotalCompra();
 
-                string queryProducto =
-                @"UPDATE Productos
-                  SET Stock = Stock + @Cantidad,
-                      PrecioCompra = @CostoPromedio
-                  WHERE Id = @ProductoId";
-
-                SqlCommand cmdProducto = new SqlCommand(queryProducto, conn);
-                cmdProducto.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                cmdProducto.Parameters.AddWithValue("@CostoPromedio", costoPromedio);
-                cmdProducto.Parameters.AddWithValue("@ProductoId", item.ProductoId);
-                cmdProducto.ExecuteNonQuery();
-
-                string queryMovimiento =
-                @"INSERT INTO MovimientoInventarios
-                (ProductoId, TipoMovimiento, Cantidad, Motivo, UsuarioId, Fecha)
-                VALUES
-                (@ProductoId, 'Entrada', @Cantidad, @Motivo, @UsuarioId, GETDATE())";
-
-                SqlCommand cmdMov = new SqlCommand(queryMovimiento, conn);
-                cmdMov.Parameters.AddWithValue("@ProductoId", item.ProductoId);
-                cmdMov.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                cmdMov.Parameters.AddWithValue("@Motivo", $"Compra #{compraId}" +
-                    (string.IsNullOrWhiteSpace(txtNumeroFactura.Text) ? "" : $" - Factura {txtNumeroFactura.Text}"));
-                cmdMov.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
-                cmdMov.ExecuteNonQuery();
+                // El pedido recién enviado ya quedó guardado en BD como "Enviado"
+                CargarPedidosPendientes();
             }
-
-            MessageBox.Show(
-                $"Compra #{compraId} registrada correctamente.\nTotal: {totalCompra:C}",
-                "Éxito",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-
-            itemsCompra.Clear();
-            txtNumeroFactura.Clear();
-            cbProveedor.SelectedIndex = -1;
-            ActualizarTotalCompra();
-
-            CargarProductos();
-            CargarMovimientos();
-            CargarAlertasStock();
         }
 
         // =========================================
-        // PESTAÑA 3 — AJUSTE DE INVENTARIO 
+        // PESTAÑA 3 — AJUSTE DE INVENTARIO
         // =========================================
 
         private void BtnCargarAjuste_Click(object sender, RoutedEventArgs e)
@@ -471,14 +399,13 @@ namespace FarmaciaPOS.Views
                     ProductoId = p.Id,
                     Nombre = p.Nombre,
                     StockSistema = p.Stock,
-                    StockContado = p.Stock // por defecto igual al sistema, el usuario lo corrige
+                    StockContado = p.Stock
                 });
             }
         }
 
         private void dgAjuste_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            // Refresca visualmente los estilos de fila (diferencias) tras editar
             Dispatcher.BeginInvoke(new Action(() => dgAjuste.Items.Refresh()));
         }
 
@@ -488,27 +415,26 @@ namespace FarmaciaPOS.Views
 
             if (itemsConDiferencia.Count == 0)
             {
-                MessageBox.Show("No hay diferencias que ajustar. Todos los productos coinciden con el sistema.");
+                MensajeHelper.Info("No hay diferencias que ajustar. Todos los productos coinciden con el sistema.", "Sin cambios", this);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtMotivoAjuste.Text))
             {
-                MessageBox.Show("Escribe el motivo del ajuste (ej. \"Conteo físico mensual\")");
+                MensajeHelper.Advertencia("Escribe el motivo del ajuste (ej. \"Conteo físico mensual\")", "Aviso", this);
                 return;
             }
 
             string resumen = string.Join("\n", itemsConDiferencia.Select(x =>
                 $"{x.Nombre}: {(x.Diferencia > 0 ? "+" : "")}{x.Diferencia}"));
 
-            var confirmar = MessageBox.Show(
+            bool confirmar = MensajeHelper.Confirmar(
                 $"Se aplicarán {itemsConDiferencia.Count} ajuste(s):\n\n{resumen}\n\n" +
                 "El stock del sistema se actualizará para reflejar el conteo físico. ¿Confirmar?",
                 "Confirmar ajuste de inventario",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                this);
 
-            if (confirmar != MessageBoxResult.Yes)
+            if (!confirmar)
                 return;
 
             using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
@@ -533,7 +459,6 @@ namespace FarmaciaPOS.Views
                 cmdMov.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
                 cmdMov.ExecuteNonQuery();
 
-                // El nuevo stock queda exactamente igual al contado, sin importar el signo
                 string queryProducto = "UPDATE Productos SET Stock = @StockContado WHERE Id = @ProductoId";
 
                 SqlCommand cmdProducto = new SqlCommand(queryProducto, conn);
@@ -542,11 +467,10 @@ namespace FarmaciaPOS.Views
                 cmdProducto.ExecuteNonQuery();
             }
 
-            MessageBox.Show(
+            MensajeHelper.Exito(
                 $"Se aplicaron {itemsConDiferencia.Count} ajuste(s) de inventario correctamente.",
                 "Éxito",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                this);
 
             txtMotivoAjuste.Clear();
             itemsAjuste.Clear();
@@ -557,14 +481,14 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ PESTAÑA 4 — KARDEX POR PRODUCTO
+        // PESTAÑA 4 — KARDEX POR PRODUCTO
         // =========================================
 
         private void BtnVerKardex_Click(object sender, RoutedEventArgs e)
         {
             if (cbProductoKardex.SelectedItem is not Producto producto)
             {
-                MessageBox.Show("Selecciona un producto");
+                MensajeHelper.Advertencia("Selecciona un producto", "Aviso", this);
                 return;
             }
 
@@ -595,8 +519,6 @@ namespace FarmaciaPOS.Views
                 });
             }
 
-            // Calcula el saldo retrocediendo desde el stock actual
-            // (los movimientos vienen ordenados del más reciente al más antiguo)
             int saldoActual = producto.Stock;
 
             foreach (var mov in movimientos)
@@ -612,7 +534,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ PESTAÑA 5 — VALORIZACIÓN DE INVENTARIO
+        // PESTAÑA 5 — VALORIZACIÓN DE INVENTARIO
         // =========================================
 
         private void CargarValorizacion()
@@ -637,7 +559,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ PESTAÑA 6 — SUGERENCIA DE COMPRA
+        // PESTAÑA 6 — SUGERENCIA DE COMPRA
         // =========================================
 
         private void BtnGenerarSugerencias_Click(object sender, RoutedEventArgs e)
@@ -646,11 +568,7 @@ namespace FarmaciaPOS.Views
 
             foreach (var p in productos.Where(p => p.StockMinimo > 0 && p.Stock <= p.StockMinimo))
             {
-                // ✅ CORREGIDO — ahora sí compara contra StockMaximo real
-                int cantidadSugerida = p.Stock > p.Stock
-                    ? p.Stock - p.Stock
-                    : (p.StockMinimo * 2) - p.Stock;
-
+                int cantidadSugerida = (p.StockMinimo * 2) - p.Stock;
                 cantidadSugerida = Math.Max(cantidadSugerida, 1);
 
                 sugerencias.Add(new SugerenciaCompraItem
@@ -659,7 +577,7 @@ namespace FarmaciaPOS.Views
                     Nombre = p.Nombre,
                     Stock = p.Stock,
                     StockMinimo = p.StockMinimo,
-                    StockMaximo = p.Stock, // ✅ CORREGIDO — antes usaba p.Stock por error
+                    StockMaximo = p.StockMinimo * 2,
                     CantidadSugerida = cantidadSugerida,
                     CostoUnitario = p.PrecioCompra
                 });
@@ -671,7 +589,7 @@ namespace FarmaciaPOS.Views
 
             if (sugerencias.Count == 0)
             {
-                MessageBox.Show("No hay productos por debajo de su stock mínimo en este momento. 🎉");
+                MensajeHelper.Info("No hay productos por debajo de su stock mínimo en este momento. 🎉", "Todo en orden", this);
             }
         }
 
@@ -692,7 +610,7 @@ namespace FarmaciaPOS.Views
 
             if (seleccionados.Count == 0)
             {
-                MessageBox.Show("Selecciona al menos un producto");
+                MensajeHelper.Advertencia("Selecciona al menos un producto", "Aviso", this);
                 return;
             }
 
@@ -720,18 +638,16 @@ namespace FarmaciaPOS.Views
 
             ActualizarTotalCompra();
 
-            // Cambia automáticamente a la pestaña de Compras (índice 1)
             tabInventario.SelectedIndex = 1;
 
-            MessageBox.Show(
-                $"{seleccionados.Count} producto(s) agregado(s) a Compras. Selecciona el proveedor y confirma la compra.",
+            MensajeHelper.Exito(
+                $"{seleccionados.Count} producto(s) agregado(s) al pedido. Selecciona el proveedor y envía el pedido.",
                 "Listo",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                this);
         }
 
         // =========================================
-        // ✅ BOTÓN GENERAL DEL HEADER — PEDIDO LIBRE
+        // BOTÓN GENERAL DEL HEADER — PEDIDO LIBRE
         // =========================================
 
         private void BtnPedirMercanciaInventario_Click(object sender, RoutedEventArgs e)
@@ -741,11 +657,16 @@ namespace FarmaciaPOS.Views
                 Owner = this
             };
 
-            ventana.ShowDialog();
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true)
+            {
+                CargarPedidosPendientes();
+            }
         }
 
         // =========================================
-        // ✅ PEDIR POR CORREO DESDE SUGERENCIA DE COMPRA
+        // PEDIR POR CORREO DESDE SUGERENCIA DE COMPRA
         // =========================================
 
         private void BtnPedirSugerenciasPorCorreo_Click(object sender, RoutedEventArgs e)
@@ -754,12 +675,13 @@ namespace FarmaciaPOS.Views
 
             if (seleccionados.Count == 0)
             {
-                MessageBox.Show("Selecciona al menos un producto");
+                MensajeHelper.Advertencia("Selecciona al menos un producto", "Aviso", this);
                 return;
             }
 
             var itemsPedido = seleccionados.Select(x => new PedidoProveedorItem
             {
+                ProductoId = x.ProductoId,
                 Nombre = x.Nombre,
                 Cantidad = x.CantidadSugerida,
                 CostoUnitario = x.CostoUnitario
@@ -770,7 +692,267 @@ namespace FarmaciaPOS.Views
                 Owner = this
             };
 
-            ventana.ShowDialog();
+            bool? resultado = ventana.ShowDialog();
+
+            if (resultado == true)
+            {
+                CargarPedidosPendientes();
+            }
+        }
+
+        // =========================================
+        // ✅ PESTAÑA 7 — RECEPCIÓN DE PEDIDOS
+        // Aquí sí se registra la compra real: stock, costo promedio,
+        // Compras/DetalleCompras y el movimiento de inventario.
+        // =========================================
+
+        private void CargarPedidosPendientes()
+        {
+            try
+            {
+                List<PedidoProveedorView> lista = new();
+
+                using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
+                conn.Open();
+
+                string query =
+                @"SELECT pp.Id, pr.Nombre AS Proveedor, pp.Fecha, pp.Total, pp.Estado
+                  FROM PedidosProveedor pp
+                  INNER JOIN Proveedores pr ON pp.ProveedorId = pr.Id
+                  WHERE pp.Estado = 'Enviado'
+                  ORDER BY pp.Fecha DESC";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    lista.Add(new PedidoProveedorView
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Proveedor = reader["Proveedor"].ToString() ?? "",
+                        Fecha = Convert.ToDateTime(reader["Fecha"]),
+                        Total = Convert.ToDecimal(reader["Total"]),
+                        Estado = reader["Estado"].ToString() ?? ""
+                    });
+                }
+
+                dgPedidosPendientes.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                // ⚠️ MessageBox.Show (no MensajeHelper): este método se llama desde
+                // el constructor antes de que la ventana se muestre en pantalla.
+                MessageBox.Show(
+                    "No se pudieron cargar los pedidos pendientes: " + ex.Message +
+                    "\n\n¿Ya creaste las tablas PedidosProveedor y DetallePedidosProveedor en tu base de datos?",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void DgPedidosPendientes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dgPedidosPendientes.SelectedItem is not PedidoProveedorView pedido)
+                return;
+
+            pedidoSeleccionadoId = pedido.Id;
+
+            txtInfoPedidoSeleccionado.Text =
+                $"Pedido a \"{pedido.Proveedor}\" — {pedido.Fecha:dd/MM/yyyy} — Total estimado: {pedido.Total:C}";
+
+            try
+            {
+                itemsRecepcion.Clear();
+
+                using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
+                conn.Open();
+
+                string query =
+                @"SELECT
+                    dp.ProductoId,
+                    p.Nombre,
+                    dp.Cantidad AS CantidadPedida,
+                    dp.CostoUnitario,
+                    p.Stock AS StockActual,
+                    p.PrecioCompra AS CostoActual
+                  FROM DetallePedidoProveedor dp
+                  INNER JOIN Productos p ON dp.ProductoId = p.Id
+                  WHERE dp.PedidoProveedorId = @PedidoId";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@PedidoId", pedidoSeleccionadoId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    itemsRecepcion.Add(new DetalleRecepcionItem
+                    {
+                        ProductoId = Convert.ToInt32(reader["ProductoId"]),
+                        Nombre = reader["Nombre"].ToString() ?? "",
+                        CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
+                        StockActual = Convert.ToInt32(reader["StockActual"]),
+                        CostoActual = Convert.ToDecimal(reader["CostoActual"]),
+                        CantidadRecibida = Convert.ToInt32(reader["CantidadPedida"]),
+                        CostoUnitarioReal = Convert.ToDecimal(reader["CostoUnitario"])
+                    });
+                }
+
+                ActualizarTotalRecepcion();
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudo cargar el detalle del pedido: " + ex.Message, "Error", this);
+            }
+        }
+
+        private void dgDetalleRecepcion_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(ActualizarTotalRecepcion));
+        }
+
+        private void ActualizarTotalRecepcion()
+        {
+            decimal total = itemsRecepcion.Sum(x => x.Subtotal);
+            txtTotalRecepcion.Text = total.ToString("C");
+        }
+
+        private void BtnConfirmarRecepcion_Click(object sender, RoutedEventArgs e)
+        {
+            if (pedidoSeleccionadoId == 0 || itemsRecepcion.Count == 0)
+            {
+                MensajeHelper.Advertencia("Selecciona un pedido con productos para recibir", "Aviso", this);
+                return;
+            }
+
+            var itemsAReceptar = itemsRecepcion.Where(x => x.CantidadRecibida > 0).ToList();
+
+            if (itemsAReceptar.Count == 0)
+            {
+                MensajeHelper.Advertencia("Indica al menos una cantidad recibida mayor a cero", "Aviso", this);
+                return;
+            }
+
+            foreach (var item in itemsAReceptar)
+            {
+                if (item.CostoUnitarioReal <= 0)
+                {
+                    MensajeHelper.Advertencia($"\"{item.Nombre}\": el costo debe ser mayor a cero", "Aviso", this);
+                    return;
+                }
+            }
+
+            decimal totalRecibido = itemsAReceptar.Sum(x => x.Subtotal);
+
+            bool confirmar = MensajeHelper.Confirmar(
+                $"Se registrará la recepción de {itemsAReceptar.Count} producto(s) por {totalRecibido:C}.\n" +
+                "Esto aumentará el stock y actualizará el costo promedio de cada producto.\n\n¿Confirmar?",
+                "Confirmar recepción",
+                this);
+
+            if (!confirmar)
+                return;
+
+            using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
+            conn.Open();
+
+            SqlTransaction trans = conn.BeginTransaction();
+
+            try
+            {
+                string queryCompra =
+                @"INSERT INTO Compras
+                (ProveedorId, NumeroFactura, Fecha, Total, UsuarioId, MetodoPago)
+                SELECT ProveedorId, @NumeroFactura, GETDATE(), @Total, @UsuarioId, MetodoPago
+                FROM PedidosProveedor WHERE Id = @PedidoProveedorId;
+                SELECT SCOPE_IDENTITY();";
+
+                SqlCommand cmdCompra = new SqlCommand(queryCompra, conn, trans);
+                cmdCompra.Parameters.AddWithValue("@NumeroFactura",
+                    string.IsNullOrWhiteSpace(txtNumeroFacturaRecepcion.Text) ? (object)DBNull.Value : txtNumeroFacturaRecepcion.Text);
+                cmdCompra.Parameters.AddWithValue("@Total", totalRecibido);
+                cmdCompra.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+                cmdCompra.Parameters.AddWithValue("@PedidoProveedorId", pedidoSeleccionadoId);
+
+                int compraId = Convert.ToInt32(cmdCompra.ExecuteScalar());
+
+                foreach (var item in itemsAReceptar)
+                {
+                    string queryDetalle =
+                    @"INSERT INTO DetalleCompras
+                    (CompraId, ProductoId, Cantidad, CostoUnitario)
+                    VALUES
+                    (@CompraId, @ProductoId, @Cantidad, @CostoUnitario)";
+
+                    SqlCommand cmdDetalle = new SqlCommand(queryDetalle, conn, trans);
+                    cmdDetalle.Parameters.AddWithValue("@CompraId", compraId);
+                    cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+                    cmdDetalle.Parameters.AddWithValue("@Cantidad", item.CantidadRecibida);
+                    cmdDetalle.Parameters.AddWithValue("@CostoUnitario", item.CostoUnitarioReal);
+                    cmdDetalle.ExecuteNonQuery();
+
+                    decimal costoPromedio = (item.StockActual + item.CantidadRecibida) == 0
+                        ? item.CostoUnitarioReal
+                        : ((item.StockActual * item.CostoActual) + (item.CantidadRecibida * item.CostoUnitarioReal))
+                          / (item.StockActual + item.CantidadRecibida);
+
+                    string queryProducto =
+                    @"UPDATE Productos
+                      SET Stock = Stock + @Cantidad,
+                          PrecioCompra = @CostoPromedio
+                      WHERE Id = @ProductoId";
+
+                    SqlCommand cmdProducto = new SqlCommand(queryProducto, conn, trans);
+                    cmdProducto.Parameters.AddWithValue("@Cantidad", item.CantidadRecibida);
+                    cmdProducto.Parameters.AddWithValue("@CostoPromedio", costoPromedio);
+                    cmdProducto.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+                    cmdProducto.ExecuteNonQuery();
+
+                    string queryMovimiento =
+                    @"INSERT INTO MovimientoInventarios
+                    (ProductoId, TipoMovimiento, Cantidad, Motivo, UsuarioId, Fecha)
+                    VALUES
+                    (@ProductoId, 'Entrada', @Cantidad, @Motivo, @UsuarioId, GETDATE())";
+
+                    SqlCommand cmdMov = new SqlCommand(queryMovimiento, conn, trans);
+                    cmdMov.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+                    cmdMov.Parameters.AddWithValue("@Cantidad", item.CantidadRecibida);
+                    cmdMov.Parameters.AddWithValue("@Motivo", $"Recepción de pedido #{pedidoSeleccionadoId} — Compra #{compraId}" +
+                        (string.IsNullOrWhiteSpace(txtNumeroFacturaRecepcion.Text) ? "" : $" - Factura {txtNumeroFacturaRecepcion.Text}"));
+                    cmdMov.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+                    cmdMov.ExecuteNonQuery();
+                }
+
+                string queryEstado = "UPDATE PedidosProveedor SET Estado = 'Recibido' WHERE Id = @PedidoProveedorId";
+                SqlCommand cmdEstado = new SqlCommand(queryEstado, conn, trans);
+                cmdEstado.Parameters.AddWithValue("@PedidoProveedorId", pedidoSeleccionadoId);
+                cmdEstado.ExecuteNonQuery();
+
+                trans.Commit();
+
+                MensajeHelper.Exito(
+                    $"Compra #{compraId} registrada correctamente.\nTotal: {totalRecibido:C}",
+                    "Recepción confirmada",
+                    this);
+
+                pedidoSeleccionadoId = 0;
+                itemsRecepcion.Clear();
+                txtNumeroFacturaRecepcion.Clear();
+                txtInfoPedidoSeleccionado.Text = "← Selecciona un pedido de la lista";
+                ActualizarTotalRecepcion();
+
+                CargarPedidosPendientes();
+                CargarProductos();
+                CargarMovimientos();
+                CargarAlertasStock();
+            }
+            catch (Exception ex)
+            {
+                trans.Rollback();
+                MensajeHelper.Error("No se pudo registrar la recepción: " + ex.Message, "Error", this);
+            }
         }
 
         // =========================================

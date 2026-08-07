@@ -37,19 +37,41 @@ namespace FarmaciaPOS.Views
                 {
                     DateTime apertura = Convert.ToDateTime(reader["FechaApertura"]);
                     decimal montoInicial = Convert.ToDecimal(reader["MontoInicial"]);
+                    int usuarioIdApertura = Convert.ToInt32(reader["UsuarioId"]);
                     string usuarioApertura = reader["NombreUsuarioApertura"]?.ToString() ?? "Desconocido";
 
-                    txtInfoCajaAbierta.Text =
-                        $"Abierta por {usuarioApertura} el {apertura:dd/MM/yyyy HH:mm}\n" +
-                        $"Monto inicial: {montoInicial:C}";
+                    reader.Close();
 
-                    pnlCajaYaAbierta.Visibility = Visibility.Visible;
-                    pnlAbrirNueva.Visibility = Visibility.Collapsed;
+                    if (usuarioIdApertura == Sesion.UsuarioId)
+                    {
+                        // ✅ La caja abierta es del mismo usuario que acaba de iniciar sesión
+                        txtInfoCajaAbierta.Text =
+                            $"Abierta el {apertura:dd/MM/yyyy HH:mm}\n" +
+                            $"Monto inicial: {montoInicial:C}";
+
+                        pnlCajaYaAbierta.Visibility = Visibility.Visible;
+                        pnlAbrirNueva.Visibility = Visibility.Collapsed;
+                        pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        // ✅ La caja abierta pertenece a OTRO usuario
+                        txtInfoCajaOtroUsuario.Text =
+                            $"\"{usuarioApertura}\" abrió una caja el {apertura:dd/MM/yyyy HH:mm} " +
+                            $"con un monto inicial de {montoInicial:C}.\n\n" +
+                            "Puedes abrir tu propia caja para trabajar de forma independiente, " +
+                            "o continuar usando esa misma si así lo prefieres.";
+
+                        pnlCajaDeOtroUsuario.Visibility = Visibility.Visible;
+                        pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
+                        pnlAbrirNueva.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else
                 {
                     pnlAbrirNueva.Visibility = Visibility.Visible;
                     pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
+                    pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -60,10 +82,20 @@ namespace FarmaciaPOS.Views
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
-                // Ante un error de conexión, permitimos abrir caja de todos modos
                 pnlAbrirNueva.Visibility = Visibility.Visible;
                 pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
+                pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;
             }
+        }
+
+        // ✅ Desde el panel de "caja de otro usuario", pasa al formulario para abrir la propia
+        private void BtnAbrirLaMiaPropia_Click(object sender, RoutedEventArgs e)
+        {
+            pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;
+            pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
+            pnlAbrirNueva.Visibility = Visibility.Visible;
+
+            txtMontoInicial.Focus();
         }
 
         private void BtnAbrirCaja_Click(object sender, RoutedEventArgs e)
@@ -79,14 +111,16 @@ namespace FarmaciaPOS.Views
                 using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
                 conn.Open();
 
+                
                 string query =
                 @"INSERT INTO Caja
                 (UsuarioId, FechaApertura, MontoInicial, Estado)
                 VALUES
-                (@UsuarioId, GETDATE(), @MontoInicial, 'ABIERTA')";
+                (@UsuarioId, @FechaApertura, @MontoInicial, 'ABIERTA')";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+                cmd.Parameters.AddWithValue("@FechaApertura", DateTime.Now);
                 cmd.Parameters.AddWithValue("@MontoInicial", monto);
                 cmd.ExecuteNonQuery();
 
@@ -109,7 +143,6 @@ namespace FarmaciaPOS.Views
             DialogResult = true;
         }
 
-        // ✅ Bloquea Alt+F4 / cierre por otro medio: es obligatorio completar una acción
         protected override void OnClosing(CancelEventArgs e)
         {
             if (!accionCompletada)

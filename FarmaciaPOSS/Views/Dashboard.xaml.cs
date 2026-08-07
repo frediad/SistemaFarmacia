@@ -18,12 +18,11 @@ namespace FarmaciaPOS
 {
     public partial class MainWindow : Window
     {
-        
-
-        List<Producto> productos =
-            new();
+        List<Producto> productos = new();
 
         ObservableCollection<VentaItem> carritoCentral = new();
+
+        private Dictionary<int, int> ventasPorProducto = new();
 
         // =========================================
         // CONSTRUCTOR
@@ -33,19 +32,17 @@ namespace FarmaciaPOS
         {
             InitializeComponent();
 
-            txtUsuarioSesion.Text =
-               Sesion.NombreUsuario;
-
-            txtCargoSesion.Text = 
-               Sesion.Rol;
+            txtUsuarioSesion.Text = Sesion.NombreUsuario;
+            txtCargoSesion.Text = Sesion.Rol;
 
             CargarProductos();
+            CargarVentasPorProducto();
 
             InicializarCarritoCentral();
 
             IniciarReloj();
 
-            CargarCategoriasCatalogo();  
+            CargarCategoriasCatalogo();
             CargarCatalogo();
 
             AplicarPermisosEnMenu();
@@ -80,7 +77,7 @@ namespace FarmaciaPOS
                 btnPedidos,
                 btnProductos,
                 btnInventario,
-                btnReportes,      
+                btnReportes,
                 btnConfiguracion,
                 btnCaja,
                 btnDevoluciones,
@@ -93,14 +90,12 @@ namespace FarmaciaPOS
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                // ✅ Productos, precios, stock, categorías y subcategorías
                 CargarProductos();
+                CargarVentasPorProducto();
                 CargarCategoriasCatalogo();
 
-                // ✅ Reaplica la categoría/subcategoría que el cajero tenía seleccionada
                 AplicarFiltroCatalogo();
 
-                // ✅ Refresca Nombre, Precio y Stock de los productos que ya están en el carrito
                 foreach (var item in carritoCentral)
                 {
                     var productoActual = productos.FirstOrDefault(p => p.Id == item.ProductoId);
@@ -112,7 +107,6 @@ namespace FarmaciaPOS
                     }
                 }
 
-                // ✅ Refresca el panel "Producto actual" si ese producto cambió
                 if (productoActualMostradoId.HasValue)
                 {
                     var productoMostrado = productos.FirstOrDefault(p => p.Id == productoActualMostradoId.Value);
@@ -123,18 +117,16 @@ namespace FarmaciaPOS
                     }
                 }
 
-                // ✅ Refresca permisos del menú (por si cambiaron el rol/permisos del usuario)
                 AplicarPermisosEnMenu();
 
                 ActualizarCarritoCentral();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     "No se pudo actualizar la información: " + ex.Message,
                     "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    this);
             }
             finally
             {
@@ -224,6 +216,47 @@ namespace FarmaciaPOS
         }
 
         // =========================================
+        // ✅ VENTAS POR PRODUCTO (para ordenar el catálogo por más vendidos)
+        // =========================================
+
+        private void CargarVentasPorProducto()
+        {
+            ventasPorProducto.Clear();
+
+            try
+            {
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                string query =
+                @"SELECT dv.ProductoId, SUM(dv.Cantidad) AS TotalVendido
+                  FROM DetalleVentas dv
+                  INNER JOIN Ventas v ON dv.VentaId = v.Id
+                  WHERE v.Estado = 'Completada'
+                  GROUP BY dv.ProductoId";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    int productoId = Convert.ToInt32(reader["ProductoId"]);
+                    int totalVendido = Convert.ToInt32(reader["TotalVendido"]);
+                    ventasPorProducto[productoId] = totalVendido;
+                }
+            }
+            catch
+            {
+                
+            }
+        }
+
+        private int VentasDe(Producto p) =>
+            ventasPorProducto.TryGetValue(p.Id, out int total) ? total : 0;
+
+        // =========================================
         // INICIALIZAR CARRITO CENTRAL
         // =========================================
 
@@ -267,15 +300,10 @@ namespace FarmaciaPOS
 
             if (producto == null)
             {
-                MessageBox.Show(
-                    "Producto no encontrado",
-                    "Aviso",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MensajeHelper.Advertencia("Producto no encontrado", "Aviso", this);
                 return;
             }
 
-            // ✅ Mostrar nombre e imagen del producto escaneado
             txtNombreProductoActual.Text = producto.Nombre;
             CargarImagenProductoActual(producto.ImagenBytes);
             productoActualMostradoId = producto.Id;
@@ -365,8 +393,7 @@ namespace FarmaciaPOS
 
             if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -384,17 +411,16 @@ namespace FarmaciaPOS
 
             if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
-            
+
             var producto = productos.FirstOrDefault(p => p.Id == seleccionado.ProductoId);
 
             if (producto == null)
             {
-                MessageBox.Show("No se encontró la información del producto");
+                MensajeHelper.Error("No se encontró la información del producto", "Error", this);
                 return;
             }
 
@@ -417,7 +443,7 @@ namespace FarmaciaPOS
 
             if (seleccionado == null)
             {
-                MessageBox.Show("Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -434,7 +460,6 @@ namespace FarmaciaPOS
             {
                 seleccionado.Precio = ventana.PrecioSeleccionado;
 
-                // ✅ Ajustar cantidad mínima según el tipo de precio elegido
                 switch (ventana.TipoPrecio)
                 {
                     case 2:
@@ -454,7 +479,6 @@ namespace FarmaciaPOS
                         break;
 
                     default:
-                        // Precio 1 — no cambia la cantidad
                         break;
                 }
 
@@ -472,8 +496,7 @@ namespace FarmaciaPOS
 
             if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "Selecciona un producto de la lista");
+                MensajeHelper.Advertencia("Selecciona un producto de la lista", "Aviso", this);
                 return;
             }
 
@@ -515,8 +538,6 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            // ✅ Siempre abre la lista, sin importar si el carrito tiene productos o no.
-            // Guardar la venta actual ahora es una acción explícita DENTRO de esa ventana.
             AbrirVentasEnEspera();
         }
 
@@ -535,7 +556,6 @@ namespace FarmaciaPOS
 
             bool? resultado = ventana.ShowDialog();
 
-            // ✅ Si dentro de la ventana se guardó la venta actual, limpiamos el carrito aquí
             if (ventana.VentaActualGuardada)
             {
                 carritoCentral.Clear();
@@ -561,8 +581,6 @@ namespace FarmaciaPOS
 
             ActualizarCarritoCentral();
 
-            // ✅ Muestra la imagen y nombre del último producto de la venta recuperada,
-            // igual que cuando agregas un producto normalmente
             if (venta.Items.Count > 0)
             {
                 var ultimoItem = venta.Items.Last();
@@ -576,11 +594,7 @@ namespace FarmaciaPOS
                 }
             }
 
-            MessageBox.Show(
-                $"Venta \"{venta.Referencia}\" recuperada",
-                "Venta recuperada",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            MensajeHelper.Exito($"Venta \"{venta.Referencia}\" recuperada", "Venta recuperada", this);
         }
         private void ActualizarBadgeEspera()
         {
@@ -605,8 +619,7 @@ namespace FarmaciaPOS
 
             if (seleccionado == null)
             {
-                MessageBox.Show(
-                    "Selecciona un producto para eliminar");
+                MensajeHelper.Advertencia("Selecciona un producto para eliminar", "Aviso", this);
                 return;
             }
 
@@ -625,11 +638,7 @@ namespace FarmaciaPOS
         {
             if (carritoCentral.Count == 0)
             {
-                MessageBox.Show(
-                    "No hay productos en el carrito",
-                    "Aviso",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MensajeHelper.Advertencia("No hay productos en el carrito", "Aviso", this);
                 return;
             }
 
@@ -649,8 +658,8 @@ namespace FarmaciaPOS
                 imgProductoActual.Source = null;
                 productoActualMostradoId = null;
 
-                // Refrescar catálogo y stock tras la venta
                 CargarProductos();
+                CargarVentasPorProducto();
                 AplicarFiltroCatalogo();
             }
         }
@@ -704,7 +713,7 @@ namespace FarmaciaPOS
             InventarioWindow inventario =
                 new InventarioWindow();
 
-            inventario.Show();
+            inventario.ShowDialog();
         }
 
         private void BtnReportes_Click(
@@ -720,15 +729,15 @@ namespace FarmaciaPOS
             ReportesWindow reporte =
                 new ReportesWindow();
 
-            reporte.Show();
+            reporte.ShowDialog();
         }
 
         private void BtnPedidos_Click(
             object sender,
             RoutedEventArgs e)
         {
-            if(!PermisosHelper.TieneAcceso("Pedidos"))
-    {
+            if (!PermisosHelper.TieneAcceso("Pedidos"))
+            {
                 PermisosHelper.MostrarAccesoDenegado();
                 return;
             }
@@ -752,7 +761,7 @@ namespace FarmaciaPOS
             ConfiguracionWindow configuracion
                 = new ConfiguracionWindow();
 
-            configuracion.Show();
+            configuracion.ShowDialog();
 
         }
 
@@ -800,14 +809,12 @@ namespace FarmaciaPOS
             object sender,
             RoutedEventArgs e)
         {
-            MessageBoxResult resultado =
-                MessageBox.Show(
-                    "¿Deseas cerrar sesión?",
-                    "Confirmar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+            bool confirmar = MensajeHelper.Confirmar(
+                "¿Deseas cerrar sesión?",
+                "Confirmar",
+                this);
 
-            if (resultado == MessageBoxResult.Yes)
+            if (confirmar)
             {
                 cierreConfirmadoPorBoton = true;
 
@@ -904,7 +911,6 @@ namespace FarmaciaPOS
         {
             pnlCategorias.Children.Clear();
 
-            // Botón "Todos"
             var btnTodos = new Button
             {
                 Content = "🏠 Todos",
@@ -919,7 +925,6 @@ namespace FarmaciaPOS
 
             conn.Open();
 
-            // 1. Cargar categorías
             var categorias = new List<(int Id, string Nombre)>();
             string queryCat = "SELECT * FROM Categorias ORDER BY Nombre";
             SqlCommand cmdCat = new SqlCommand(queryCat, conn);
@@ -933,7 +938,6 @@ namespace FarmaciaPOS
                 }
             }
 
-            // 2. Cargar subcategorías, agrupadas por CategoriaId
             var subcategoriasPorCategoria = new Dictionary<int, List<(int Id, string Nombre)>>();
             string querySub = "SELECT * FROM Subcategorias ORDER BY Nombre";
             SqlCommand cmdSub = new SqlCommand(querySub, conn);
@@ -952,7 +956,6 @@ namespace FarmaciaPOS
                 }
             }
 
-            // 3. Generar botones: cada categoría seguida de sus subcategorías (si tiene)
             foreach (var cat in categorias)
             {
                 var btnCat = new Button
@@ -986,16 +989,15 @@ namespace FarmaciaPOS
             var btn = sender as Button;
             var filtro = btn?.Tag as FiltroCatalogo;
 
-            filtroActivo = filtro ?? new FiltroCatalogo { Tipo = "Todos", Id = 0 }; 
+            filtroActivo = filtro ?? new FiltroCatalogo { Tipo = "Todos", Id = 0 };
 
-
-            AplicarFiltroCatalogo(); 
+            AplicarFiltroCatalogo();
         }
 
-        
+
+        // ✅ Ahora ordena por más vendidos (descendente), y por nombre como criterio secundario
         private void AplicarFiltroCatalogo()
         {
-            // Resaltar botón activo
             foreach (Button b in pnlCategorias.Children.OfType<Button>())
             {
                 var tagBtn = b.Tag as FiltroCatalogo;
@@ -1006,31 +1008,33 @@ namespace FarmaciaPOS
                 b.Style = (Style)FindResource(esActivo ? "BtnCategoriaActiva" : "BtnCategoria");
             }
 
-            if (filtroActivo.Tipo == "Todos")
+            IEnumerable<Producto> filtrados = productos;
+
+            if (filtroActivo.Tipo == "Categoria")
             {
-                icProductosCatalogo.ItemsSource = productos;
-            }
-            else if (filtroActivo.Tipo == "Categoria")
-            {
-                icProductosCatalogo.ItemsSource = productos
-                    .Where(p => p.CategoriaId == filtroActivo.Id)
-                    .ToList();
+                filtrados = productos.Where(p => p.CategoriaId == filtroActivo.Id);
             }
             else if (filtroActivo.Tipo == "Subcategoria")
             {
-                icProductosCatalogo.ItemsSource = productos
-                    .Where(p => p.SubcategoriaId == filtroActivo.Id)
-                    .ToList();
+                filtrados = productos.Where(p => p.SubcategoriaId == filtroActivo.Id);
             }
+
+            icProductosCatalogo.ItemsSource = filtrados
+                .OrderByDescending(p => VentasDe(p))
+                .ThenBy(p => p.Nombre)
+                .ToList();
         }
 
         // =========================================
-        // ✅ CARGAR CATÁLOGO DE PRODUCTOS
+        // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
         // =========================================
 
         private void CargarCatalogo()
         {
-            icProductosCatalogo.ItemsSource = productos;
+            icProductosCatalogo.ItemsSource = productos
+                .OrderByDescending(p => VentasDe(p))
+                .ThenBy(p => p.Nombre)
+                .ToList();
         }
 
         // =========================================
@@ -1050,7 +1054,7 @@ namespace FarmaciaPOS
             bool? resultado = ventana.ShowDialog();
 
             if (resultado != true)
-                return; // El usuario canceló
+                return;
 
             int cantidad = ventana.CantidadSeleccionada;
 
@@ -1074,7 +1078,6 @@ namespace FarmaciaPOS
                 });
             }
 
-            // ✅ Mostrar nombre e imagen del producto agregado
             txtNombreProductoActual.Text = producto.Nombre;
             CargarImagenProductoActual(producto.ImagenBytes);
             productoActualMostradoId = producto.Id;
@@ -1098,19 +1101,16 @@ namespace FarmaciaPOS
         {
             if (cierreConfirmadoPorBoton)
             {
-                // Ya se confirmó desde el botón "Salir" — no preguntar de nuevo
                 relojTimer?.Stop();
                 return;
             }
 
-            MessageBoxResult resultado =
-                MessageBox.Show(
-                    "¿Deseas cerrar sesión?",
-                    "Confirmar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+            bool confirmar = MensajeHelper.Confirmar(
+                "¿Deseas cerrar sesión?",
+                "Confirmar",
+                this);
 
-            if (resultado == MessageBoxResult.Yes)
+            if (confirmar)
             {
                 relojTimer?.Stop();
 

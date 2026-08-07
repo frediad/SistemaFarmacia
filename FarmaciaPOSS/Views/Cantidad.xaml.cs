@@ -35,10 +35,64 @@ namespace FarmaciaPOS.Views
 
         private void txtCantidad_KeyDown(object sender, KeyEventArgs e)
         {
+            // ✅ + del teclado numérico o del teclado normal (Shift + =)
+            if (e.Key == Key.Add || e.Key == Key.OemPlus)
+            {
+                IncrementarCantidad();
+                e.Handled = true;
+                return;
+            }
+
+            // ✅ - del teclado numérico o del teclado normal
+            if (e.Key == Key.Subtract || e.Key == Key.OemMinus)
+            {
+                DecrementarCantidad();
+                e.Handled = true;
+                return;
+            }
+
             if (e.Key == Key.Enter)
                 BtnAceptar_Click(sender, new RoutedEventArgs());
             else if (e.Key == Key.Escape)
                 BtnCancelar_Click(sender, new RoutedEventArgs());
+        }
+
+        // incrementa la cantidad respetando el stock disponible
+        private void IncrementarCantidad()
+        {
+            int cantidadActual = ObtenerCantidadActual();
+
+            if (cantidadActual >= _producto.Stock)
+            {
+                // Ya está en el máximo disponible; no sigue subiendo
+                return;
+            }
+
+            cantidadActual++;
+            ActualizarCampoCantidad(cantidadActual);
+        }
+
+        //  disminuye la cantidad sin bajar de 1
+        private void DecrementarCantidad()
+        {
+            int cantidadActual = ObtenerCantidadActual();
+
+            if (cantidadActual <= 1)
+                return;
+
+            cantidadActual--;
+            ActualizarCampoCantidad(cantidadActual);
+        }
+
+        private int ObtenerCantidadActual()
+        {
+            return int.TryParse(txtCantidad.Text, out int valor) && valor > 0 ? valor : 1;
+        }
+
+        private void ActualizarCampoCantidad(int nuevaCantidad)
+        {
+            txtCantidad.Text = nuevaCantidad.ToString();
+            txtCantidad.CaretIndex = txtCantidad.Text.Length; // cursor al final
         }
 
         private void BtnAceptar_Click(object sender, RoutedEventArgs e)

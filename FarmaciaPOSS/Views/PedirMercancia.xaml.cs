@@ -133,6 +133,7 @@ namespace FarmaciaPOS.Views
             {
                 itemsPedido.Add(new PedidoProveedorItem
                 {
+                    ProductoId = producto.Id,
                     Nombre = producto.Nombre,
                     Cantidad = 1,
                     CostoUnitario = producto.PrecioVenta
@@ -191,7 +192,6 @@ namespace FarmaciaPOS.Views
             string metodoPago = (cbMetodoPago.SelectedItem as ComboBoxItem)?
                 .Content.ToString() ?? "Transferencia";
 
-            // ✅ Construir asunto y cuerpo
             string asunto =
                 $"Pedido de mercancía — FarmaClick Yatzil ({DateTime.Now:dd/MM/yyyy})";
 
@@ -230,12 +230,12 @@ namespace FarmaciaPOS.Views
 
             try
             {
-                // ✅ Confirmar antes de abrir Gmail
                 var confirmar = MessageBox.Show(
                     $"Se abrirá Gmail en tu navegador con el pedido listo para enviar a:\n\n" +
                     $"📧 {proveedor.Correo}\n\n" +
                     $"Método de pago: {metodoPago}\n" +
                     $"Total estimado: {itemsPedido.Sum(x => x.Subtotal):C}\n\n" +
+                    "El pedido también quedará registrado como \"Pendiente de recibir\" en Inventario.\n\n" +
                     "¿Continuar?",
                     "Confirmar",
                     MessageBoxButton.YesNo,
@@ -244,13 +244,16 @@ namespace FarmaciaPOS.Views
                 if (confirmar != MessageBoxResult.Yes)
                     return;
 
+                // ✅ Registra el pedido en BD como "Enviado", antes de abrir Gmail
+                GuardarPedidoEnBD(proveedor.Id, metodoPago);
+
                 CorreoHelper.AbrirCorreoPedido(
                     proveedor.Correo,
                     asunto,
                     cuerpo.ToString());
 
                 MessageBox.Show(
-                    "✅ Se abrió Gmail en tu navegador.\n" +
+                    "✅ Se abrió Gmail en tu navegador y el pedido quedó registrado.\n" +
                     "Revisa que el contenido sea correcto y presiona Enviar.",
                     "Gmail abierto",
                     MessageBoxButton.OK,
@@ -262,10 +265,64 @@ namespace FarmaciaPOS.Views
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Error al abrir Gmail:\n{ex.Message}",
+                    $"Error al procesar el pedido:\n{ex.Message}",
                     "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+            }
+        }
+
+        // ✅ NUEVO — guarda el pedido y su detalle, con Estado = 'Enviado'
+        private void GuardarPedidoEnBD(int proveedorId, string metodoPago)
+        {
+            using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
+            conn.Open();
+
+            SqlTransaction trans = conn.BeginTransaction();
+
+            try
+            {
+                decimal total = itemsPedido.Sum(x => x.Subtotal);
+
+                string queryPedido =
+                @"INSERT INTO PedidosProveedor
+                (ProveedorId, Fecha, Estado, MetodoPago, Total, UsuarioId)
+                VALUES
+                (@ProveedorId, @Fecha, 'Enviado', @MetodoPago, @Total, @UsuarioId);
+                SELECT SCOPE_IDENTITY();";
+
+                SqlCommand cmdPedido = new SqlCommand(queryPedido, conn, trans);
+                cmdPedido.Parameters.AddWithValue("@ProveedorId", proveedorId);
+                cmdPedido.Parameters.AddWithValue("@Fecha", DateTime.Now);
+                cmdPedido.Parameters.AddWithValue("@MetodoPago", metodoPago);
+                cmdPedido.Parameters.AddWithValue("@Total", total);
+                cmdPedido.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+
+                int pedidoId = Convert.ToInt32(cmdPedido.ExecuteScalar());
+
+                foreach (var item in itemsPedido)
+                {
+                    string queryDetalle =
+                    @"INSERT INTO DetallePedidoProveedor
+                    (PedidoProveedorId, ProductoId, Cantidad, CostoUnitario, Subtotal)
+                    VALUES
+                    (@PedidoProveedorId, @ProductoId, @Cantidad, @CostoUnitario, @Subtotal)";
+
+                    SqlCommand cmdDetalle = new SqlCommand(queryDetalle, conn, trans);
+                    cmdDetalle.Parameters.AddWithValue("@PedidoProveedorId", pedidoId);
+                    cmdDetalle.Parameters.AddWithValue("@ProductoId", item.ProductoId);
+                    cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+                    cmdDetalle.Parameters.AddWithValue("@CostoUnitario", item.CostoUnitario);
+                    cmdDetalle.Parameters.AddWithValue("@Subtotal", item.Subtotal);
+                    cmdDetalle.ExecuteNonQuery();
+                }
+
+                trans.Commit();
+            }
+            catch
+            {
+                trans.Rollback();
+                throw;
             }
         }
     }

@@ -13,8 +13,8 @@ namespace FarmaciaPOS.Views
     public partial class UsuariosWindow : Window
     {
         int usuarioId = 0;
+        bool passwordVisible = false;
 
-        // ✅ Lista fija de módulos del sistema
         readonly List<string> modulosDisponibles = new()
         {
             "Ventas",
@@ -29,12 +29,9 @@ namespace FarmaciaPOS.Views
             "FarmaciaConfi",
             "Devoluciones",
             "Clientes",
-
-
         };
 
         ObservableCollection<ModuloPermiso> listaModulos = new();
-      
 
         public UsuariosWindow()
         {
@@ -71,29 +68,60 @@ namespace FarmaciaPOS.Views
 
         private void CargarRoles()
         {
-            List<Rol> lista = new();
-
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query = "SELECT * FROM Roles";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                lista.Add(new Rol
-                {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    Nombre = reader["Nombre"].ToString() ?? "",
-                    Descripcion = reader["Descripcion"].ToString() ?? ""
-                });
-            }
+                int? seleccionAnterior = cbRoles.SelectedValue as int?;
 
-            cbRoles.ItemsSource = lista;
+                List<Rol> lista = new();
+
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                string query = "SELECT * FROM Roles ORDER BY Nombre";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    lista.Add(new Rol
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Nombre = reader["Nombre"].ToString() ?? "",
+                        Descripcion = reader["Descripcion"].ToString() ?? ""
+                    });
+                }
+
+                cbRoles.ItemsSource = lista;
+
+                if (seleccionAnterior.HasValue)
+                    cbRoles.SelectedValue = seleccionAnterior.Value;
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudieron cargar los roles: " + ex.Message, "Error", this);
+            }
+        }
+
+        // =========================================
+        // ✅ GESTIONAR ROLES (agregar/editar/eliminar)
+        // =========================================
+
+        private void BtnGestionarRoles_Click(object sender, RoutedEventArgs e)
+        {
+            var ventana = new GestionRolesWindow
+            {
+                Owner = this
+            };
+
+            ventana.ShowDialog();
+
+            if (ventana.HuboCambios)
+            {
+                CargarRoles();
+            }
         }
 
         // =========================================
@@ -102,43 +130,50 @@ namespace FarmaciaPOS.Views
 
         private void CargarUsuarios()
         {
-            List<Usuario> lista = new();
-
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT u.*, r.Nombre AS NombreRol
-              FROM Usuarios u
-              INNER JOIN Roles r ON u.RolId = r.Id
-              WHERE u.Activo = 1
-              ORDER BY u.Nombre";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                lista.Add(new Usuario
-                {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    Nombre = reader["Nombre"].ToString() ?? "",
-                    Apellido = reader["Apellido"].ToString() ?? "",
-                    UsuarioLogin = reader["UsuarioLogin"].ToString() ?? "",
-                    Correo = reader["Correo"].ToString() ?? "",
-                    Telefono = reader["Telefono"].ToString() ?? "",
-                    RolId = Convert.ToInt32(reader["RolId"]),
-                    Activo = Convert.ToBoolean(reader["Activo"]),
-                    Rol = new Rol
-                    {
-                        Nombre = reader["NombreRol"].ToString() ?? ""
-                    }
-                });
-            }
+                List<Usuario> lista = new();
 
-            dgUsuarios.ItemsSource = lista;
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                string query =
+                @"SELECT u.*, r.Nombre AS NombreRol
+                  FROM Usuarios u
+                  INNER JOIN Roles r ON u.RolId = r.Id
+                  WHERE u.Activo = 1
+                  ORDER BY u.Nombre";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    lista.Add(new Usuario
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Nombre = reader["Nombre"].ToString() ?? "",
+                        Apellido = reader["Apellido"].ToString() ?? "",
+                        UsuarioLogin = reader["UsuarioLogin"].ToString() ?? "",
+                        Correo = reader["Correo"].ToString() ?? "",
+                        Telefono = reader["Telefono"].ToString() ?? "",
+                        RolId = Convert.ToInt32(reader["RolId"]),
+                        Activo = Convert.ToBoolean(reader["Activo"]),
+                        Rol = new Rol
+                        {
+                            Nombre = reader["NombreRol"].ToString() ?? ""
+                        }
+                    });
+                }
+
+                dgUsuarios.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudieron cargar los usuarios: " + ex.Message, "Error", this);
+            }
         }
 
         // =========================================
@@ -158,9 +193,10 @@ namespace FarmaciaPOS.Views
                 txtUsuarioLogin.Text = usuario.UsuarioLogin;
                 txtCorreo.Text = usuario.Correo;
                 txtTelefono.Text = usuario.Telefono;
-                txtPassword.Password = "";
 
-                // ✅ Mostrar el placeholder indicando que ya hay contraseña
+                txtPassword.Password = "";
+                txtPasswordVisible.Text = "";
+
                 txtPlaceholderPassword.Visibility = Visibility.Visible;
 
                 cbRoles.SelectedValue = usuario.RolId;
@@ -172,42 +208,49 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ CARGAR PERMISOS DEL USUARIO SELECCIONADO
+        // CARGAR PERMISOS DEL USUARIO SELECCIONADO
         // =========================================
 
         private void CargarPermisosUsuario(int idUsuario)
         {
             InicializarModulos();
 
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT NombreModulo, TieneAcceso
-              FROM PermisosUsuario
-              WHERE UsuarioId = @UsuarioId";
-
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@UsuarioId", idUsuario);
-
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            var permisosGuardados = new Dictionary<string, bool>();
-
-            while (reader.Read())
+            try
             {
-                permisosGuardados[reader["NombreModulo"].ToString() ?? ""] =
-                    Convert.ToBoolean(reader["TieneAcceso"]);
-            }
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
 
-            foreach (var modulo in listaModulos)
-            {
-                if (permisosGuardados.ContainsKey(modulo.NombreModulo))
+                conn.Open();
+
+                string query =
+                @"SELECT NombreModulo, TieneAcceso
+                  FROM PermisosUsuario
+                  WHERE UsuarioId = @UsuarioId";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UsuarioId", idUsuario);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                var permisosGuardados = new Dictionary<string, bool>();
+
+                while (reader.Read())
                 {
-                    modulo.TieneAcceso = permisosGuardados[modulo.NombreModulo];
+                    permisosGuardados[reader["NombreModulo"].ToString() ?? ""] =
+                        Convert.ToBoolean(reader["TieneAcceso"]);
                 }
+
+                foreach (var modulo in listaModulos)
+                {
+                    if (permisosGuardados.ContainsKey(modulo.NombreModulo))
+                    {
+                        modulo.TieneAcceso = permisosGuardados[modulo.NombreModulo];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudieron cargar los permisos: " + ex.Message, "Error", this);
             }
         }
 
@@ -229,7 +272,9 @@ namespace FarmaciaPOS.Views
             txtUsuarioLogin.Clear();
             txtCorreo.Clear();
             txtTelefono.Clear();
+
             txtPassword.Password = "";
+            txtPasswordVisible.Text = "";
 
             txtPlaceholderPassword.Visibility = Visibility.Collapsed;
 
@@ -237,113 +282,233 @@ namespace FarmaciaPOS.Views
 
             chkActivo.IsChecked = true;
 
+            dgUsuarios.SelectedIndex = -1;
+
             InicializarModulos();
         }
 
         // =========================================
-        // GUARDAR USUARIO + PERMISOS
+        // ✅ VALIDACIÓN COMPARTIDA
+        // =========================================
+
+        private bool ValidarFormulario(bool esUsuarioNuevo)
+        {
+            if (string.IsNullOrWhiteSpace(txtUsuarioLogin.Text))
+            {
+                MensajeHelper.Advertencia("Rellena todos los campos, por favor", "Aviso", this);
+                return false;
+            }
+
+            if (cbRoles.SelectedValue == null)
+            {
+                MensajeHelper.Advertencia("Selecciona un rol", "Aviso", this);
+                return false;
+            }
+
+            if (esUsuarioNuevo && string.IsNullOrWhiteSpace(ObtenerPasswordActual()))
+            {
+                MensajeHelper.Advertencia("La contraseña es obligatoria para un usuario nuevo", "Aviso", this);
+                return false;
+            }
+
+            return true;
+        }
+
+        // ✅ Obtiene la contraseña sin importar si está visible u oculta en ese momento
+        private string ObtenerPasswordActual()
+        {
+            return passwordVisible ? txtPasswordVisible.Text : txtPassword.Password;
+        }
+
+        // =========================================
+        // ✅ GUARDAR — SOLO PARA USUARIOS NUEVOS
         // =========================================
 
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
+            if (usuarioId != 0)
+            {
+                MensajeHelper.Advertencia(
+                    "Ya tienes un usuario seleccionado. Usa \"Actualizar\" para modificarlo, o \"Nuevo\" para crear otro.",
+                    "Aviso",
+                    this);
+                return;
+            }
+
+            if (!ValidarFormulario(esUsuarioNuevo: true))
+                return;
+
             try
             {
-                if (string.IsNullOrWhiteSpace(txtUsuarioLogin.Text))
-                {
-                    MessageBox.Show("Rellena todos los campos, por favor");
-                    return;
-                }
-
-                if (cbRoles.SelectedValue == null)
-                {
-                    MessageBox.Show("Selecciona un rol");
-                    return;
-                }
-
-                if (usuarioId == 0 && string.IsNullOrWhiteSpace(txtPassword.Password))
-                {
-                    MessageBox.Show("La contraseña es obligatoria para un usuario nuevo");
-                    return;
-                }
-
                 using SqlConnection conn =
                     new SqlConnection(DatabaseHelper.ConnectionString);
 
                 conn.Open();
 
-                string query;
+                // ✅ Verifica que no exista ya un usuario con el mismo login o correo
+                if (ExisteUsuarioDuplicado(conn, idExcluir: 0))
+                    return;
 
-                if (usuarioId == 0)
-                {
-                    query =
-                    @"INSERT INTO Usuarios
-                    (Nombre, Apellido, UsuarioLogin, Correo, PasswordHash, Telefono, RolId, Activo, FechaCreacion)
-                    VALUES
-                    (@Nombre, @Apellido, @UsuarioLogin, @Correo, @PasswordHash, @Telefono, @RolId, @Activo, GETDATE());
-                    SELECT SCOPE_IDENTITY();";
-                }
-                else
-                {
-                    query =
-                    @"UPDATE Usuarios SET
-                        Nombre = @Nombre,
-                        Apellido = @Apellido,
-                        UsuarioLogin = @UsuarioLogin,
-                        Correo = @Correo,
-                        Telefono = @Telefono,
-                        RolId = @RolId,
-                        Activo = @Activo";
-
-                    if (!string.IsNullOrWhiteSpace(txtPassword.Password))
-                    {
-                        query += ", PasswordHash = @PasswordHash";
-                    }
-
-                    query += " WHERE Id = @Id";
-                }
+                string query =
+                @"INSERT INTO Usuarios
+                (Nombre, Apellido, UsuarioLogin, Correo, PasswordHash, Telefono, RolId, Activo, FechaCreacion)
+                VALUES
+                (@Nombre, @Apellido, @UsuarioLogin, @Correo, @PasswordHash, @Telefono, @RolId, @Activo, GETDATE());
+                SELECT SCOPE_IDENTITY();";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
                 cmd.Parameters.AddWithValue("@Nombre", txtNombre.Text);
                 cmd.Parameters.AddWithValue("@Apellido", txtApellido.Text);
-                cmd.Parameters.AddWithValue("@UsuarioLogin", txtUsuarioLogin.Text);
-                cmd.Parameters.AddWithValue("@Correo", txtCorreo.Text);
+                cmd.Parameters.AddWithValue("@UsuarioLogin", txtUsuarioLogin.Text.Trim());
+                cmd.Parameters.AddWithValue("@Correo", txtCorreo.Text.Trim());
                 cmd.Parameters.AddWithValue("@Telefono", txtTelefono.Text);
                 cmd.Parameters.AddWithValue("@RolId", cbRoles.SelectedValue);
                 cmd.Parameters.AddWithValue("@Activo", chkActivo.IsChecked ?? true);
+                cmd.Parameters.AddWithValue("@PasswordHash", PasswordHelper.Hashear(ObtenerPasswordActual()));
 
-                if (usuarioId == 0 || !string.IsNullOrWhiteSpace(txtPassword.Password))
-                {
-                    string hash = HashPassword(txtPassword.Password);
-                    cmd.Parameters.AddWithValue("@PasswordHash", hash);
-                }
+                var resultado = cmd.ExecuteScalar();
+                usuarioId = Convert.ToInt32(resultado);
 
-                if (usuarioId != 0)
-                {
-                    cmd.Parameters.AddWithValue("@Id", usuarioId);
-                    cmd.ExecuteNonQuery();
-                }
-                else
-                {
-                    var resultado = cmd.ExecuteScalar();
-                    usuarioId = Convert.ToInt32(resultado);
-                }
-
-                // ✅ Guardar permisos
                 GuardarPermisos(usuarioId);
 
-                MessageBox.Show("Usuario guardado correctamente");
+                MensajeHelper.Exito("Usuario creado correctamente", "Listo", this);
 
                 CargarUsuarios();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "ERROR", this);
             }
         }
 
         // =========================================
-        // ✅ GUARDAR PERMISOS (borra e inserta de nuevo)
+        // ✅ ACTUALIZAR — SOLO PARA USUARIOS EXISTENTES
+        // =========================================
+
+        private void BtnActualizar_Click(object sender, RoutedEventArgs e)
+        {
+            if (usuarioId == 0)
+            {
+                MensajeHelper.Advertencia("Selecciona un usuario de la lista para actualizar", "Aviso", this);
+                return;
+            }
+
+            if (!ValidarFormulario(esUsuarioNuevo: false))
+                return;
+
+            try
+            {
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
+
+                conn.Open();
+
+                // ✅ Verifica duplicados, excluyendo al usuario que se está editando
+                if (ExisteUsuarioDuplicado(conn, idExcluir: usuarioId))
+                    return;
+
+                string query =
+                @"UPDATE Usuarios SET
+                Nombre = @Nombre,
+                Apellido = @Apellido,
+                UsuarioLogin = @UsuarioLogin,
+                Correo = @Correo,
+                Telefono = @Telefono,
+                RolId = @RolId,
+                Activo = @Activo";
+
+                string passwordActual = ObtenerPasswordActual();
+                bool cambioPassword = !string.IsNullOrWhiteSpace(passwordActual);
+
+                if (cambioPassword)
+                {
+                    query += ", PasswordHash = @PasswordHash";
+                }
+
+                query += " WHERE Id = @Id";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+
+                cmd.Parameters.AddWithValue("@Nombre", txtNombre.Text);
+                cmd.Parameters.AddWithValue("@Apellido", txtApellido.Text);
+                cmd.Parameters.AddWithValue("@UsuarioLogin", txtUsuarioLogin.Text.Trim());
+                cmd.Parameters.AddWithValue("@Correo", txtCorreo.Text.Trim());
+                cmd.Parameters.AddWithValue("@Telefono", txtTelefono.Text);
+                cmd.Parameters.AddWithValue("@RolId", cbRoles.SelectedValue);
+                cmd.Parameters.AddWithValue("@Activo", chkActivo.IsChecked ?? true);
+                cmd.Parameters.AddWithValue("@Id", usuarioId);
+
+                if (cambioPassword)
+                {
+                    cmd.Parameters.AddWithValue("@PasswordHash", PasswordHelper.Hashear(passwordActual));
+                }
+
+                cmd.ExecuteNonQuery();
+
+                GuardarPermisos(usuarioId);
+
+                MensajeHelper.Exito("Usuario actualizado correctamente", "Listo", this);
+
+                CargarUsuarios();
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error(ex.Message, "ERROR", this);
+            }
+        }
+
+        // =========================================
+        // VERIFICAR DUPLICADOS (LOGIN O CORREO)
+        // =========================================
+
+        private bool ExisteUsuarioDuplicado(SqlConnection conn, int idExcluir)
+        {
+            string login = txtUsuarioLogin.Text.Trim();
+            string correo = txtCorreo.Text.Trim();
+
+            string queryLogin =
+            @"SELECT COUNT(*) FROM Usuarios
+            WHERE UsuarioLogin = @UsuarioLogin AND Id <> @IdExcluir";
+
+            SqlCommand cmdLogin = new SqlCommand(queryLogin, conn);
+            cmdLogin.Parameters.AddWithValue("@UsuarioLogin", login);
+            cmdLogin.Parameters.AddWithValue("@IdExcluir", idExcluir);
+
+            if (Convert.ToInt32(cmdLogin.ExecuteScalar()) > 0)
+            {
+                MensajeHelper.Advertencia(
+                    $"Ya existe un usuario con el nombre de usuario \"{login}\". Elige otro.",
+                    "Usuario duplicado",
+                    this);
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(correo))
+            {
+                string queryCorreo =
+                @"SELECT COUNT(*) FROM Usuarios
+                WHERE Correo = @Correo AND Id <> @IdExcluir";
+
+                SqlCommand cmdCorreo = new SqlCommand(queryCorreo, conn);
+                cmdCorreo.Parameters.AddWithValue("@Correo", correo);
+                cmdCorreo.Parameters.AddWithValue("@IdExcluir", idExcluir);
+
+                if (Convert.ToInt32(cmdCorreo.ExecuteScalar()) > 0)
+                {
+                    MensajeHelper.Advertencia(
+                        $"Ya existe un usuario con el correo \"{correo}\". Elige otro.",
+                        "Correo duplicado",
+                        this);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // =========================================
+        // GUARDAR PERMISOS
         // =========================================
 
         private void GuardarPermisos(int idUsuario)
@@ -383,9 +548,17 @@ namespace FarmaciaPOS.Views
             {
                 if (usuarioId == 0)
                 {
-                    MessageBox.Show("Selecciona un usuario");
+                    MensajeHelper.Advertencia("Selecciona un usuario", "Aviso", this);
                     return;
                 }
+
+                bool confirmar = MensajeHelper.Confirmar(
+                    "¿Eliminar este usuario? Podrás reactivarlo más adelante si es necesario.",
+                    "Confirmar",
+                    this);
+
+                if (!confirmar)
+                    return;
 
                 using SqlConnection conn =
                     new SqlConnection(DatabaseHelper.ConnectionString);
@@ -397,15 +570,15 @@ namespace FarmaciaPOS.Views
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Id", usuarioId);
 
-                int filasAfectadas = cmd.ExecuteNonQuery(); 
+                int filasAfectadas = cmd.ExecuteNonQuery();
 
                 if (filasAfectadas > 0)
                 {
-                    MessageBox.Show("Usuario eliminado correctamente");
+                    MensajeHelper.Exito("Usuario eliminado correctamente", "Listo", this);
                 }
                 else
                 {
-                    MessageBox.Show("No se encontró el usuario a eliminar");
+                    MensajeHelper.Advertencia("No se encontró el usuario a eliminar", "Aviso", this);
                 }
 
                 Limpiar();
@@ -413,34 +586,70 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MensajeHelper.Error(ex.Message, "Error", this);
+            }
+        }
+
+        // =========================================
+        // ✅ MOSTRAR/OCULTAR CONTRASEÑA
+        // =========================================
+
+        private void BtnTogglePassword_Click(object sender, RoutedEventArgs e)
+        {
+            passwordVisible = !passwordVisible;
+
+            if (passwordVisible)
+            {
+                // Pasa el valor actual del PasswordBox al TextBox visible
+                txtPasswordVisible.Text = txtPassword.Password;
+
+                txtPassword.Visibility = Visibility.Collapsed;
+                txtPasswordVisible.Visibility = Visibility.Visible;
+
+                btnTogglePassword.Content = "🙈";
+
+                if (!string.IsNullOrEmpty(txtPasswordVisible.Text))
+                    txtPlaceholderPassword.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                // Pasa el valor actual del TextBox de vuelta al PasswordBox
+                txtPassword.Password = txtPasswordVisible.Text;
+
+                txtPasswordVisible.Visibility = Visibility.Collapsed;
+                txtPassword.Visibility = Visibility.Visible;
+
+                btnTogglePassword.Content = "👁";
+
+                if (!string.IsNullOrEmpty(txtPassword.Password))
+                    txtPlaceholderPassword.Visibility = Visibility.Collapsed;
             }
         }
 
         private void TxtPassword_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            // Si el usuario empieza a escribir, ocultamos el placeholder
             if (!string.IsNullOrEmpty(txtPassword.Password))
             {
                 txtPlaceholderPassword.Visibility = Visibility.Collapsed;
             }
             else if (usuarioId != 0)
             {
-                // Si lo borra todo y es un usuario existente, mostramos el placeholder de nuevo
                 txtPlaceholderPassword.Visibility = Visibility.Visible;
             }
         }
 
-        // =========================================
-        // HASH DE CONTRASEÑA (SHA256)
-        // =========================================
-
-        private string HashPassword(string password)
+        private void TxtPasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
         {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
+            if (!string.IsNullOrEmpty(txtPasswordVisible.Text))
+            {
+                txtPlaceholderPassword.Visibility = Visibility.Collapsed;
+            }
+            else if (usuarioId != 0)
+            {
+                txtPlaceholderPassword.Visibility = Visibility.Visible;
+            }
         }
+
 
         private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
         {

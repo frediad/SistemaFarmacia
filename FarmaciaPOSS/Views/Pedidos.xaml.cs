@@ -147,6 +147,8 @@ namespace FarmaciaPOS.Views
                 txtDetalleTotalPedido.Text = pedido.Total.ToString("C");
 
                 CargarDetallePedido(pedido.Id);
+
+                ActualizarBotonesEstado(pedido);
             }
         }
 
@@ -220,6 +222,17 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
+            // ✅ Bloquea cualquier cambio si el pedido ya está en un estado final
+            if (pedidoSeleccionado.EstadoPedido == "Entregado" ||
+                pedidoSeleccionado.EstadoPedido == "Cancelado")
+            {
+                MensajeHelper.Advertencia(
+                    $"Este pedido ya está \"{pedidoSeleccionado.EstadoPedido}\" y no se puede modificar.",
+                    "Pedido finalizado",
+                    this);
+                return;
+            }
+
             string nuevoEstado = (sender as Button)?.Tag?.ToString() ?? "";
 
             if (string.IsNullOrEmpty(nuevoEstado))
@@ -265,7 +278,6 @@ namespace FarmaciaPOS.Views
                         this);
                 }
 
-                // ✅ Recargar preservando filtro actual — ahora sí refresca visualmente
                 string estadoFiltro = (cbEstado.SelectedItem as ComboBoxItem)?
                     .Content.ToString() ?? "";
 
@@ -273,20 +285,45 @@ namespace FarmaciaPOS.Views
 
                 CargarPedidos(estadoFiltro);
 
-                // ✅ Reselecciona el mismo pedido si sigue visible tras el filtro,
-                // para que el panel de detalle también se refresque solo
                 var pedidoActualizado = listaTodosLosPedidos
                     .FirstOrDefault(p => p.Id == idPedidoActual);
 
                 if (pedidoActualizado != null)
                 {
                     dgPedidos.SelectedItem = pedidoActualizado;
+                    ActualizarBotonesEstado(pedidoActualizado); // ✅  refresca botones tras cambiar de "Preparando" a "Entregado", etc.
                 }
             }
             catch (Exception ex)
             {
                 MensajeHelper.Error(ex.Message, "ERROR", this);
             }
+        }
+
+        // =========================================
+        // ✅ HABILITAR/DESHABILITAR BOTONES SEGÚN ESTADO
+        // =========================================
+
+        private void ActualizarBotonesEstado(PedidoView pedido)
+        {
+            bool esEstadoFinal = pedido.EstadoPedido == "Entregado" || pedido.EstadoPedido == "Cancelado";
+
+            btnEstadoPendiente.IsEnabled = !esEstadoFinal;
+            btnEstadoPreparando.IsEnabled = !esEstadoFinal;
+            btnEstadoListoRecoger.IsEnabled = !esEstadoFinal;
+            btnEstadoEntregado.IsEnabled = !esEstadoFinal;
+            btnEstadoCancelado.IsEnabled = !esEstadoFinal;
+
+            // Atenúa visualmente los botones deshabilitados
+            double opacidad = esEstadoFinal ? 0.4 : 1.0;
+
+            btnEstadoPendiente.Opacity = opacidad;
+            btnEstadoPreparando.Opacity = opacidad;
+            btnEstadoListoRecoger.Opacity = opacidad;
+            btnEstadoEntregado.Opacity = opacidad;
+            btnEstadoCancelado.Opacity = opacidad;
+
+            txtPedidoFinalizado.Visibility = esEstadoFinal ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // =========================================
@@ -299,6 +336,8 @@ namespace FarmaciaPOS.Views
             string cuerpo = "";
             string emoji = "";
 
+            const string LINEA = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
             switch (estado)
             {
                 case "Pendiente":
@@ -307,14 +346,17 @@ namespace FarmaciaPOS.Views
                         $"Tu pedido #{pedido.NumeroPedido} ha sido recibido — FarmaClick Yatzil";
                     cuerpo =
                         $"Estimado(a) {pedido.ClienteNombre},\n\n" +
-                        $"Hemos recibido tu pedido #{pedido.NumeroPedido} " +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: PENDIENTE\n" +
+                        $"{LINEA}\n\n" +
+                        $"Hemos recibido tu pedido #{pedido.NumeroPedido},\n" +
                         $"realizado el {pedido.FechaPedido:dd/MM/yyyy}.\n\n" +
-                        $"📋 Estado actual: PENDIENTE\n\n" +
-                        $"Tu pedido está en nuestra lista de espera y pronto " +
+                        $"Tu pedido está en nuestra lista de espera y pronto\n" +
                         $"comenzaremos a prepararlo.\n\n" +
-                        $"💰 Total: {pedido.Total:C}\n\n" +
+                        $"    💰  Total: {pedido.Total:C}\n\n" +
                         $"Te notificaremos cuando tu pedido esté en preparación.\n\n" +
                         $"Gracias por tu preferencia.\n\n" +
+                        $"{LINEA}\n" +
                         $"Atentamente,\n" +
                         $"FarmaClick Yatzil";
                     break;
@@ -325,13 +367,16 @@ namespace FarmaciaPOS.Views
                         $"Tu pedido #{pedido.NumeroPedido} está siendo preparado — FarmaClick Yatzil";
                     cuerpo =
                         $"Estimado(a) {pedido.ClienteNombre},\n\n" +
-                        $"¡Buenas noticias! Tu pedido #{pedido.NumeroPedido} " +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: EN PREPARACIÓN\n" +
+                        $"{LINEA}\n\n" +
+                        $"¡Buenas noticias! Tu pedido #{pedido.NumeroPedido}\n" +
                         $"ya está siendo preparado por nuestro equipo.\n\n" +
-                        $"📋 Estado actual: EN PREPARACIÓN\n\n" +
-                        $"💰 Total: {pedido.Total:C}\n\n" +
-                        $"Te avisaremos en cuanto esté listo para que " +
+                        $"    💰  Total: {pedido.Total:C}\n\n" +
+                        $"Te avisaremos en cuanto esté listo para que\n" +
                         $"puedas pasar a recogerlo.\n\n" +
                         $"Gracias por tu paciencia.\n\n" +
+                        $"{LINEA}\n" +
                         $"Atentamente,\n" +
                         $"FarmaClick Yatzil";
                     break;
@@ -342,17 +387,44 @@ namespace FarmaciaPOS.Views
                         $"Tu pedido #{pedido.NumeroPedido} está listo para recoger — FarmaClick Yatzil";
                     cuerpo =
                         $"Estimado(a) {pedido.ClienteNombre},\n\n" +
-                        $"¡Tu pedido #{pedido.NumeroPedido} está listo! " +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: LISTO PARA RECOGER\n" +
+                        $"{LINEA}\n\n" +
+                        $"¡Tu pedido #{pedido.NumeroPedido} está listo!\n" +
                         $"Ya puedes pasar a recogerlo.\n\n" +
-                        $"📋 Estado actual: LISTO PARA RECOGER\n\n" +
-                        $"💰 Total a pagar: {pedido.Total:C}\n\n" +
+                        $"    💰  Total a pagar: {pedido.Total:C}\n" +
                         (string.IsNullOrEmpty(pedido.HoraRecogida)
                             ? ""
-                            : $"🕐 Hora de recogida acordada: {pedido.HoraRecogida}\n\n") +
+                            : $"    🕐  Hora acordada: {pedido.HoraRecogida}\n") +
                         (string.IsNullOrEmpty(pedido.Observaciones)
                             ? ""
-                            : $"📝 Observaciones: {pedido.Observaciones}\n\n") +
-                        $"Te esperamos en FarmaClick Yatzil.\n\n" +
+                            : $"    📝  Observaciones: {pedido.Observaciones}\n") +
+                        $"\nTe esperamos en FarmaClick Yatzil.\n\n" +
+                        $"{LINEA}\n" +
+                        $"Atentamente,\n" +
+                        $"FarmaClick Yatzil";
+                    break;
+
+                case "Listo para recoger":
+                    emoji = "📦";
+                    asunto =
+                        $"Tu pedido #{pedido.NumeroPedido} está listo para recoger — FarmaClick Yatzil";
+                    cuerpo =
+                        $"Estimado(a) {pedido.ClienteNombre},\n\n" +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: LISTO PARA RECOGER\n" +
+                        $"{LINEA}\n\n" +
+                        $"¡Tu pedido #{pedido.NumeroPedido} ya está listo!\n" +
+                        $"Puedes pasar a recogerlo en nuestra farmacia.\n\n" +
+                        $"    💰  Total a pagar: {pedido.Total:C}\n" +
+                        (string.IsNullOrEmpty(pedido.HoraRecogida)
+                            ? ""
+                            : $"    🕐  Hora acordada: {pedido.HoraRecogida}\n") +
+                        (string.IsNullOrEmpty(pedido.Observaciones)
+                            ? ""
+                            : $"    📝  Observaciones: {pedido.Observaciones}\n") +
+                        $"\nTe esperamos en FarmaClick Yatzil.\n\n" +
+                        $"{LINEA}\n" +
                         $"Atentamente,\n" +
                         $"FarmaClick Yatzil";
                     break;
@@ -363,12 +435,15 @@ namespace FarmaciaPOS.Views
                         $"Tu pedido #{pedido.NumeroPedido} ha sido cancelado — FarmaClick Yatzil";
                     cuerpo =
                         $"Estimado(a) {pedido.ClienteNombre},\n\n" +
-                        $"Te informamos que tu pedido #{pedido.NumeroPedido} " +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: CANCELADO\n" +
+                        $"{LINEA}\n\n" +
+                        $"Te informamos que tu pedido #{pedido.NumeroPedido}\n" +
                         $"ha sido cancelado.\n\n" +
-                        $"📋 Estado actual: CANCELADO\n\n" +
-                        $"Si tienes alguna duda o deseas hacer un nuevo pedido, " +
+                        $"Si tienes alguna duda o deseas hacer un nuevo pedido,\n" +
                         $"no dudes en contactarnos.\n\n" +
                         $"Disculpa los inconvenientes.\n\n" +
+                        $"{LINEA}\n" +
                         $"Atentamente,\n" +
                         $"FarmaClick Yatzil";
                     break;

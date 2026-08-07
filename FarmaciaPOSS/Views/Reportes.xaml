@@ -3,9 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Reportes"
         Height="700"
-        Width="1100"
+        Width="1150"
+        Icon="/logo-icono.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
+
+    <Window.Resources>
+
+        <Style x:Key="DpRango" TargetType="DatePicker">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Width" Value="130"/>
+        </Style>
+
+        <Style x:Key="BtnAplicarRango" TargetType="Button">
+            <Setter Property="Background" Value="#7C3AED"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
 
     <Grid Margin="20">
 
@@ -27,6 +56,7 @@
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="180"/>
                     <ColumnDefinition Width="110"/>
                 </Grid.ColumnDefinitions>
@@ -37,7 +67,32 @@
                            Foreground="White"
                            VerticalAlignment="Center"/>
 
-                <Button Grid.Column="1"
+                <!-- ✅ RANGO PERSONALIZADO -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0">
+
+                    <StackPanel Margin="0,0,6,0">
+                        <TextBlock Text="DESDE" FontSize="9" Foreground="#93C5FD" FontWeight="Bold"/>
+                        <DatePicker x:Name="dpDesde" Style="{StaticResource DpRango}"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="HASTA" FontSize="9" Foreground="#93C5FD" FontWeight="Bold"/>
+                        <DatePicker x:Name="dpHasta" Style="{StaticResource DpRango}"/>
+                    </StackPanel>
+
+                    <Button Content="🔎 Aplicar"
+                            Width="90"
+                            Height="36"
+                            VerticalAlignment="Bottom"
+                            Style="{StaticResource BtnAplicarRango}"
+                            Click="BtnAplicarRango_Click"/>
+
+                </StackPanel>
+
+                <Button Grid.Column="2"
                         Content="📄 Exportar"
                         Height="42"
                         FontSize="14"
@@ -58,7 +113,7 @@
                     </Button.Template>
                 </Button>
 
-                <Button Grid.Column="2"
+                <Button Grid.Column="3"
                         Content="✕ Cerrar"
                         Width="100"
                         Height="42"
@@ -137,13 +192,13 @@
                                     Margin="5"
                                     Click="BtnMes_Click"/>
 
-                            <Button x:Name="btnAnio"
+                            <Button x:Name="btnAño"
                                     Content="📊 Año"
                                     Height="55"
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Margin="5"
-                                    Click="BtnAnio_Click"/>
+                                    Click="BtnAño_Click"/>
 
                         </UniformGrid>
 
@@ -342,7 +397,7 @@
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Margin="5"
-                                    Click="BtnMasVendidosAnio_Click"/>
+                                    Click="BtnMasVendidosAño_Click"/>
 
                         </UniformGrid>
 
@@ -507,7 +562,7 @@
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Margin="5"
-                                    Click="BtnGananciasAnio_Click"/>
+                                    Click="BtnGananciasAño_Click"/>
 
                         </UniformGrid>
 
@@ -695,7 +750,7 @@
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Margin="5"
-                                    Click="BtnInventarioAnio_Click"/>
+                                    Click="BtnInventarioAño_Click"/>
 
                         </UniformGrid>
 
@@ -815,7 +870,7 @@
             </TabItem>
 
             <!-- ===================================== -->
-            <!-- ✅ PESTAÑA 5 — PEDIDOS                 -->
+            <!-- PESTAÑA 5 — PEDIDOS                   -->
             <!-- ===================================== -->
 
             <TabItem Header="🛵 Pedidos">
@@ -863,7 +918,7 @@
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Margin="5"
-                                    Click="BtnPedidosAnio_Click"/>
+                                    Click="BtnPedidosAño_Click"/>
 
                         </UniformGrid>
 
@@ -990,6 +1045,208 @@
                                     <DataGridTextColumn Header="Fecha"
                                         Binding="{Binding Fecha, StringFormat=dd/MM/yyyy hh:mm tt}"
                                         Width="160"/>
+
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Grid>
+
+                    </Border>
+
+                </Grid>
+
+            </TabItem>
+
+            <!-- ===================================== -->
+            <!-- ✅ PESTAÑA 6 — CAJA                    -->
+            <!-- ===================================== -->
+
+            <TabItem Header="🧾 Caja">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="110"/>
+                        <RowDefinition Height="110"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White"
+                            CornerRadius="10"
+                            Padding="15"
+                            Margin="0,0,0,15">
+
+                        <UniformGrid Columns="4">
+
+                            <Button Content="📅 Hoy"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    Click="BtnCajaHoy_Click"/>
+
+                            <Button Content="📆 Semana"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnCajaSemana_Click"/>
+
+                            <Button Content="🗓️ Mes"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnCajaMes_Click"/>
+
+                            <Button Content="📊 Año"
+                                    Height="55"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Margin="5"
+                                    Click="BtnCajaAño_Click"/>
+
+                        </UniformGrid>
+
+                    </Border>
+
+                    <!-- RESUMEN -->
+                    <Grid Grid.Row="1" Margin="0,0,0,15">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Background="#1E293B"
+                                CornerRadius="10"
+                                Margin="0,0,8,0"
+                                Padding="12">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="TOTAL DE CORTES"
+                                           Foreground="#94A3B8" FontSize="12" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtCajaTotalCortes"
+                                           Text="0"
+                                           Foreground="White" FontSize="24" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="#1E293B"
+                                CornerRadius="10"
+                                Margin="4,0,4,0"
+                                Padding="12">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="TOTAL ESPERADO"
+                                           Foreground="#94A3B8" FontSize="12" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtCajaTotalEsperado"
+                                           Text="$0.00"
+                                           Foreground="#60A5FA" FontSize="20" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Background="#1E293B"
+                                CornerRadius="10"
+                                Margin="4,0,4,0"
+                                Padding="12">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="TOTAL CONTADO"
+                                           Foreground="#94A3B8" FontSize="12" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtCajaTotalContado"
+                                           Text="$0.00"
+                                           Foreground="#22C55E" FontSize="20" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="3"
+                                Background="#1E293B"
+                                CornerRadius="10"
+                                Margin="8,0,0,0"
+                                Padding="12">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="DIFERENCIA TOTAL"
+                                           Foreground="#94A3B8" FontSize="12" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="txtCajaTotalDiferencia"
+                                           Text="$0.00"
+                                           Foreground="#F87171" FontSize="20" FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- TABLA DE CORTES -->
+                    <Border Grid.Row="2"
+                            Background="White"
+                            CornerRadius="10"
+                            Padding="15">
+
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock x:Name="txtPeriodoCaja"
+                                       Text="Periodo: Hoy"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+
+                            <DataGrid x:Name="dgCortesCaja"
+                                      Grid.Row="1"
+                                      AutoGenerateColumns="False"
+                                      FontSize="14"
+                                      IsReadOnly="True"
+                                      CanUserAddRows="False">
+
+                                <DataGrid.Columns>
+
+                                    <DataGridTextColumn Header="Usuario"
+                                        Binding="{Binding Usuario}"
+                                        Width="140"/>
+
+                                    <DataGridTextColumn Header="Apertura"
+                                        Binding="{Binding FechaApertura, StringFormat=dd/MM/yyyy HH:mm}"
+                                        Width="140"/>
+
+                                    <DataGridTextColumn Header="Cierre"
+                                        Binding="{Binding FechaCierre, StringFormat=dd/MM/yyyy HH:mm}"
+                                        Width="140"/>
+
+                                    <DataGridTextColumn Header="Monto Inicial"
+                                        Binding="{Binding MontoInicial, StringFormat=C}"
+                                        Width="110"/>
+
+                                    <DataGridTextColumn Header="Esperado"
+                                        Binding="{Binding MontoFinalEsperado, StringFormat=C}"
+                                        Width="110"/>
+
+                                    <DataGridTextColumn Header="Contado"
+                                        Binding="{Binding MontoFinalContado, StringFormat=C}"
+                                        Width="110"/>
+
+                                    <DataGridTextColumn Header="Diferencia"
+                                        Binding="{Binding Diferencia, StringFormat=C}"
+                                        Width="110"/>
+
+                                    <DataGridTextColumn Header="Estado"
+                                        Binding="{Binding Estado}"
+                                        Width="*"/>
 
                                 </DataGrid.Columns>
 
