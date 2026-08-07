@@ -208,7 +208,7 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-               
+
 
             </Grid>
 
@@ -339,7 +339,7 @@
                                     </Button>
 
 
-                           <!-- INDICADOR DE POSICIÓN (1/3, 2/3, 3/3) -->
+                                    <!-- INDICADOR DE POSICIÓN (1/3, 2/3, 3/3) -->
 
 
                                     <TextBlock x:Name="txtIndicadorImagen"
@@ -542,84 +542,255 @@
                         <TextBox x:Name="txtPrecioVenta"
                                  Height="40"
                                  FontSize="16"
-                                 Margin="0,5,0,15"/>
+                                 Margin="0,5,0,10"
+                                 TextChanged="txtPrecioVenta_TextChanged"/>
+
+                        <CheckBox x:Name="chkIncluirIva"
+                                  Content="Incluir IVA (16% fijo)"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  IsChecked="True"
+                                  Margin="0,0,0,10"
+                                  Checked="ChkIncluirIva_Changed"
+                                  Unchecked="ChkIncluirIva_Changed"/>
+
+                        <!-- PRECIO FINAL de Precio Venta (aquí sí aplica el IVA) -->
+
+                        <Border Background="#F0FDF4"
+                                BorderBrush="#86EFAC"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,10"
+                                Margin="0,0,0,15">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="txtLabelPrecioFinal"
+                                           Text="Precio final (con 16% IVA)"
+                                           FontWeight="SemiBold"
+                                           FontSize="14"
+                                           Foreground="#166534"
+                                           VerticalAlignment="Center"/>
+
+                                <TextBlock x:Name="txtPrecioVentaFinal"
+                                           Grid.Column="1"
+                                           Text="0.00"
+                                           FontWeight="Bold"
+                                           FontSize="17"
+                                           Foreground="#166534"
+                                           VerticalAlignment="Center"/>
+
+                            </Grid>
+
+                        </Border>
 
                         <!-- ===================================== -->
-                        <!-- PRECIOS POR VOLUMEN (ESTILO SICAR)    -->
+                        <!-- PRECIOS POR VOLUMEN -->
                         <!-- ===================================== -->
 
                         <Border Background="#EFF6FF"
                                 BorderBrush="#BFDBFE"
                                 BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="12"
+                                CornerRadius="10"
+                                Padding="15"
                                 Margin="0,0,0,15">
 
                             <StackPanel>
 
                                 <TextBlock Text="💰 Precios por volumen"
+                                           FontSize="16"
                                            FontWeight="Bold"
-                                           FontSize="14"
                                            Foreground="#1E3A8A"
-                                           Margin="0,0,0,10"/>
+                                           Margin="0,0,0,5"/>
 
-                                <TextBlock Text="Opcional. Define un mejor precio por pieza cuando el cliente compra varias unidades."
-                                           FontSize="11"
+                                <TextBlock Text="Configura un descuento automático según la cantidad comprada."
+                                           FontSize="12"
                                            Foreground="#64748B"
-                                           TextWrapping="Wrap"
-                                           Margin="0,0,0,10"/>
+                                           Margin="0,0,0,12"/>
 
-                                <!-- PRECIO 2 -->
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="140"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="140"/>
-                                    </Grid.ColumnDefinitions>
+                                <!-- ===================== -->
+                                <!-- (el IVA ya no se muestra aquí: se controla arriba, junto a Precio Venta) -->
+                                <!-- ===================== -->
 
-                                    <TextBlock Text="Precio 2"
-                                               FontSize="13"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center"/>
+                                <!-- ===================== -->
+                                <!-- Precio 2 (mayoreo) -->
+                                <!-- ===================== -->
 
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="A partir de (pzas.)" FontSize="11" Foreground="Gray"/>
-                                        <TextBox x:Name="txtCantidadMayoreo2" Height="34" FontSize="14"/>
+                                <Border Background="White"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12"
+                                        Margin="0,0,0,10">
+
+                                    <StackPanel>
+
+                                        <TextBlock Text="Precio 2 (mayoreo)"
+                                                   FontWeight="Bold"
+                                                   FontSize="13"
+                                                   Foreground="#1E3A8A"
+                                                   Margin="0,0,0,8"/>
+
+                                        <Grid Margin="0,0,0,12">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Piezas"
+                                                       Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,6,0"/>
+
+                                            <TextBox x:Name="txtCantidadMayoreo2"
+                                                     Grid.Column="1"
+                                                     Height="34"
+                                                     TextChanged="txtCantidadMayoreo2_TextChanged"/>
+
+                                            <TextBlock Text="%"
+                                                       Grid.Column="3"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,6,0"/>
+
+                                            <TextBox x:Name="txtPorcentaje2"
+                                                     Grid.Column="4"
+                                                     Height="34"
+                                                     TextChanged="txtPorcentaje2_TextChanged"/>
+
+                                        </Grid>
+
+                                        <!-- PRECIO FINAL — bien visible, sin recortarse -->
+
+                                        <Border Background="#F0FDF4"
+                                                BorderBrush="#86EFAC"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="12,10">
+
+                                            <Grid>
+
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Text="Precio final"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="14"
+                                                           Foreground="#166534"
+                                                           VerticalAlignment="Center"/>
+
+                                                <TextBlock x:Name="txtPrecio2"
+                                                           Grid.Column="1"
+                                                           Text="0.00"
+                                                           FontWeight="Bold"
+                                                           FontSize="17"
+                                                           Foreground="#166534"
+                                                           VerticalAlignment="Center"/>
+
+                                            </Grid>
+
+                                        </Border>
+
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="4">
-                                        <TextBlock Text="Precio c/u" FontSize="11" Foreground="Gray"/>
-                                        <TextBox x:Name="txtPrecio2" Height="34" FontSize="14"/>
+                                </Border>
+
+                                <!-- ===================== -->
+                                <!-- Precio 3 (mayoreo) -->
+                                <!-- ===================== -->
+
+                                <Border Background="White"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12">
+
+                                    <StackPanel>
+
+                                        <TextBlock Text="Precio 3 (mayoreo)"
+                                                   FontWeight="Bold"
+                                                   FontSize="13"
+                                                   Foreground="#1E3A8A"
+                                                   Margin="0,0,0,8"/>
+
+                                        <Grid Margin="0,0,0,12">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Piezas"
+                                                       Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,6,0"/>
+
+                                            <TextBox x:Name="txtCantidadMayoreo3"
+                                                     Grid.Column="1"
+                                                     Height="34"
+                                                     TextChanged="txtCantidadMayoreo3_TextChanged"/>
+
+                                            <TextBlock Text="%"
+                                                       Grid.Column="3"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,6,0"/>
+
+                                            <TextBox x:Name="txtPorcentaje3"
+                                                     Grid.Column="4"
+                                                     Height="34"
+                                                     TextChanged="txtPorcentaje3_TextChanged"/>
+
+                                        </Grid>
+
+                                        <!-- PRECIO FINAL — bien visible, sin recortarse -->
+
+                                        <Border Background="#F0FDF4"
+                                                BorderBrush="#86EFAC"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="12,10">
+
+                                            <Grid>
+
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Text="Precio final"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="14"
+                                                           Foreground="#166534"
+                                                           VerticalAlignment="Center"/>
+
+                                                <TextBlock x:Name="txtPrecio3"
+                                                           Grid.Column="1"
+                                                           Text="0.00"
+                                                           FontWeight="Bold"
+                                                           FontSize="17"
+                                                           Foreground="#166534"
+                                                           VerticalAlignment="Center"/>
+
+                                            </Grid>
+
+                                        </Border>
+
                                     </StackPanel>
-                                </Grid>
 
-                                <!-- PRECIO 3 -->
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="140"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="140"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="Precio 3"
-                                               FontSize="13"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center"/>
-
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="A partir de (pzas.)" FontSize="11" Foreground="Gray"/>
-                                        <TextBox x:Name="txtCantidadMayoreo3" Height="34" FontSize="14"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="4">
-                                        <TextBlock Text="Precio c/u" FontSize="11" Foreground="Gray"/>
-                                        <TextBox x:Name="txtPrecio3" Height="34" FontSize="14"/>
-                                    </StackPanel>
-                                </Grid>
+                                </Border>
 
                             </StackPanel>
 
@@ -811,6 +982,7 @@
                                   RowHeight="42"
                                   GridLinesVisibility="Horizontal"
                                   HorizontalGridLinesBrush="#F1F5F9"
+                                  HorizontalScrollBarVisibility="Auto"
                                   SelectionChanged="dgProductos_SelectionChanged">
 
                             <DataGrid.ColumnHeaderStyle>
@@ -850,34 +1022,34 @@
 
                                 <DataGridTextColumn Header="ID"
                                                     Binding="{Binding Id}"
-                                                    Width="55"/>
+                                                    Width="50"/>
 
                                 <DataGridTextColumn Header="Código"
                                                     Binding="{Binding CodigoBarras}"
-                                                    Width="140"/>
+                                                    Width="120"/>
 
                                 <DataGridTextColumn Header="Nombre"
                                                     Binding="{Binding Nombre}"
-                                                    Width="200"
+                                                    Width="170"
                                                     FontWeight="SemiBold"/>
 
                                 <DataGridTextColumn Header="Categoría"
                                                     Binding="{Binding NombreCategoria}"
-                                                    Width="130"/>
+                                                    Width="110"/>
 
                                 <DataGridTextColumn Header="Precio 1"
                                                     Binding="{Binding PrecioVenta, StringFormat=C}"
-                                                    Width="95"/>
+                                                    Width="85"/>
 
                                 <DataGridTextColumn Header="Precio 2"
                                                     Binding="{Binding Precio2, StringFormat=C}"
-                                                    Width="95"/>
+                                                    Width="85"/>
 
                                 <DataGridTextColumn Header="Precio 3"
                                                     Binding="{Binding Precio3, StringFormat=C}"
-                                                    Width="95"/>
+                                                    Width="85"/>
 
-                                <DataGridTemplateColumn Header="Stock" Width="90">
+                                <DataGridTemplateColumn Header="Stock" Width="80">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Border CornerRadius="10"
@@ -920,7 +1092,7 @@
 
                                 <DataGridCheckBoxColumn Header="Activo"
                                                         Binding="{Binding Activo}"
-                                                        Width="70"/>
+                                                        Width="65"/>
 
                             </DataGrid.Columns>
 
