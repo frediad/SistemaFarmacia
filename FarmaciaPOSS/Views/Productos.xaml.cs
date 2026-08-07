@@ -1,4 +1,5 @@
-﻿using FarmaciaPOS.Models;
+﻿
+using FarmaciaPOS.Models;
 using FarmaciaPOS.Helpers;
 using Microsoft.Data.SqlClient;
 using System;
@@ -23,16 +24,33 @@ namespace FarmaciaPOS.Views
         const int MAX_IMAGENES = 3;
         List<byte[]> imagenesPendientes = new();
 
+        // IVA fijo del 16%. No es editable desde la interfaz: se usa
+        // este valor constante en todos los cálculos de precio final.
+        const decimal IVA_FIJO = 16m;
+
         public ProductosWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            dgProductos.AlternationCount = 2;
+                dgProductos.AlternationCount = 2;
 
-            CargarCategorias();
-            CargarProductos();
-            CargarTodasSubcategorias();
-            CargarCategoriasFiltro();
+                CargarCategorias();
+                CargarProductos();
+                CargarTodasSubcategorias();
+                CargarCategoriasFiltro();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "No se pudo abrir la ventana de Productos:\n\n" + ex,
+                    "Error al cargar Productos",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                throw;
+            }
         }
 
         // =========================================
@@ -558,6 +576,7 @@ namespace FarmaciaPOS.Views
 
                 txtPrecio2.Text = producto.Precio2 > 0 ? producto.Precio2.ToString() : "";
                 txtCantidadMayoreo2.Text = producto.CantidadMayoreo2 > 0 ? producto.CantidadMayoreo2.ToString() : "";
+
                 txtPrecio3.Text = producto.Precio3 > 0 ? producto.Precio3.ToString() : "";
                 txtCantidadMayoreo3.Text = producto.CantidadMayoreo3 > 0 ? producto.CantidadMayoreo3.ToString() : "";
 
@@ -565,6 +584,8 @@ namespace FarmaciaPOS.Views
                 txtStockMinimo.Text = producto.StockMinimo.ToString();
 
                 chkActivo.IsChecked = producto.Activo;
+
+                CalcularPrecioVolumen();
 
                 CargarLotes();
                 CargarImagenesProducto(producto.Id);
@@ -596,11 +617,16 @@ namespace FarmaciaPOS.Views
 
             txtPrecioCompra.Clear();
             txtPrecioVenta.Clear();
+            chkIncluirIva.IsChecked = true;
+            txtPrecioVentaFinal.Text = "0.00";
 
-            txtPrecio2.Clear();
+            txtPrecio2.Text = "0.00";
             txtCantidadMayoreo2.Clear();
-            txtPrecio3.Clear();
+            txtPorcentaje2.Clear();
+
+            txtPrecio3.Text = "0.00";
             txtCantidadMayoreo3.Clear();
+            txtPorcentaje3.Clear();
 
             txtStock.Clear();
             txtStockMinimo.Clear();
@@ -1152,5 +1178,118 @@ namespace FarmaciaPOS.Views
         {
             this.Close();
         }
+
+        // =========================================
+        // Calcula el "Precio final" que se muestra dentro de cada
+        // bloque de mayoreo (Precio 2 y Precio 3):
+        // 1) Toma el Precio Venta (Precio 1) como base.
+        // 2) Si "Incluir IVA" está marcado, le suma el IVA fijo del 16%.
+        //    Si no está marcado, usa el precio de venta tal cual.
+        // 3) A ese resultado le resta el % de descuento configurado
+        //    para ese nivel de mayoreo -> precio unitario.
+        // 4) Multiplica ese precio unitario por las piezas indicadas,
+        //    para mostrar el total de esa cantidad (no solo 1 pieza).
+        // Ejemplo: Precio Venta $100, IVA activado -> $116.00 unitario
+        //          20% de descuento -> 116 - 20% de 116 = $92.80 c/u
+        //          10 piezas -> 92.80 x 10 = $928.00
+        // =========================================
+        // =========================================
+        // 1) "Precio final" (junto a Precio Venta): es el único lugar
+        //    donde se aplica el IVA. Si "Incluir IVA" está marcado,
+        //    se le suma el 16% fijo al Precio Venta; si no, se muestra
+        //    el mismo Precio Venta sin cambios.
+        // 2) "Precios por volumen" (Precio 2 y Precio 3): NUNCA incluyen
+        //    IVA. Se calculan directamente sobre el Precio Venta, le
+        //    restan su % de descuento y se multiplican por las piezas.
+        // Ejemplo: Precio Venta $100, IVA activado -> Precio final $116.00
+        //          Precio 2: 20% desc., 10 piezas -> (100 - 20%) x 10 = $800.00
+        // =========================================
+        private void CalcularPrecioVolumen()
+        {
+            // Mientras la ventana se está construyendo (InitializeComponent),
+            // el checkbox de IVA puede disparar su evento "Checked" antes de
+            // que los demás controles (txtPrecio2, txtPrecio3, etc.) existan.
+            // Si eso pasa, simplemente no hacemos nada todavía.
+            if (txtPrecioVenta == null || txtPrecio2 == null || txtPrecio3 == null ||
+                txtCantidadMayoreo2 == null || txtCantidadMayoreo3 == null ||
+                txtPorcentaje2 == null || txtPorcentaje3 == null || chkIncluirIva == null ||
+                txtPrecioVentaFinal == null || txtLabelPrecioFinal == null)
+                return;
+
+            if (!decimal.TryParse(txtPrecioVenta.Text, out decimal precioBase))
+            {
+                txtPrecioVentaFinal.Text = "0.00";
+                txtPrecio2.Text = "0.00";
+                txtPrecio3.Text = "0.00";
+                return;
+            }
+
+            // --- Precio final (con o sin IVA, según el checkbox) ---
+
+            decimal precioFinalVenta = precioBase;
+
+            if (chkIncluirIva.IsChecked == true)
+            {
+                precioFinalVenta = precioBase + (precioBase * IVA_FIJO / 100);
+                txtLabelPrecioFinal.Text = "Precio final (con 16% IVA)";
+            }
+            else
+            {
+                txtLabelPrecioFinal.Text = "Precio final (sin IVA)";
+            }
+
+            txtPrecioVentaFinal.Text = precioFinalVenta.ToString("0.00");
+
+            // --- Precios por volumen: siempre sin IVA ---
+
+            txtPrecio2.Text = CalcularTotalMayoreo(precioBase, txtPorcentaje2.Text, txtCantidadMayoreo2.Text);
+            txtPrecio3.Text = CalcularTotalMayoreo(precioBase, txtPorcentaje3.Text, txtCantidadMayoreo3.Text);
+        }
+
+        private void ChkIncluirIva_Changed(object sender, RoutedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
+        private string CalcularTotalMayoreo(decimal precioConIva, string textoPorcentaje, string textoPiezas)
+        {
+            if (!decimal.TryParse(textoPorcentaje, out decimal porcentaje))
+                porcentaje = 0;
+
+            // Si no se especifican piezas, se asume 1 (precio unitario).
+            if (!decimal.TryParse(textoPiezas, out decimal piezas) || piezas <= 0)
+                piezas = 1;
+
+            decimal precioUnitario = precioConIva + (precioConIva * porcentaje / 100);
+            decimal total = precioUnitario * piezas;
+
+            return total.ToString("0.00");
+        }
+
+        private void txtCantidadMayoreo2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
+        private void txtCantidadMayoreo3_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
+        private void txtPorcentaje3_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
+        private void txtPrecioVenta_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
+        private void txtPorcentaje2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalcularPrecioVolumen();
+        }
+
     }
 }
