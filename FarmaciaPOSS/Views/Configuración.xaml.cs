@@ -63,7 +63,7 @@ namespace FarmaciaPOS.Views
 
         private void BtnFarmacia_Click(object sender, RoutedEventArgs e)
         {
-            Farma ventana = new Farma();
+            Graficas ventana = new Graficas();
 
             ventana.ShowDialog();
         }

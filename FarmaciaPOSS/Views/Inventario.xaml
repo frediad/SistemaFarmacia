@@ -113,11 +113,11 @@
                     </Button.Template>
                 </Button>
 
-                
+
             </Grid>
         </Border>
-        
-        
+
+
 
         <!-- ===================================== -->
         <!-- CONTENIDO                             -->
@@ -295,53 +295,53 @@
 
                 <TabItem Header="📧 Pedir a Proveedor">
 
-                <Grid Margin="0,15,0,0">
+                    <Grid Margin="0,15,0,0">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="80"/>
-                    </Grid.RowDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="80"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- DATOS DEL PEDIDO -->
-                    <Border Background="White"
+                        <!-- DATOS DEL PEDIDO -->
+                        <Border Background="White"
                             CornerRadius="12"
                             Padding="18"
                             Margin="0,0,0,12">
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
 
-                            <StackPanel>
-                                <TextBlock Text="PROVEEDOR" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                                <ComboBox x:Name="cbProveedor" Height="40" Style="{StaticResource CboInventario}"
+                                <StackPanel>
+                                    <TextBlock Text="PROVEEDOR" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                    <ComboBox x:Name="cbProveedor" Height="40" Style="{StaticResource CboInventario}"
                                           DisplayMemberPath="Nombre" SelectedValuePath="Id"/>
-                            </StackPanel>
+                                </StackPanel>
 
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text=" " FontSize="11" Margin="2,0,0,6"/>
-                                <Button Content="🔍 Buscar producto"
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text=" " FontSize="11" Margin="2,0,0,6"/>
+                                    <Button Content="🔍 Buscar producto"
                                         Height="40"
                                         Background="#2563EB"
                                         Style="{StaticResource BtnAccionInventario}"
                                         Click="BtnBuscarProductoCompra_Click"/>
-                            </StackPanel>
+                                </StackPanel>
 
-                        </Grid>
+                            </Grid>
 
-                    </Border>
+                        </Border>
 
-                    <!-- TABLA DE PRODUCTOS DEL PEDIDO -->
-                    <Border Grid.Row="1"
+                        <!-- TABLA DE PRODUCTOS DEL PEDIDO -->
+                        <Border Grid.Row="1"
                             Background="White"
                             CornerRadius="12"
                             Padding="12">
 
-                        <DataGrid x:Name="dgItemsCompra"
+                            <DataGrid x:Name="dgItemsCompra"
                                   AutoGenerateColumns="False"
                                   HeadersVisibility="Column"
                                   BorderThickness="0"
@@ -352,30 +352,30 @@
                                   HorizontalGridLinesBrush="#F1F5F9"
                                   CellEditEnding="dgItemsCompra_CellEditEnding">
 
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#F8FAFC"/>
-                                    <Setter Property="Foreground" Value="#64748B"/>
-                                    <Setter Property="FontSize" Value="12"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Padding" Value="10,8"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
 
-                            <DataGrid.Columns>
+                                <DataGrid.Columns>
 
-                                <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Stock actual" Binding="{Binding StockActual}" Width="100" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Costo actual" Binding="{Binding CostoActual, StringFormat=C}" Width="100" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Cantidad a pedir" Binding="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
-                                <DataGridTextColumn Header="Costo estimado" Binding="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
-                                <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="110" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Stock actual" Binding="{Binding StockActual}" Width="100" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Costo actual" Binding="{Binding CostoActual, StringFormat=C}" Width="100" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Cantidad a pedir" Binding="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                                    <DataGridTextColumn Header="Costo estimado" Binding="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                    <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="110" IsReadOnly="True"/>
 
-                                <DataGridTemplateColumn Header="" Width="50">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="✕"
+                                    <DataGridTemplateColumn Header="" Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="✕"
                                                     Width="28" Height="28"
                                                     Background="#FEE2E2"
                                                     Foreground="#DC2626"
@@ -383,25 +383,25 @@
                                                     FontWeight="Bold"
                                                     Cursor="Hand"
                                                     Click="BtnQuitarItemCompra_Click">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
-                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
 
-                            </DataGrid.Columns>
+                                </DataGrid.Columns>
 
-                        </DataGrid>
+                            </DataGrid>
 
-                    </Border>
+                        </Border>
 
-                    <!-- TOTAL Y ENVIAR -->
+                        <!-- TOTAL Y ENVIAR -->
                         <Grid Grid.Row="2" Margin="0,12,0,0">
 
                             <Grid.ColumnDefinitions>
@@ -427,7 +427,7 @@
 
                     </Grid>
 
-            </TabItem>
+                </TabItem>
 
                 <!-- ===================================== -->
                 <!-- PESTAÑA 3 — VER PEDIDOS DE COMPRAS       -->
@@ -602,8 +602,124 @@
 
                 </TabItem>
 
+                <!-- ===================================== -->
+                <!-- PESTAÑA — PRODUCTOS POR CADUCAR        -->
+                <!-- ===================================== -->
 
+                <TabItem Header="⏰ Por Caducar">
 
+                    <Grid Margin="0,15,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- BUSCADOR Y RESUMEN -->
+                        <Border Background="White"
+                                CornerRadius="12"
+                                Padding="16"
+                                Margin="0,0,0,12">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="260"/>
+                                    <ColumnDefinition Width="160"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Productos por caducar"
+                                               FontSize="15"
+                                               FontWeight="Bold"
+                                               Foreground="#1E293B"/>
+                                    <TextBlock x:Name="txtResumenCaducidades"
+                                               Text="Cargando..."
+                                               FontSize="11"
+                                               Foreground="#94A3B8"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                                    <TextBlock Text="BUSCAR" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                    <TextBox x:Name="txtBuscarCaducidad"
+                                             Height="38"
+                                             Style="{StaticResource TxtInventario}"
+                                             TextChanged="txtBuscarCaducidad_TextChanged"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="2"
+                                        Content="🔄 Actualizar"
+                                        Height="38"
+                                        VerticalAlignment="Bottom"
+                                        Background="#2563EB"
+                                        Style="{StaticResource BtnAccionInventario}"
+                                        Click="BtnActualizarCaducidades_Click"/>
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- TABLA DE LOTES / CADUCIDADES -->
+                        <Border Grid.Row="1"
+                                Background="White"
+                                CornerRadius="12"
+                                Padding="12">
+
+                            <DataGrid x:Name="dgCaducidades"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      IsReadOnly="True"
+                                      BorderThickness="0"
+                                      RowHeight="38"
+                                      FontSize="13"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HorizontalGridLinesBrush="#F1F5F9">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F8FAFC"/>
+                                        <Setter Property="Foreground" Value="#64748B"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Estado}" Value="CADUCADO">
+                                                <Setter Property="Background" Value="#FEE2E2"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Estado}" Value="PRÓXIMO A CADUCAR">
+                                                <Setter Property="Background" Value="#FEF9C3"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Estado}" Value="SIN LOTE REGISTRADO">
+                                                <Setter Property="Background" Value="#F1F5F9"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Código" Binding="{Binding CodigoBarras}" Width="110"/>
+                                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*"/>
+                                    <DataGridTextColumn Header="Lote" Binding="{Binding NumeroLote}" Width="110"/>
+                                    <DataGridTextColumn Header="Caducidad" Binding="{Binding Caducidad, StringFormat=dd/MM/yyyy}" Width="110"/>
+                                    <DataGridTextColumn Header="Días restantes" Binding="{Binding DiasRestantes}" Width="110"/>
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="80"/>
+                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="160"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+
+                        </Border>
+
+                    </Grid>
+
+                </TabItem>
 
                 <!-- ===================================== -->
                 <!-- PESTAÑA 4 — AJUSTE DE INVENTARIO       -->

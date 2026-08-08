@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,9 @@ namespace FarmaciaPOS.Views
         private ObservableCollection<DetalleRecepcionItem> itemsRecepcion = new();
         private int pedidoSeleccionadoId = 0;
 
+        // ✅ Productos por caducar
+        private DataView vistaCaducidades;
+
         public InventarioWindow()
         {
             InitializeComponent();
@@ -49,6 +53,7 @@ namespace FarmaciaPOS.Views
                 CargarMovimientos();
                 CargarAlertasStock();
                 CargarPedidosPendientes();
+                CargarCaducidades();
 
                 cbProductoKardex.ItemsSource = productos;
                 cbProductoKardex.DisplayMemberPath = "Nombre";
@@ -953,6 +958,106 @@ namespace FarmaciaPOS.Views
                 trans.Rollback();
                 MensajeHelper.Error("No se pudo registrar la recepción: " + ex.Message, "Error", this);
             }
+        }
+
+        // =========================================
+        // ✅ PRODUCTOS POR CADUCAR
+        // Usa la tabla LotesProductos (FechaCaducidad, NumeroLote, Cantidad)
+        // relacionada con Productos por ProductoId.
+        // =========================================
+
+        private void CargarCaducidades()
+        {
+            DataTable dt = ObtenerCaducidades();
+
+            vistaCaducidades = dt.DefaultView;
+            dgCaducidades.ItemsSource = vistaCaducidades;
+
+            int caducados = 0;
+            int proximos = 0;
+
+            foreach (DataRow fila in dt.Rows)
+            {
+                string estado = fila["Estado"].ToString();
+
+                if (estado == "CADUCADO")
+                    caducados++;
+                else if (estado == "PRÓXIMO A CADUCAR")
+                    proximos++;
+            }
+
+            txtResumenCaducidades.Text =
+                (caducados == 0 && proximos == 0)
+                    ? "Sin productos caducados ni próximos a caducar ✅"
+                    : $"{caducados} caducado(s) · {proximos} próximo(s) a caducar (30 días)";
+        }
+
+        private DataTable ObtenerCaducidades()
+        {
+            DataTable dt = new DataTable();
+
+            try
+            {
+                using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
+                conn.Open();
+
+                string query =
+                @"SELECT
+                    p.CodigoBarras,
+                    p.Nombre,
+                    ISNULL(l.NumeroLote, '—') AS NumeroLote,
+                    l.FechaCaducidad AS Caducidad,
+                    CASE
+                        WHEN l.FechaCaducidad IS NULL THEN NULL
+                        ELSE DATEDIFF(DAY, GETDATE(), l.FechaCaducidad)
+                    END AS DiasRestantes,
+                    l.Cantidad AS Stock,
+                    CASE
+                        WHEN l.FechaCaducidad IS NULL
+                            THEN 'SIN LOTE REGISTRADO'
+                        WHEN DATEDIFF(DAY, GETDATE(), l.FechaCaducidad) < 0
+                            THEN 'CADUCADO'
+                        WHEN DATEDIFF(DAY, GETDATE(), l.FechaCaducidad) <= 30
+                            THEN 'PRÓXIMO A CADUCAR'
+                        ELSE 'NO CADUCADO'
+                    END AS Estado
+                  FROM Productos p
+                  LEFT JOIN LotesProductos l ON l.ProductoId = p.Id
+                  WHERE p.Activo = 1
+                  ORDER BY p.Nombre ASC, l.FechaCaducidad ASC";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                da.Fill(dt);
+            }
+            catch (Exception ex)
+            {
+                // ⚠️ MessageBox.Show (no MensajeHelper): este método también se llama
+                // desde el constructor antes de que la ventana se muestre en pantalla.
+                MessageBox.Show(
+                    "No se pudieron cargar las caducidades: " + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+
+            return dt;
+        }
+
+        private void txtBuscarCaducidad_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (vistaCaducidades == null)
+                return;
+
+            string filtro = txtBuscarCaducidad.Text.Trim().Replace("'", "''");
+
+            vistaCaducidades.RowFilter = string.IsNullOrWhiteSpace(filtro)
+                ? ""
+                : $"Nombre LIKE '%{filtro}%' OR CodigoBarras LIKE '%{filtro}%'";
+        }
+
+        private void BtnActualizarCaducidades_Click(object sender, RoutedEventArgs e)
+        {
+            CargarCaducidades();
         }
 
         // =========================================
