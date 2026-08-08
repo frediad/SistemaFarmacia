@@ -65,13 +65,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QuestPDF" Version="2026.6.0" />
-    <PackageReference Include="Syncfusion.SfChart.WPF" Version="33.2.15" />
+    <PackageReference Include="Syncfusion.SfChart.WPF" Version="34.2.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\FarmaciaAPI\FarmaciaAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -100,6 +96,10 @@
 
   <ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FarmaciaAPI\FarmaciaAPI.csproj" />
   </ItemGroup>
 
 </Project>

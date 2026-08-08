@@ -415,7 +415,9 @@
 
                             <TextBox x:Name="txtCodigo"
                                      Height="40"
-                                     FontSize="16"/>
+                                     FontSize="16"
+                                     KeyDown="TxtCodigo_KeyDown"
+                                     GotFocus="TxtCodigo_GotFocus"/>
 
                             <Button Grid.Column="1"
                                     Content="🔑 Generar"
