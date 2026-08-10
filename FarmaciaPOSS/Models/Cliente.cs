@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace FarmaciaPOS.Models
+﻿namespace FarmaciaPOS.Models
 {
-    public class Clientes
+    public class Cliente
     {
         public int Id { get; set; }
         public string Nombre { get; set; } = string.Empty;

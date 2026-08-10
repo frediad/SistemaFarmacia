@@ -71,15 +71,13 @@ namespace FarmaciaPOS.Views
 
                 DatabaseHelper.ForzarReevaluacion();
 
-                MessageBox.Show(
+                MensajeHelper.Info(
                     $"Modo de conexión guardado: {modo}",
-                    "Éxito",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    "Éxito");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error(ex.Message, "Error");
             }
         }
 
@@ -147,12 +145,10 @@ namespace FarmaciaPOS.Views
 
             ConfiguracionPosHelper.Guardar(config);
 
-            MessageBox.Show(
+            MensajeHelper.Info(
                 "Configuración de respaldo guardada. El respaldo automático se ejecutará mientras el sistema esté abierto, " +
                 "según el intervalo indicado.",
-                "Éxito",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                "Éxito");
         }
 
         private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)

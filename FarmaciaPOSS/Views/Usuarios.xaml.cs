@@ -1,5 +1,4 @@
-﻿using FarmaciaAPI.Models;
-using FarmaciaPOS.Helpers;
+﻿using FarmaciaPOS.Helpers;
 using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;

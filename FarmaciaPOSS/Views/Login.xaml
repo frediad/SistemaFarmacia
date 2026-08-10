@@ -2,16 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Iniciar Sesión"
-        Height="520"
-        Width="950"
-        Icon="/logo-icono.ico"
+        Height="500"
+        Width="850"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F0F4F8"
         PreviewKeyDown="Login_PreviewKeyDown">
-
-
-
 
 <Window.Resources>
 
@@ -159,7 +156,7 @@
 
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#1E3A8A" Offset="0"/>
+                        <GradientStop Color="#163075" Offset="0"/>
                         <GradientStop Color="#1E40AF" Offset="1"/>
                     </LinearGradientBrush>
                 </Border.Background>
@@ -187,8 +184,8 @@
 
                         <Border Background="White"
                                 CornerRadius="20"
-                                Width="140"
-                                Height="140"
+                                Width="180"
+                                Height="180"
                                 HorizontalAlignment="Center">
 
                             <Border.Effect>
@@ -198,10 +195,10 @@
                                                   ShadowDepth="4"/>
                             </Border.Effect>
 
-                            <Image Source="/Images/logo-click.png"
-                                   Width="100"
-                                   Height="100"
-                                   Stretch="Uniform"/>
+                            <Image Source="/Images/farma.png"
+                                   Width="180"
+                                   Height="180"
+                                   Stretch="UniformToFill"/>
 
                         </Border>
 
@@ -307,19 +304,9 @@
                                Cursor="Hand"
                                Visibility="Visible"
                                MouseLeftButtonUp="TxtCrearAdmin_Click"/>
-                        
-                   
-                    
-                    
-                    
-
-                              
 
                 </StackPanel>
-                
-                
-
-            </Border>
+           </Border>
 
         </Grid>
         

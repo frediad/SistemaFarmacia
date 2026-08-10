@@ -32,22 +32,22 @@ namespace FarmaciaPOS
         {
             InitializeComponent();
 
-            txtUsuarioSesion.Text = Sesion.NombreUsuario;
-            txtCargoSesion.Text = Sesion.Rol;
+                txtUsuarioSesion.Text = Sesion.NombreUsuario;
+                txtCargoSesion.Text = Sesion.Rol;
 
-            CargarProductos();
-            CargarVentasPorProducto();
+                CargarProductos();
+                CargarVentasPorProducto();
 
-            InicializarCarritoCentral();
+                InicializarCarritoCentral();
 
-            IniciarReloj();
+                IniciarReloj();
 
-            CargarCategoriasCatalogo();
-            CargarCatalogo();
+                CargarCategoriasCatalogo();
+                CargarCatalogo();
 
-            AplicarPermisosEnMenu();
+                AplicarPermisosEnMenu();
         }
-
+        
         private DispatcherTimer relojTimer;
 
         private bool cierreConfirmadoPorBoton = false;
@@ -140,79 +140,79 @@ namespace FarmaciaPOS
         // =========================================
 
         private void CargarProductos()
-        {
-            productos.Clear();
+        {      
+                productos.Clear();
 
-            using SqlConnection conn =
-                 new SqlConnection(DatabaseHelper.ConnectionString);
+                using SqlConnection conn =
+                     new SqlConnection(DatabaseHelper.ConnectionString);
 
-            conn.Open();
+                conn.Open();
 
-            string query =
-            @"SELECT p.*,
-            (SELECT TOP 1 img.ImagenData
-            FROM ImagenesProducto img
-            WHERE img.ProductoId = p.Id
-            ORDER BY img.Orden) AS PrimeraImagenData
-            FROM Productos p
-            WHERE p.Activo = 1
-            ORDER BY p.Nombre";
+                string query =
+                @"SELECT p.*,
+                (SELECT TOP 1 img.ImagenData
+                FROM ImagenesProducto img
+                WHERE img.ProductoId = p.Id
+                ORDER BY img.Orden) AS PrimeraImagenData
+                FROM Productos p
+                WHERE p.Activo = 1
+                ORDER BY p.Nombre";
 
-            SqlCommand cmd =
-                new SqlCommand(query, conn);
+                SqlCommand cmd =
+                    new SqlCommand(query, conn);
 
-            SqlDataReader reader =
-                cmd.ExecuteReader();
+                SqlDataReader reader =
+                    cmd.ExecuteReader();
 
-            while (reader.Read())
-            {
-                productos.Add(new Producto
+                while (reader.Read())
                 {
-                    Id =
-                        Convert.ToInt32(
-                            reader["Id"]),
+                    productos.Add(new Producto
+                    {
+                        Id =
+                            Convert.ToInt32(
+                                reader["Id"]),
 
-                    CodigoBarras =
-                        reader["CodigoBarras"]
-                        .ToString(),
+                        CodigoBarras =
+                            reader["CodigoBarras"]
+                            .ToString(),
 
-                    Nombre =
-                        reader["Nombre"]
-                        .ToString(),
+                        Nombre =
+                            reader["Nombre"]
+                            .ToString(),
 
-                    Stock =
-                        Convert.ToInt32(
-                            reader["Stock"]),
+                        Stock =
+                            Convert.ToInt32(
+                                reader["Stock"]),
 
-                    PrecioVenta =
-                        Convert.ToDecimal(
-                            reader["PrecioVenta"]),
+                        PrecioVenta =
+                            Convert.ToDecimal(
+                                reader["PrecioVenta"]),
 
-                    Precio2 =
-                         Convert.ToDecimal(
-                             reader["Precio2"]),
-                    Precio3 =
-                         Convert.ToDecimal(
-                            reader["Precio3"]),
+                        Precio2 =
+                             Convert.ToDecimal(
+                                 reader["Precio2"]),
+                        Precio3 =
+                             Convert.ToDecimal(
+                                reader["Precio3"]),
 
-                    CantidadMayoreo2 =
-                         Convert.ToInt32(
-                             reader["CantidadMayoreo2"]),
+                        CantidadMayoreo2 =
+                             Convert.ToInt32(
+                                 reader["CantidadMayoreo2"]),
 
-                    CantidadMayoreo3 =
-                         Convert.ToInt32(
-                             reader["CantidadMayoreo3"]),
+                        CantidadMayoreo3 =
+                             Convert.ToInt32(
+                                 reader["CantidadMayoreo3"]),
 
-                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
-                        ? (byte[])reader["PrimeraImagenData"]
-                        : null,
+                        ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
+                            ? (byte[])reader["PrimeraImagenData"]
+                            : null,
 
-                    CategoriaId =
-                        reader["CategoriaId"] != DBNull.Value
-                        ? Convert.ToInt32(reader["CategoriaId"])
-                        : 0,
-                });
-            }
+                        CategoriaId =
+                            reader["CategoriaId"] != DBNull.Value
+                            ? Convert.ToInt32(reader["CategoriaId"])
+                            : 0,
+                    });
+                }
         }
 
         // =========================================
@@ -225,9 +225,7 @@ namespace FarmaciaPOS
 
             try
             {
-                using SqlConnection conn =
-                    new SqlConnection(DatabaseHelper.ConnectionString);
-
+                using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
                 conn.Open();
 
                 string query =
@@ -242,19 +240,28 @@ namespace FarmaciaPOS
 
                 while (reader.Read())
                 {
-                    int productoId = Convert.ToInt32(reader["ProductoId"]);
-                    int totalVendido = Convert.ToInt32(reader["TotalVendido"]);
-                    ventasPorProducto[productoId] = totalVendido;
+                    ventasPorProducto[Convert.ToInt32(reader["ProductoId"])] =
+                        Convert.ToInt32(reader["TotalVendido"]);
                 }
             }
-            catch
-            {
-                
-            }
+            catch { }
         }
 
         private int VentasDe(Producto p) =>
             ventasPorProducto.TryGetValue(p.Id, out int total) ? total : 0;
+
+
+        // =========================================
+        // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
+        // =========================================
+
+        private void CargarCatalogo()
+        {
+            icProductosCatalogo.ItemsSource = productos
+                .OrderByDescending(p => VentasDe(p))
+                .ThenBy(p => p.Nombre)
+                .ToList();
+        }
 
         // =========================================
         // INICIALIZAR CARRITO CENTRAL
@@ -1025,17 +1032,7 @@ namespace FarmaciaPOS
                 .ToList();
         }
 
-        // =========================================
-        // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
-        // =========================================
-
-        private void CargarCatalogo()
-        {
-            icProductosCatalogo.ItemsSource = productos
-                .OrderByDescending(p => VentasDe(p))
-                .ThenBy(p => p.Nombre)
-                .ToList();
-        }
+       
 
         // =========================================
         // ✅ AGREGAR PRODUCTO DESDE EL CATÁLOGO (CON CANTIDAD)

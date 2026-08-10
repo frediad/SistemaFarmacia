@@ -11,6 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.json" />
+    <None Remove="click.ico" />
+    <None Remove="farma.ico" />
     <None Remove="icono\logo-icono.ico" />
     <None Remove="Images\logo-click.png" />
     <None Remove="Images\logo-sin-fondo.png" />
@@ -21,11 +24,25 @@
     <None Remove="logo.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
  
 
  
 
   <ItemGroup>
+    <Resource Include="click.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="farma.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="logo-icono.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -96,10 +113,6 @@
 
   <ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\FarmaciaAPI\FarmaciaAPI.csproj" />
   </ItemGroup>
 
 </Project>

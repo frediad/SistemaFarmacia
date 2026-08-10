@@ -76,11 +76,9 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     "No se pudo verificar el estado de la caja: " + ex.Message,
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    "Error");
 
                 pnlAbrirNueva.Visibility = Visibility.Visible;
                 pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
@@ -102,7 +100,7 @@ namespace FarmaciaPOS.Views
         {
             if (!decimal.TryParse(txtMontoInicial.Text, out decimal monto) || monto < 0)
             {
-                MessageBox.Show("Ingresa un monto inicial válido");
+                MensajeHelper.Error("Ingresa un monto inicial válido");
                 return;
             }
 
@@ -129,11 +127,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    "No se pudo abrir la caja: " + ex.Message,
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MensajeHelper.Error("No se pudo abrir la caja: " + ex.Message, "Error");
             }
         }
 

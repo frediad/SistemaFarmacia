@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using FarmaciaPOS.Helpers;
 
 namespace FarmaciaPOS.Views
 {
@@ -83,11 +84,9 @@ namespace FarmaciaPOS.Views
             ActualizarLista();
             ActualizarBannerVentaActual();
 
-            MessageBox.Show(
+            MensajeHelper.Info(
                 $"Venta \"{ventaEspera.Referencia}\" guardada en espera",
-                "En espera",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                "En espera");
         }
 
         // =========================================

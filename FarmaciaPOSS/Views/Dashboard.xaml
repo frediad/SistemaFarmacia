@@ -5,7 +5,7 @@
         Title="Sistema de Ventas"
         Height="750"
         Width="1250"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8"
         PreviewKeyDown="DashboardWindow_PreviewKeyDown"
@@ -375,19 +375,19 @@
                                 Foreground="#32248A"
                                 Click="BtnReportes_Click"/>
 
-                        <Button x:Name="btnConfiguracion"
-                                Content="Configuración"
-                                Style="{StaticResource BtnMenuSuperior}"
-                                Height="40"
-                                Foreground="#32248A"
-                                Click="BtnConfiguracion_Click"/>
-
                         <Button x:Name="btnCaja"
                                 Content="Caja"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
                                 Foreground="#32248A"
                                 Click="BtnCaja_Click"/>
+
+                        <Button x:Name="btnConfiguracion"
+                                Content="Configuración"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="#32248A"
+                                Click="BtnConfiguracion_Click"/>
 
                     </StackPanel>
 
