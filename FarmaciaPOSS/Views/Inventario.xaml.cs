@@ -83,13 +83,9 @@ namespace FarmaciaPOS.Views
             conn.Open();
 
             string query =
-            @"SELECT p.*,
-            (SELECT TOP 1 img.ImagenData
-            FROM ImagenesProducto img
-            WHERE img.ProductoId = p.Id
-            ORDER BY img.Orden) AS PrimeraImagenData
-            FROM Productos p
-            WHERE p.Activo = 1";
+            @"SELECT * FROM Productos p
+              WHERE p.Activo = 1
+              ORDER BY p.Nombre";
 
             SqlCommand cmd = new SqlCommand(query, conn);
             SqlDataReader reader = cmd.ExecuteReader();
@@ -103,9 +99,10 @@ namespace FarmaciaPOS.Views
                     CodigoBarras = reader["CodigoBarras"].ToString(),
                     PrecioCompra = Convert.ToDecimal(reader["PrecioCompra"]),
                     PrecioVenta = Convert.ToDecimal(reader["PrecioVenta"]),
-                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
-                        ? (byte[])reader["PrimeraImagenData"]
-                        : null,
+                    ImagenURL =
+                        reader["ImagenURL"] != DBNull.Value
+                            ? reader["ImagenURL"].ToString()
+                            : "",
 
                     StockMinimo = reader["StockMinimo"] != DBNull.Value
                         ? Convert.ToInt32(reader["StockMinimo"])

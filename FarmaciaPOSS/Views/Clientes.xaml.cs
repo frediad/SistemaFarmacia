@@ -1,12 +1,12 @@
-﻿using FarmaciaAPI.Models;
+﻿
 using FarmaciaPOS.Helpers;
-using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using FarmaciaPOS.Models;
 
 namespace FarmaciaPOS.Views
 {

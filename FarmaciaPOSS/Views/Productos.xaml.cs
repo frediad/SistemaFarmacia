@@ -1,12 +1,13 @@
 ﻿
-using FarmaciaPOS.Models;
 using FarmaciaPOS.Helpers;
+using FarmaciaPOS.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FarmaciaPOS.Views
 {
@@ -1033,6 +1034,73 @@ namespace FarmaciaPOS.Views
                 DateTime.Now.Ticks
                 .ToString()
                 .Substring(0, 12);
+        }
+
+        // =========================================
+        // ✅ ESCÁNER DE CÓDIGO DE BARRAS
+        // =========================================
+
+        private void TxtCodigo_GotFocus(object sender, RoutedEventArgs e)
+        {
+            // Selecciona todo el texto al entrar al campo, así un nuevo escaneo
+            // reemplaza el código anterior en vez de pegarse al final.
+            txtCodigo.SelectAll();
+        }
+
+        private void TxtCodigo_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (e.Key != Key.Enter)
+                return;
+
+            e.Handled = true;
+
+            string codigoEscaneado = txtCodigo.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(codigoEscaneado))
+                return;
+
+            // ¿Ese código ya pertenece a un producto existente?
+            var productoExistente = listaCompletaProductos
+                .FirstOrDefault(p => p.CodigoBarras == codigoEscaneado);
+
+            if (productoExistente != null)
+            {
+                // Si estamos creando un producto nuevo, avisamos antes de sobreescribir el formulario
+                if (productoId == 0 &&
+                    (!string.IsNullOrWhiteSpace(txtNombre.Text) || !string.IsNullOrWhiteSpace(txtDescripcion.Text)))
+                {
+                    bool continuar = MensajeHelper.Confirmar(
+                        $"Este código ya pertenece a \"{productoExistente.Nombre}\".\n\n" +
+                        "¿Deseas cargar ese producto para editarlo? Se perderán los datos no guardados del formulario actual.",
+                        "Código ya registrado",
+                        this);
+
+                    if (!continuar)
+                        return;
+                }
+
+                // Selecciona esa fila en la tabla — dispara dgProductos_SelectionChanged,
+                // que ya se encarga de llenar todo el formulario con sus datos.
+                dgProductos.SelectedItem = productoExistente;
+                dgProductos.ScrollIntoView(productoExistente);
+
+                MensajeHelper.Info(
+                    $"Producto encontrado: \"{productoExistente.Nombre}\". Se cargó para editar.",
+                    "Producto existente",
+                    this);
+            }
+            else
+            {
+                // Código nuevo — no existe todavía, así que solo avanzamos el foco
+                // para continuar registrando el producto nuevo.
+                MensajeHelper.Info(
+                    "Código nuevo. Continúa llenando los datos del producto.",
+                    "Código disponible",
+                    this);
+
+                txtNombre.Focus();
+            }
         }
 
         private void BtnCancelar_Click(

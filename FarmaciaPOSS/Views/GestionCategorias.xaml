@@ -4,6 +4,7 @@
         Title="Gestionar Categorías y Subcategorías"
         Height="620"
         Width="900"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F0F4F8">

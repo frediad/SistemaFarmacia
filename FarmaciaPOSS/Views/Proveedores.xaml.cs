@@ -151,7 +151,7 @@ namespace FarmaciaPOS.Views
 
             cmd.ExecuteNonQuery();
 
-            MessageBox.Show(
+            MensajeHelper.Info(
                 "Proveedor agregado");
 
             CargarProveedores();
@@ -168,7 +168,7 @@ namespace FarmaciaPOS.Views
             if (dgProveedores.SelectedItem
                 is not Proveedor proveedor)
             {
-                MessageBox.Show(
+                MensajeHelper.Info(
                     "Selecciona un proveedor");
 
                 return;
@@ -192,8 +192,7 @@ namespace FarmaciaPOS.Views
 
             cmd.ExecuteNonQuery();
 
-            MessageBox.Show(
-                "Proveedor eliminado");
+            MensajeHelper.Info("Proveedor eliminado");
 
             CargarProveedores();
         }
@@ -202,7 +201,7 @@ namespace FarmaciaPOS.Views
         {
             if (dgProveedores.SelectedItem is not Proveedor proveedor)
             {
-                MessageBox.Show("Selecciona un proveedor de la lista");
+                MensajeHelper.Info("Selecciona un proveedor de la lista");
                 return;
             }
 

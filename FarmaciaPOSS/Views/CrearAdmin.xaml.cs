@@ -31,19 +31,19 @@ namespace FarmaciaPOS.Views
                 string.IsNullOrWhiteSpace(usuario) ||
                 string.IsNullOrWhiteSpace(password))
             {
-                MostrarError("Todos los campos son obligatorios.");
+                MensajeHelper.Error("Todos los campos son obligatorios.");
                 return;
             }
 
             if (password.Length < 6)
             {
-                MostrarError("La contraseña debe tener al menos 6 caracteres.");
+                MensajeHelper.Error("La contraseña debe tener al menos 6 caracteres.");
                 return;
             }
 
             if (password != passwordConfirmar)
             {
-                MostrarError("Las contraseñas no coinciden.");
+                MensajeHelper.Error("Las contraseñas no coinciden.");
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace FarmaciaPOS.Views
                 // en pantalla en vez de crashear la app.
                 if (UsuarioSetupHelper.ExisteAdministrador())
                 {
-                    MostrarError("Ya existe un usuario administrador. Cierra esta ventana e inicia sesión normalmente.");
+                    MensajeHelper.Error("Ya existe un usuario administrador. Cierra esta ventana e inicia sesión normalmente.");
                     return;
                 }
 
@@ -66,7 +66,7 @@ namespace FarmaciaPOS.Views
 
                 if ((int)cmdExiste.ExecuteScalar() > 0)
                 {
-                    MostrarError("Ese nombre de usuario ya está en uso.");
+                    MensajeHelper.Error("Ese nombre de usuario ya está en uso.");
                     return;
                 }
 
@@ -76,7 +76,7 @@ namespace FarmaciaPOS.Views
 
                 if (resultadoRol == null)
                 {
-                    MostrarError("No se encontró el rol 'Administrador' en la base de datos. Verifica la tabla Roles.");
+                    MensajeHelper.Error("No se encontró el rol 'Administrador' en la base de datos. Verifica la tabla Roles.");
                     return;
                 }
 
@@ -105,25 +105,18 @@ namespace FarmaciaPOS.Views
 
                 UsuarioCreado = true;
 
-                MessageBox.Show(
+                MensajeHelper.Exito(
                     "Usuario administrador creado correctamente. Ya puedes iniciar sesión.",
-                    "Éxito",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    "Éxito");
 
                 DialogResult = true;
             }
             catch (Exception ex)
             {
-                MostrarError("Error al crear el usuario: " + ex.Message);
+                MensajeHelper.Error("Error al crear el usuario: " + ex.Message);
             }
         }
 
-        private void MostrarError(string mensaje)
-        {
-            txtError.Text = mensaje;
-            borderError.Visibility = Visibility.Visible;
-        }
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
         {

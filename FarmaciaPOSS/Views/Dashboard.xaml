@@ -5,7 +5,7 @@
         Title="Sistema de Ventas"
         Height="750"
         Width="1250"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8"
         PreviewKeyDown="DashboardWindow_PreviewKeyDown"
@@ -311,13 +311,13 @@
                             VerticalAlignment="Center">
 
                     <Image Source="/Images/logo-click.png"
-                           Width="55"
-                           Height="55"
+                           Width="60"
+                           Height="60"
                            Margin="0,0,12,0"/>
 
                     <StackPanel VerticalAlignment="Center">
 
-                        <TextBlock Text="FarmaClick Yatzil"
+                        <TextBlock Text="Farmacia Yatzil"
                                    FontSize="24"
                                    FontWeight="Bold"
                                    Foreground="White"/>
@@ -375,19 +375,19 @@
                                 Foreground="#32248A"
                                 Click="BtnReportes_Click"/>
 
-                        <Button x:Name="btnConfiguracion"
-                                Content="Configuración"
-                                Style="{StaticResource BtnMenuSuperior}"
-                                Height="40"
-                                Foreground="#32248A"
-                                Click="BtnConfiguracion_Click"/>
-
                         <Button x:Name="btnCaja"
                                 Content="Caja"
                                 Style="{StaticResource BtnMenuSuperior}"
                                 Height="40"
                                 Foreground="#32248A"
                                 Click="BtnCaja_Click"/>
+
+                        <Button x:Name="btnConfiguracion"
+                                Content="Configuración"
+                                Style="{StaticResource BtnMenuSuperior}"
+                                Height="40"
+                                Foreground="#32248A"
+                                Click="BtnConfiguracion_Click"/>
 
                     </StackPanel>
 
@@ -696,6 +696,25 @@
                             </StackPanel>
                         </Button>
 
+                        <Button x:Name="btnLateralEliminar"
+                                Style="{StaticResource BtnLateral}"
+                                Click="BtnEliminar_Click">
+                            <StackPanel>
+                                <TextBlock Text="🗑️"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Remover"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="#374151"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="F7"
+                                           FontSize="9"
+                                           Foreground="#94A3B8"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                         <Button x:Name="btnCantidad"
                                 Style="{StaticResource BtnLateral}"
                                 Click="BtnCantidad_Click">
@@ -715,24 +734,6 @@
                             </StackPanel>
                         </Button>
 
-                        <Button x:Name="btnLateralEliminar"
-                                Style="{StaticResource BtnLateral}"
-                                Click="BtnEliminar_Click">
-                            <StackPanel>
-                                <TextBlock Text="🗑️"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Remover"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#374151"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="F7"
-                                           FontSize="9"
-                                           Foreground="#94A3B8"
-                                           HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
 
                         <Button x:Name="btnLateralDescuento"
                                 Style="{StaticResource BtnLateral}"

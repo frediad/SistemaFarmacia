@@ -13,6 +13,8 @@ namespace FarmaciaPOS.Helpers
         public int RespaldoIntervaloHoras { get; set; } = 24;
         public DateTime? UltimoRespaldo { get; set; }
         public string ModoConexion { get; set; } = "Ambas"; // "Local" | "Azure" | "Ambas"
+
+        public int AnchoTicketMM { get; set; } = 58;
     }
 
     public static class ConfiguracionPosHelper

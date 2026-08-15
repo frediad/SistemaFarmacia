@@ -6,19 +6,25 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>farma.ico</ApplicationIcon>
+	
   
     
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="icono\logo-icono.ico" />
+	  <None Remove="appsettings.json" />
+    <None Remove="farma.ico" />
     <None Remove="Images\logo-click.png" />
-    <None Remove="Images\logo-sin-fondo.png" />
-    <None Remove="Images\Logo.png" />
-    <None Remove="logito.ico" />
-    <None Remove="logo-mtc %281%29.ico" />
-    <None Remove="logo-sin-fondo.ico" />
-    <None Remove="logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+   
   </ItemGroup>
 
  
@@ -26,12 +32,18 @@
  
 
   <ItemGroup>
+    <Resource Include="click.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="farma.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="logo-icono.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Images\logo-click.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+	<Resource Include="Images\logo-click.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	 </Resource>
     <Resource Include="Images\logo-sin-fondo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -65,13 +77,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QuestPDF" Version="2026.6.0" />
-    <PackageReference Include="Syncfusion.SfChart.WPF" Version="33.2.15" />
+    <PackageReference Include="Syncfusion.SfChart.WPF" Version="34.2.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\FarmaciaAPI\FarmaciaAPI.csproj" />
+    <PackageReference Include="System.Management" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>

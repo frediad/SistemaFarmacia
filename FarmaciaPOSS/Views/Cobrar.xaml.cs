@@ -95,7 +95,7 @@ namespace FarmaciaPOS.Views
         {
             if (carrito.Count == 0)
             {
-                MessageBox.Show("No hay productos en el carrito.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MensajeHelper.Info("No hay productos en el carrito.", "Aviso");
                 return;
             }
 
@@ -108,13 +108,13 @@ namespace FarmaciaPOS.Views
             {
                 if (!decimal.TryParse(txtMontoRecibido.Text, out pago))
                 {
-                    MessageBox.Show("Ingresa un monto válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MensajeHelper.Info("Ingresa un monto válido.", "Aviso");
                     return;
                 }
 
                 if (pago < total)
                 {
-                    MessageBox.Show("El pago es insuficiente.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MensajeHelper.Info("El pago es insuficiente.", "Aviso");
                     return;
                 }
 
@@ -181,11 +181,9 @@ namespace FarmaciaPOS.Views
 
                 VentaCompletada = true;
 
-                MessageBox.Show(
+                MensajeHelper.Info(
                     $"✅ Venta registrada correctamente.\n\nFolio: {folio}\nMétodo: {metodoPago}\nCambio: {cambio:C}",
-                    "Venta exitosa",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    "Venta exitosa"  );
 
                 PreguntarEImprimirTicket(folio, pago, cambio);
 
@@ -194,7 +192,7 @@ namespace FarmaciaPOS.Views
             catch (Exception ex)
             {
                 trans.Rollback();
-                MessageBox.Show("Error al registrar la venta: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MensajeHelper.Error("Error al registrar la venta: " + ex.Message, "Error");
             }
         }
 
@@ -204,24 +202,20 @@ namespace FarmaciaPOS.Views
 
         private void PreguntarEImprimirTicket(string folio, decimal pago, decimal cambio)
         {
-            var resultado = MessageBox.Show(
+            var resultado = MensajeHelper.Confirmar(
                 "¿Deseas imprimir el ticket de esta venta?",
-                "Imprimir ticket",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                "Imprimir ticket");
 
-            if (resultado != MessageBoxResult.Yes)
+            if (resultado != true)
                 return;
 
             var config = ConfiguracionPosHelper.Cargar();
 
             if (string.IsNullOrWhiteSpace(config.ImpresoraTicket))
             {
-                MessageBox.Show(
+                MensajeHelper.Info(
                     "No hay una impresora configurada. Ve a Configuración para asignar una.",
-                    "Impresora no configurada",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                    "Impresora no configurada");
                 return;
             }
 
@@ -239,11 +233,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    "No se pudo imprimir el ticket: " + ex.Message,
-                    "Error de impresión",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MensajeHelper.Error("No se pudo imprimir el ticket: " + ex.Message, "Error de impresión");
             }
         }
 

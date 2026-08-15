@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
 using System.Windows.Input;
+using FarmaciaPOS.Models;
 
 namespace FarmaciaPOS.Views
 {
@@ -14,79 +15,89 @@ namespace FarmaciaPOS.Views
         {
             InitializeComponent();
             VerificarSiMostrarCrearAdmin();
-
-
         }
 
         private void BtnLogin_Click(
             object sender,
             RoutedEventArgs e)
         {
-            string usuario =
-                txtUsuario.Text;
-
-            string password =
-                txtPassword.Password;
-
-            string passwordHash = HashPassword(password);
-
-            using SqlConnection conn =
-                new SqlConnection(DatabaseHelper.ConnectionString);
-
-            conn.Open();
-
-            string query =
-            @"SELECT U.*, R.Nombre AS Rol
-            FROM Usuarios U
-            INNER JOIN Roles R
-            ON U.RolId = R.Id
-            WHERE U.UsuarioLogin = @Usuario
-            AND U.PasswordHash = @Password
-            AND U.Activo = 1";
-
-            SqlCommand cmd =
-                new SqlCommand(query, conn);
-
-            cmd.Parameters.AddWithValue(
-                "@Usuario",
-                usuario);
-
-            cmd.Parameters.AddWithValue(
-                "@Password",
-                passwordHash);
-
-            SqlDataReader reader =
-                cmd.ExecuteReader();
-
-            if (reader.Read())
+            try
             {
-                Sesion.UsuarioId =
-                Convert.ToInt32(reader["Id"]);
+                string usuario =
+                    txtUsuario.Text;
 
-                Sesion.NombreUsuario =
-                    reader["Nombre"].ToString();
+                string password =
+                    txtPassword.Password;
 
-                Sesion.RolId =
-                    Convert.ToInt32(reader["RolId"]);
+                string passwordHash = HashPassword(password);
 
-                Sesion.Rol =
-                    reader["Rol"].ToString();
+                using SqlConnection conn =
+                    new SqlConnection(DatabaseHelper.ConnectionString);
 
-                reader.Close();
+                conn.Open();
 
-                // ✅ Apertura de caja obligatoria antes de entrar al dashboard
-                var ventanaCaja = new AbrirCajaWindow();
-                ventanaCaja.ShowDialog();
+                string query =
+                @"SELECT U.*, R.Nombre AS Rol
+                  FROM Usuarios U
+                  INNER JOIN Roles R
+                  ON U.RolId = R.Id
+                  WHERE U.UsuarioLogin = @Usuario
+                  AND U.PasswordHash = @Password
+                  AND U.Activo = 1";
 
-                MainWindow main = new MainWindow();
-                main.Show();
+                SqlCommand cmd =
+                    new SqlCommand(query, conn);
 
-                this.Close();
+                cmd.Parameters.AddWithValue(
+                    "@Usuario",
+                    usuario);
+
+                cmd.Parameters.AddWithValue(
+                    "@Password",
+                    passwordHash);
+
+                SqlDataReader reader =
+                    cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    Sesion.UsuarioId =
+                        Convert.ToInt32(reader["Id"]);
+
+                    Sesion.NombreUsuario =
+                        reader["Nombre"].ToString();
+
+                    Sesion.RolId =
+                        Convert.ToInt32(reader["RolId"]);
+
+                    Sesion.Rol =
+                        reader["Rol"].ToString();
+
+                    reader.Close();
+                    conn.Close();
+
+                    // ✅ Apertura de caja obligatoria
+                    var ventanaCaja = new AbrirCajaWindow();
+                    ventanaCaja.ShowDialog();
+
+                    // ✅ Abrir pantalla principal
+                    MainWindow main = new MainWindow();
+                    main.Show();
+
+                    this.Close();
+                }
+                else
+                {
+                    MensajeHelper.Error(
+                        "Usuario o contraseña incorrectos.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(
-                    "Usuario o contraseña incorrectos");
+                MensajeHelper.Error(
+                    $"Error en Login:\n\n{ex.Message}\n\n" +
+                    $"Stack:\n{ex.StackTrace}",
+                    "ERROR");
             }
         }
 
@@ -99,6 +110,19 @@ namespace FarmaciaPOS.Views
             {
                 BtnLogin_Click(sender, e);
             }
+        }
+
+        // ✅ Cierra la app desde el botón "✕" propio (WindowStyle="None" quita el nativo)
+        private void BtnCerrarLogin_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        // ✅ Permite arrastrar la ventana (WindowStyle="None" quita el drag nativo)
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+                this.DragMove();
         }
 
         private string HashPassword(string password)

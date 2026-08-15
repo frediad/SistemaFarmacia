@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using FarmaciaPOS.Helpers;
 
 namespace FarmaciaPOS.Views
 {
@@ -14,8 +15,6 @@ namespace FarmaciaPOS.Views
 
         public VentaEnEspera VentaSeleccionada { get; private set; }
 
-        // ✅ Indica si, DESDE esta ventana, se guardó el carrito actual en espera.
-        // MainWindow usa esto para saber si debe limpiar su propio carrito.
         public bool VentaActualGuardada { get; private set; } = false;
 
         public VentasEnEsperaWindow(
@@ -42,7 +41,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ BANNER DE LA VENTA ACTUAL (carrito en curso)
+        // BANNER DE LA VENTA ACTUAL (carrito en curso)
         // =========================================
 
         private void ActualizarBannerVentaActual()
@@ -75,19 +74,16 @@ namespace FarmaciaPOS.Views
 
             _ventasEnEspera.Add(ventaEspera);
 
-            // Ya se guardó: vaciamos la referencia local para ocultar el banner,
-            // y marcamos la bandera para que MainWindow sepa que debe limpiar su carrito.
             _carritoActual.Clear();
             VentaActualGuardada = true;
 
             ActualizarLista();
             ActualizarBannerVentaActual();
 
-            MessageBox.Show(
+            MensajeHelper.Exito(
                 $"Venta \"{ventaEspera.Referencia}\" guardada en espera",
                 "En espera",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                this);
         }
 
         // =========================================
@@ -99,18 +95,16 @@ namespace FarmaciaPOS.Views
             if (sender is not Button btn || btn.Tag is not VentaEnEspera venta)
                 return;
 
-            // ✅ Si el usuario trae productos sin guardar, avisamos antes de perderlos
             if (_carritoActual.Count > 0 && !VentaActualGuardada)
             {
-                var confirmar = MessageBox.Show(
+                bool confirmar = MensajeHelper.Confirmar(
                     "Tienes productos en tu venta actual que no has guardado.\n\n" +
                     "Si recuperas esta venta en espera, tu venta actual se perderá.\n\n" +
                     "¿Deseas continuar de todos modos?",
                     "Venta actual sin guardar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
+                    this);
 
-                if (confirmar != MessageBoxResult.Yes)
+                if (!confirmar)
                     return;
             }
 
@@ -123,13 +117,12 @@ namespace FarmaciaPOS.Views
         {
             if (sender is Button btn && btn.Tag is VentaEnEspera venta)
             {
-                var confirmar = MessageBox.Show(
+                bool confirmar = MensajeHelper.Confirmar(
                     $"¿Eliminar la venta en espera \"{venta.Referencia}\"?",
                     "Confirmar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                    this);
 
-                if (confirmar == MessageBoxResult.Yes)
+                if (confirmar)
                 {
                     _ventasEnEspera.Remove(venta);
                     ActualizarLista();

@@ -2,18 +2,26 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Iniciar Sesión"
-        Height="520"
-        Width="950"
-        Icon="/logo-icono.ico"
+        Height="560"
+        Width="880"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#F0F4F8"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         PreviewKeyDown="Login_PreviewKeyDown">
 
+    <Window.Resources>
 
+        <!-- ===================================== -->
+        <!-- GRADIENTE DE MARCA (reutilizable)     -->
+        <!-- ===================================== -->
 
-
-<Window.Resources>
+        <LinearGradientBrush x:Key="BrandGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#1E3A8A" Offset="0"/>
+            <GradientStop Color="#2563EB" Offset="1"/>
+        </LinearGradientBrush>
 
         <!-- ===================================== -->
         <!-- ESTILO CAMPOS DE TEXTO                -->
@@ -21,7 +29,7 @@
 
         <Style x:Key="TxtLogin" TargetType="TextBox">
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Padding" Value="44,0,14,0"/>
             <Setter Property="BorderThickness" Value="1.5"/>
             <Setter Property="BorderBrush" Value="#E2E8F0"/>
             <Setter Property="Background" Value="#F8FAFC"/>
@@ -34,7 +42,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
+                                CornerRadius="12">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Margin="{TemplateBinding Padding}"
                                           VerticalAlignment="Center"/>
@@ -59,7 +67,7 @@
 
         <Style x:Key="PwdLogin" TargetType="PasswordBox">
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Padding" Value="44,0,14,0"/>
             <Setter Property="BorderThickness" Value="1.5"/>
             <Setter Property="BorderBrush" Value="#E2E8F0"/>
             <Setter Property="Background" Value="#F8FAFC"/>
@@ -73,7 +81,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
+                                CornerRadius="12">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Margin="{TemplateBinding Padding}"
                                           VerticalAlignment="Center"/>
@@ -99,7 +107,7 @@
         <Style x:Key="BtnLoginPrincipal" TargetType="Button">
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -108,9 +116,19 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                CornerRadius="12">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="Iniciar Sesión" VerticalAlignment="Center"/>
+                                <Path Data="M0,0 L6,5 L0,10"
+                                      Stroke="White"
+                                      StrokeThickness="2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Margin="10,0,0,0"
+                                      VerticalAlignment="Center"/>
+                            </StackPanel>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -125,122 +143,217 @@
             </Setter>
         </Style>
 
+        <Style x:Key="FeatureBullet" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+        </Style>
+
     </Window.Resources>
 
-    <Border Background="White"
-            CornerRadius="18"
-            Margin="18">
+    <!-- ✅ Arrastrar la ventana (no hay barra de título nativa) -->
+    <Border x:Name="borderVentana"
+            Background="White"
+            CornerRadius="20"
+            Margin="18"
+            MouseLeftButtonDown="Border_MouseLeftButtonDown">
 
         <Border.Effect>
             <DropShadowEffect Color="#000000"
-                              Opacity="0.12"
-                              BlurRadius="30"
-                              ShadowDepth="6"/>
+                              Opacity="0.25"
+                              BlurRadius="35"
+                              ShadowDepth="8"/>
         </Border.Effect>
 
         <Border.Clip>
-            <RectangleGeometry Rect="0,0,914,484" RadiusX="18" RadiusY="18"/>
+            <RectangleGeometry Rect="0,0,924,524" RadiusX="20" RadiusY="20"/>
         </Border.Clip>
 
         <Grid>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="340"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
-            
 
             <!-- ===================================== -->
-            <!-- PANEL IZQUIERDO — MARCA               -->
+            <!-- DIVISOR ONDULADO (capa de fondo)      -->
+            <!-- ===================================== -->
+            <!-- Dibuja TODO el área azul con un borde derecho ondulado,
+                 en vez de depender de la línea recta de la columna.
+                 Va primero en el árbol visual = queda debajo del contenido. -->
+
+            <Path Grid.ColumnSpan="2"
+                  HorizontalAlignment="Left"
+                  Width="440"
+                  Height="524"
+                  Fill="{StaticResource BrandGradient}"
+                  Data="M0,0 L340,0
+                        C 510,70 270,150 348,210
+                        C 460,270 268,360 340,430
+                        C 400,470 300,495 340,524
+                        L0,524 Z">
+                <Path.Effect>
+                    <DropShadowEffect Color="#1E3A8A"
+                                      Opacity="0.25"
+                                      BlurRadius="14"
+                                      ShadowDepth="0"/>
+                </Path.Effect>
+            </Path>
+
+            <!-- ===================================== -->
+            <!-- BOTÓN CERRAR (por WindowStyle=None)   -->
             <!-- ===================================== -->
 
-            <Border>
+            <Button x:Name="btnCerrarLogin"
+                    Grid.ColumnSpan="2"
+                    Content="✕"
+                    Width="34" Height="34"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,14,14,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="#94A3B8"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Click="BtnCerrarLogin_Click"
+                    Panel.ZIndex="10"/>
 
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#1E3A8A" Offset="0"/>
-                        <GradientStop Color="#1E40AF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <!-- ===================================== -->
+            <!-- PANEL IZQUIERDO — MARCA (contenido)   -->
+            <!-- ===================================== -->
 
-                <Grid>
+            <Grid Grid.Column="0" ClipToBounds="True">
 
-                    <!-- Decoración: círculos translúcidos -->
-                    <Ellipse Width="220" Height="220"
-                             Fill="#FFFFFF"
-                             Opacity="0.05"
-                             HorizontalAlignment="Right"
-                             VerticalAlignment="Top"
-                             Margin="0,-80,-90,0"/>
+                <!-- Patrón decorativo: rombos concéntricos -->
+                <Canvas>
+                    <Path Data="M75,-30 L155,50 L75,130 L-5,50 Z"
+                          Stroke="White" StrokeThickness="1.4" Opacity="0.10"/>
+                    <Path Data="M75,10 L135,70 L75,130 L15,70 Z"
+                          Stroke="White" StrokeThickness="1.4" Opacity="0.14"/>
+                    <Path Data="M260,300 L330,370 L260,440 L190,370 Z"
+                          Stroke="White" StrokeThickness="1.4" Opacity="0.08"/>
+                    <Path Data="M280,320 L320,360 L280,400 L240,360 Z"
+                          Fill="White" Opacity="0.05"/>
+                </Canvas>
 
-                    <Ellipse Width="160" Height="160"
-                             Fill="#FFFFFF"
-                             Opacity="0.06"
-                             HorizontalAlignment="Left"
-                             VerticalAlignment="Bottom"
-                             Margin="-60,0,0,-60"/>
+                <!-- Silueta escalonada tipo pirámide -->
+                <StackPanel VerticalAlignment="Bottom">
+                    <Border Height="14" Width="330" Background="White" Opacity="0.05" HorizontalAlignment="Center"/>
+                    <Border Height="14" Width="270" Background="White" Opacity="0.06" HorizontalAlignment="Center"/>
+                    <Border Height="14" Width="210" Background="White" Opacity="0.08" HorizontalAlignment="Center"/>
+                    <Border Height="14" Width="150" Background="White" Opacity="0.10" HorizontalAlignment="Center"/>
+                    <Border Height="14" Width="90"  Background="White" Opacity="0.12" HorizontalAlignment="Center"/>
+                </StackPanel>
 
-                    <StackPanel VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Margin="30">
+                <!-- Contenido: logo, nombre, features -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Margin="40,0">
 
-                        <Border Background="White"
-                                CornerRadius="20"
-                                Width="140"
-                                Height="140"
-                                HorizontalAlignment="Center">
+                    <Border Background="White"
+                            CornerRadius="24"
+                            Width="110"
+                            Height="110"
+                            HorizontalAlignment="Center">
 
-                            <Border.Effect>
-                                <DropShadowEffect Color="#000000"
-                                                  Opacity="0.15"
-                                                  BlurRadius="20"
-                                                  ShadowDepth="4"/>
-                            </Border.Effect>
+                        <Border.Effect>
+                            <DropShadowEffect Color="#000000"
+                                              Opacity="0.20"
+                                              BlurRadius="18"
+                                              ShadowDepth="4"/>
+                        </Border.Effect>
 
-                            <Image Source="/Images/logo-click.png"
-                                   Width="100"
-                                   Height="100"
-                                   Stretch="Uniform"/>
+                        <Image Source="/Images/logo-click.png"
+                               Width="80"
+                               Height="86"
+                               Stretch="Uniform"/>
 
-                        </Border>
+                    </Border>
 
-                        <TextBlock Text="FarmaClick Yatzil"
-                                   Foreground="White"
-                                   FontSize="30"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,24,0,0"/>
+                    <TextBlock Text="Farmacia Yatzil"
+                               Foreground="White"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,20,0,4"/>
 
-                        <TextBlock Text="Tu sistema de ventas de confianza"
-                                   Foreground="#93C5FD"
-                                   FontSize="14"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,6,0,0"/>
+                    <TextBlock Text="Tu sistema de ventas de confianza"
+                               Foreground="#BFDBFE"
+                               FontSize="13"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,32"/>
 
+                    <StackPanel Style="{StaticResource FeatureBullet}">
+                        <Border Width="22" Height="22" CornerRadius="11" Background="#FFFFFF" Opacity="0.15"/>
+                        <Path Data="M1,5 L4,8 L10,1" Stroke="White" StrokeThickness="2"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"
+                              Margin="-17,6,0,0" Width="10" Height="9"/>
+                        <TextBlock Text="Ventas y cobro rápido en punto de venta"
+                                   Foreground="White" FontSize="12.5" Opacity="0.9"
+                                   Margin="14,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="© 2026 FarmaClick Yatzil — v1.0"
-                               Foreground="#93C5FD"
-                               FontSize="11"
-                               Opacity="0.7"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Bottom"
-                               Margin="0,0,0,18"/>
+                    <StackPanel Style="{StaticResource FeatureBullet}">
+                        <Border Width="22" Height="22" CornerRadius="11" Background="#FFFFFF" Opacity="0.15"/>
+                        <Path Data="M1,5 L4,8 L10,1" Stroke="White" StrokeThickness="2"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"
+                              Margin="-17,6,0,0" Width="10" Height="9"/>
+                        <TextBlock Text="Control de inventario y caducidades"
+                                   Foreground="White" FontSize="12.5" Opacity="0.9"
+                                   Margin="14,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FeatureBullet}">
+                        <Border Width="22" Height="22" CornerRadius="11" Background="#FFFFFF" Opacity="0.15"/>
+                        <Path Data="M1,5 L4,8 L10,1" Stroke="White" StrokeThickness="2"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"
+                              Margin="-17,6,0,0" Width="10" Height="9"/>
+                        <TextBlock Text="Reportes y cortes de caja en tiempo real"
+                                   Foreground="White" FontSize="12.5" Opacity="0.9"
+                                   Margin="14,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
                     
+                    
+                    <TextBlock Text="¡Y mucho más!"
+                               Foreground="White"
+                               FontSize="12.5"
+                               Opacity="0.9"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
+                    
+                    <TextBlock Text="¡Vende con amor, compra con amor!"
+                               Foreground="White"
+                               FontSize="15"
+                               Opacity="0.9"
+                               HorizontalAlignment="Center"
+                               Margin="0,2,0,0"/>
 
-                </Grid>
+                </StackPanel>
+                
+                
 
-            </Border>
+                <TextBlock Text="© 2026 FarmaClick Yatzil — v1.0"
+                           Foreground="#BFDBFE"
+                           FontSize="11"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,0,18"/>
+
+            </Grid>
 
             <!-- ===================================== -->
             <!-- PANEL DERECHO — FORMULARIO            -->
             <!-- ===================================== -->
 
-            <Border Grid.Column="1" Background="White">
+
+            <Border Grid.Column="1" Background="Transparent">
 
                 <StackPanel Width="360"
-                           
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
 
@@ -254,20 +367,24 @@
                                Foreground="#94A3B8"
                                Margin="0,4,0,28"/>
 
-                    <!-- MENSAJE DE ERROR -->
                     <Border x:Name="borderError"
                             Background="#FEE2E2"
-                            CornerRadius="8"
+                            CornerRadius="10"
                             Padding="12,10"
                             Margin="0,0,0,16"
                             Visibility="Collapsed">
 
-                        <TextBlock x:Name="txtError"
-                                   Text="Usuario o contraseña incorrectos"
-                                   Foreground="#DC2626"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#DC2626"
+                                     VerticalAlignment="Top" Margin="0,4,8,0"/>
+                            <TextBlock x:Name="txtError"
+                                       Text="Usuario o contraseña incorrectos"
+                                       Foreground="#DC2626"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Width="300"/>
+                        </StackPanel>
 
                     </Border>
 
@@ -277,10 +394,19 @@
                                Foreground="#94A3B8"
                                Margin="2,0,0,6"/>
 
-                    <TextBox x:Name="txtUsuario"
-                             Height="46"
-                             Style="{StaticResource TxtLogin}"
-                             Margin="0,0,0,20"/>
+                    <Grid Margin="0,0,0,20">
+                        <TextBox x:Name="txtUsuario"
+                                 Height="48"
+                                 Style="{StaticResource TxtLogin}"/>
+                        <Canvas Width="14" Height="14"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0"
+                                IsHitTestVisible="False">
+                            <Ellipse Canvas.Left="3.5" Canvas.Top="0" Width="7" Height="7" Fill="#94A3B8"/>
+                            <Path Data="M0,14 C0,9.5 3.5,8 7,8 C10.5,8 14,9.5 14,14 Z" Fill="#94A3B8"/>
+                        </Canvas>
+                    </Grid>
 
                     <TextBlock Text="CONTRASEÑA"
                                FontSize="11"
@@ -288,44 +414,42 @@
                                Foreground="#94A3B8"
                                Margin="2,0,0,6"/>
 
-                    <PasswordBox x:Name="txtPassword"
-                                 Height="46"
-                                 Style="{StaticResource PwdLogin}"
-                                 Margin="0,0,0,30"/>
+                    <Grid Margin="0,0,0,30">
+                        <PasswordBox x:Name="txtPassword"
+                                     Height="48"
+                                     Style="{StaticResource PwdLogin}"/>
+                        <Canvas Width="14" Height="14"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0"
+                                IsHitTestVisible="False">
+                            <Rectangle Canvas.Top="6" Width="14" Height="8" RadiusX="2" RadiusY="2" Fill="#94A3B8"/>
+                            <Path Data="M3,6 V4.5 A4,4 0 0 1 11,4.5 V6"
+                                  Stroke="#94A3B8" StrokeThickness="2" Fill="Transparent"/>
+                        </Canvas>
+                    </Grid>
 
                     <Button Content="Iniciar Sesión"
                             Height="50"
                             Style="{StaticResource BtnLoginPrincipal}"
                             Click="BtnLogin_Click"/>
+
                     <TextBlock x:Name="txtCrearAdmin"
                                Text="¿No tienes cuenta? Crear usuario administrador"
                                FontSize="13"
                                FontWeight="SemiBold"
                                Foreground="#2563EB"
                                HorizontalAlignment="Center"
-                               Margin="0,18,0,0"
+                               Margin="0,20,0,0"
                                Cursor="Hand"
                                Visibility="Visible"
                                MouseLeftButtonUp="TxtCrearAdmin_Click"/>
-                        
-                   
-                    
-                    
-                    
-
-                              
 
                 </StackPanel>
-                
-                
-
             </Border>
 
         </Grid>
-        
-        
-      </Border>
+
+    </Border>
 
 </Window>
-
-  

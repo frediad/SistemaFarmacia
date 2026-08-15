@@ -186,7 +186,7 @@ namespace FarmaciaPOS.Views
                 {
                     lista.Add(new DetallePedidoView
                     {
-                        NombreProducto = reader["NombreProducto"].ToString() ?? "",
+                        Nombre = reader["Nombre"].ToString() ?? "",
                         Cantidad = Convert.ToInt32(reader["Cantidad"]),
                         Precio = Convert.ToDecimal(reader["Precio"]),
                         Subtotal = Convert.ToDecimal(reader["Subtotal"])

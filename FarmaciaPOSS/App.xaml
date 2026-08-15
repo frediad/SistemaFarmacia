@@ -8,7 +8,8 @@
 
         <ResourceDictionary>
 
-            <helpers:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+            <helpers:ByteArrayToImageConverter
+                     x:Key="ByteArrayToImageConverter"/>
 
         </ResourceDictionary>
 

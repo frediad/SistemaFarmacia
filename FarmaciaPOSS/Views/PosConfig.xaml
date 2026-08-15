@@ -4,6 +4,7 @@
         Title="Configuración POS"
         Height="700"
         Width="900"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 

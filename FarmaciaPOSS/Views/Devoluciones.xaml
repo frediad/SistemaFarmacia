@@ -4,7 +4,7 @@
         Title="Devoluciones"
         Height="750"
         Width="1150"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 
@@ -109,7 +109,7 @@
 
             <Grid.ColumnDefinitions>
                 <!-- LISTA DE VENTAS -->
-                <ColumnDefinition Width="440"/>
+                <ColumnDefinition Width="470"/>
                 <!-- DETALLE DEVOLUCIÓN -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -128,7 +128,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="38*"/>
-                        <ColumnDefinition Width="161*"/>
+                        <ColumnDefinition Width="200"/>
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
@@ -356,26 +356,26 @@
 
                             <DataGridTextColumn Header="# Venta"
                                 Binding="{Binding Id}"
-                                Width="60"/>
+                                Width="65"/>
 
                             <DataGridTextColumn Header="Folio"
                                 Binding="{Binding Folio}"
-                                Width="*"/>
+                                Width="65"/>
 
                             <DataGridTextColumn Header="Fecha"
                                 Binding="{Binding Fecha, StringFormat=dd/MM/yyyy}"
-                                Width="90"/>
+                                Width="70"/>
 
                             <DataGridTextColumn Header="Total"
                                 Binding="{Binding Total, StringFormat=C}"
-                                Width="85"/>
+                                Width="60"/>
 
                             <DataGridTextColumn Header="Vendedor"
                                 Binding="{Binding Vendedor}"
-                                Width="110"/>
+                                Width="80"/>
 
                             <DataGridTemplateColumn Header="Estado"
-                                                    Width="90">
+                                                    Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="10"

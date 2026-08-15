@@ -22,10 +22,10 @@ namespace FarmaciaPOS.Models
 
         public decimal PrecioVenta { get; set; }
 
-        
+
         public decimal Precio1 => PrecioVenta;
 
-      
+
         public decimal Precio2 { get; set; }
         public int CantidadMayoreo2 { get; set; }
 

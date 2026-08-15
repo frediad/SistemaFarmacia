@@ -70,7 +70,7 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     ex.Message,
                     "ERROR");
             }
@@ -81,8 +81,8 @@ namespace FarmaciaPOS.Views
         // =====================================
 
         private void BtnGuardar_Click(
-    object sender,
-    RoutedEventArgs e)
+            object sender,
+            RoutedEventArgs e)
         {
             try
             {
@@ -109,24 +109,24 @@ namespace FarmaciaPOS.Views
 
                     query =
                     @"INSERT INTO ConfiguracionTicket
-            (
-                NombreNegocio,
-                RFC,
-                Direccion,
-                Telefono,
-                MensajeTicket,
-                Correo
-            )
-            VALUES
-            (
-                @Nombre,
-                @RFC,
-                @Direccion,
-                @Telefono,
-                @Mensaje,
-                @Correo
+                        (
+                            NombreNegocio,
+                            RFC,
+                            Direccion,
+                            Telefono,
+                            MensajeTicket,
+                            Correo
+                        )
+                        VALUES
+                        (
+                            @Nombre,
+                            @RFC,
+                            @Direccion,
+                            @Telefono,
+                            @Mensaje,
+                            @Correo
 
-            )";
+                        )";
                 }
                 else
                 {
@@ -173,12 +173,12 @@ namespace FarmaciaPOS.Views
 
                 cmd.ExecuteNonQuery();
 
-                MessageBox.Show(
+                MensajeHelper.Exito(
                     "Configuración guardada correctamente");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     ex.Message,
                     "ERROR");
             }

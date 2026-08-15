@@ -150,13 +150,13 @@ namespace FarmaciaPOS
 
             string query =
             @"SELECT p.*,
-            (SELECT TOP 1 img.ImagenData
-            FROM ImagenesProducto img
-            WHERE img.ProductoId = p.Id
-            ORDER BY img.Orden) AS PrimeraImagenData
-            FROM Productos p
-            WHERE p.Activo = 1
-            ORDER BY p.Nombre";
+                (SELECT TOP 1 img.ImagenData
+                FROM ImagenesProducto img
+                WHERE img.ProductoId = p.Id
+                ORDER BY img.Orden) AS PrimeraImagenData
+                FROM Productos p
+                WHERE p.Activo = 1
+                ORDER BY p.Nombre";
 
             SqlCommand cmd =
                 new SqlCommand(query, conn);
@@ -225,9 +225,7 @@ namespace FarmaciaPOS
 
             try
             {
-                using SqlConnection conn =
-                    new SqlConnection(DatabaseHelper.ConnectionString);
-
+                using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
                 conn.Open();
 
                 string query =
@@ -242,19 +240,28 @@ namespace FarmaciaPOS
 
                 while (reader.Read())
                 {
-                    int productoId = Convert.ToInt32(reader["ProductoId"]);
-                    int totalVendido = Convert.ToInt32(reader["TotalVendido"]);
-                    ventasPorProducto[productoId] = totalVendido;
+                    ventasPorProducto[Convert.ToInt32(reader["ProductoId"])] =
+                        Convert.ToInt32(reader["TotalVendido"]);
                 }
             }
-            catch
-            {
-                
-            }
+            catch { }
         }
 
         private int VentasDe(Producto p) =>
             ventasPorProducto.TryGetValue(p.Id, out int total) ? total : 0;
+
+
+        // =========================================
+        // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
+        // =========================================
+
+        private void CargarCatalogo()
+        {
+            icProductosCatalogo.ItemsSource = productos
+                .OrderByDescending(p => VentasDe(p))
+                .ThenBy(p => p.Nombre)
+                .ToList();
+        }
 
         // =========================================
         // INICIALIZAR CARRITO CENTRAL
@@ -276,33 +283,84 @@ namespace FarmaciaPOS
         {
             if (e.Key == Key.Enter)
             {
-                string codigo =
-                    txtCodigoProducto.Text.Trim();
+                string texto = txtCodigoProducto.Text.Trim();
 
-                AgregarAlCarrito(codigo);
+                BuscarYAgregarProducto(texto);
 
                 txtCodigoProducto.Clear();
             }
         }
 
         // =========================================
+        // ✅ BUSCAR POR CÓDIGO DE BARRAS O NOMBRE
+        // =========================================
+
+        private void BuscarYAgregarProducto(string textoBusqueda)
+        {
+            if (string.IsNullOrEmpty(textoBusqueda))
+                return;
+
+            // 1) Coincidencia exacta por código de barras (uso típico del lector)
+            var producto = productos.FirstOrDefault(
+                p => p.CodigoBarras == textoBusqueda);
+
+            if (producto != null)
+            {
+                AgregarAlCarrito(producto);
+                return;
+            }
+
+            // 2) Coincidencia exacta por nombre (por si escriben el nombre completo)
+            producto = productos.FirstOrDefault(
+                p => p.Nombre.Equals(textoBusqueda, StringComparison.OrdinalIgnoreCase));
+
+            if (producto != null)
+            {
+                AgregarAlCarrito(producto);
+                return;
+            }
+
+            // 3) Coincidencias parciales por nombre
+            var coincidencias = productos
+                .Where(p => p.Nombre.Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (coincidencias.Count == 1)
+            {
+                AgregarAlCarrito(coincidencias[0]);
+                return;
+            }
+
+            if (coincidencias.Count > 1)
+            {
+                // Varias coincidencias — deja que el usuario elija en el buscador
+                var ventana = new BuscarProductoWindow(coincidencias)
+                {
+                    Owner = this
+                };
+
+                bool? resultado = ventana.ShowDialog();
+
+                if (resultado == true && ventana.ProductoSeleccionado != null)
+                {
+                    AgregarProductoDesdeCatalogo(ventana.ProductoSeleccionado);
+                }
+
+                return;
+            }
+
+            // 4) Nada encontrado
+            MensajeHelper.Advertencia("Producto no encontrado", "Aviso", this);
+        }
+
+        // =========================================
         // AGREGAR AL CARRITO
         // =========================================
 
-        private void AgregarAlCarrito(string codigo)
+        private void AgregarAlCarrito(Producto producto)
         {
-            if (string.IsNullOrEmpty(codigo))
-                return;
-
-            var producto =
-                productos.FirstOrDefault(
-                    p => p.CodigoBarras == codigo);
-
             if (producto == null)
-            {
-                MensajeHelper.Advertencia("Producto no encontrado", "Aviso", this);
                 return;
-            }
 
             txtNombreProductoActual.Text = producto.Nombre;
             CargarImagenProductoActual(producto.ImagenBytes);
@@ -1025,17 +1083,7 @@ namespace FarmaciaPOS
                 .ToList();
         }
 
-        // =========================================
-        // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
-        // =========================================
 
-        private void CargarCatalogo()
-        {
-            icProductosCatalogo.ItemsSource = productos
-                .OrderByDescending(p => VentasDe(p))
-                .ThenBy(p => p.Nombre)
-                .ToList();
-        }
 
         // =========================================
         // ✅ AGREGAR PRODUCTO DESDE EL CATÁLOGO (CON CANTIDAD)

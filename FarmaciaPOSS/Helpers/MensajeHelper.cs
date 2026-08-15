@@ -34,8 +34,15 @@ namespace FarmaciaPOS.Helpers
             var ventana = new Views.MensajeWindow();
             ventana.Configurar(mensaje, titulo, tipo, esConfirmacion);
 
-            if (owner != null)
+            if (owner != null && owner.IsLoaded)
+            {
                 ventana.Owner = owner;
+                ventana.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+            else
+            {
+                ventana.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
 
             ventana.ShowDialog();
 
