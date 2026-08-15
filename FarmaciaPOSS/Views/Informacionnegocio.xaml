@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Información del Negocio"
-        Height="620"
+        Height="700"
         Width="560"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -57,64 +57,81 @@
 
             <!-- TARJETA DE DATOS -->
             <Border Background="White" CornerRadius="14" Padding="25">
-                <StackPanel x:Name="panelContenido">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="panelContenido">
 
-                    <TextBlock x:Name="txtSinDatos"
-                               Text="No se encontró información del negocio configurada todavía. Ve a Configuración de Ticket para registrarla."
-                               FontSize="13"
-                               Foreground="Gray"
-                               TextWrapping="Wrap"
-                               Visibility="Collapsed"
-                               Margin="0,0,0,15"/>
+                        <TextBlock x:Name="txtSinDatos"
+                                   Text="No se encontró información del negocio configurada todavía. Ve a Configuración de Ticket para registrarla."
+                                   FontSize="13"
+                                   Foreground="Gray"
+                                   TextWrapping="Wrap"
+                                   Visibility="Collapsed"
+                                   Margin="0,0,0,15"/>
 
-                    <StackPanel Margin="0,0,0,18">
-                        <TextBlock Text="NOMBRE DEL NEGOCIO" FontSize="11" FontWeight="Bold" Foreground="#1E3A8A"/>
-                        <TextBlock x:Name="txtNombre" Text="—" FontSize="20" FontWeight="Bold" Foreground="#111827" Margin="0,4,0,0"/>
-                    </StackPanel>
-
-                    <Separator Margin="0,0,0,18"/>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
-                        <Border Width="42" Height="42" CornerRadius="10" Background="#EAF3FE">
-                            <TextBlock Text="🧾" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="RFC" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
-                            <TextBlock x:Name="txtRFC" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                        <StackPanel Margin="0,0,0,18">
+                            <TextBlock Text="NOMBRE DEL NEGOCIO" FontSize="11" FontWeight="Bold" Foreground="#1E3A8A"/>
+                            <TextBlock x:Name="txtNombre" Text="—" FontSize="20" FontWeight="Bold" Foreground="#111827" Margin="0,4,0,0"/>
                         </StackPanel>
-                    </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
-                        <Border Width="42" Height="42" CornerRadius="10" Background="#EAF7EC">
-                            <TextBlock Text="📍" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="DIRECCIÓN" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
-                            <TextBlock x:Name="txtDireccion" Text="—" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" MaxWidth="380"/>
+                        <Separator Margin="0,0,0,18"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="42" Height="42" CornerRadius="10" Background="#EAF3FE">
+                                <TextBlock Text="🧾" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="RFC" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
+                                <TextBlock x:Name="txtRFC" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
-                        <Border Width="42" Height="42" CornerRadius="10" Background="#FFF3DE">
-                            <TextBlock Text="📞" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="TELÉFONO" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
-                            <TextBlock x:Name="txtTelefono" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="42" Height="42" CornerRadius="10" Background="#EAF7EC">
+                                <TextBlock Text="📍" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="DIRECCIÓN" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
+                                <TextBlock x:Name="txtDireccion" Text="—" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" MaxWidth="380"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <Border Width="42" Height="42" CornerRadius="10" Background="#F2ECFB">
-                            <TextBlock Text="✉️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="CORREO" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
-                            <TextBlock x:Name="txtCorreo" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="42" Height="42" CornerRadius="10" Background="#FFF3DE">
+                                <TextBlock Text="📞" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="TELÉFONO" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
+                                <TextBlock x:Name="txtTelefono" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
 
-                </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Border Width="42" Height="42" CornerRadius="10" Background="#F2ECFB">
+                                <TextBlock Text="✉️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="CORREO" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
+                                <TextBlock x:Name="txtCorreo" Text="—" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="42" Height="42" CornerRadius="10" Background="#FDECEC">
+                                <TextBlock Text="🌐" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="SITIO WEB" FontSize="11" FontWeight="Bold" Foreground="Gray"/>
+                                <TextBlock FontSize="14" FontWeight="SemiBold">
+                                    <Hyperlink NavigateUri="https://farmaciayatzil-web-hafmf8g3hvffebgd.mexicocentral-01.azurewebsites.net/"
+                                               RequestNavigate="Hyperlink_RequestNavigate">
+                                        Visitar sitio web
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
 
             <!-- BOTÓN CERRAR -->

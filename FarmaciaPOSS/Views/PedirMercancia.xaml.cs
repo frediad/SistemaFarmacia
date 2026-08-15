@@ -178,86 +178,12 @@ namespace FarmaciaPOS.Views
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(proveedor.Correo))
-            {
-                MessageBox.Show(
-                    $"El proveedor \"{proveedor.Nombre}\" no tiene correo registrado.\n" +
-                    "Agrégalo desde el módulo de Proveedores.",
-                    "Falta correo",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
-            }
-
             string metodoPago = (cbMetodoPago.SelectedItem as ComboBoxItem)?
                 .Content.ToString() ?? "Transferencia";
 
-            string asunto =
-                $"Pedido de mercancía — FarmaClick Yatzil ({DateTime.Now:dd/MM/yyyy})";
-
-            var cuerpo = new System.Text.StringBuilder();
-
-            cuerpo.AppendLine(
-                $"Estimado(a) {(string.IsNullOrWhiteSpace(proveedor.Contacto) ? proveedor.Nombre : proveedor.Nombre)},");
-            cuerpo.AppendLine();
-            cuerpo.AppendLine(
-                "Por medio del presente le solicitamos el siguiente pedido de mercancía:");
-            cuerpo.AppendLine();
-            cuerpo.AppendLine("--------------------------------------------------");
-            cuerpo.AppendLine("PRODUCTO              CANTIDAD    COSTO U.    SUBTOTAL");
-            cuerpo.AppendLine("--------------------------------------------------");
-
-            foreach (var item in itemsPedido)
-            {
-                cuerpo.AppendLine(
-                    $"{item.Nombre,-22} {item.Cantidad,-11} " +
-                    $"{item.CostoUnitario:C,-11} {item.Subtotal:C}");
-            }
-
-            cuerpo.AppendLine("--------------------------------------------------");
-            cuerpo.AppendLine(
-                $"TOTAL ESTIMADO: {itemsPedido.Sum(x => x.Subtotal):C}");
-            cuerpo.AppendLine();
-            cuerpo.AppendLine(
-                $"Forma de pago: {metodoPago}.");
-            cuerpo.AppendLine(
-                "Favor de confirmar disponibilidad, precios actualizados y tiempo de entrega.");
-            cuerpo.AppendLine();
-            cuerpo.AppendLine("Quedamos atentos a su respuesta.");
-            cuerpo.AppendLine();
-            cuerpo.AppendLine("Atentamente,");
-            cuerpo.AppendLine("FarmaClick Yatzil");
-
             try
             {
-                var confirmar = MessageBox.Show(
-                    $"Se abrirá Gmail en tu navegador con el pedido listo para enviar a:\n\n" +
-                    $"📧 {proveedor.Correo}\n\n" +
-                    $"Método de pago: {metodoPago}\n" +
-                    $"Total estimado: {itemsPedido.Sum(x => x.Subtotal):C}\n\n" +
-                    "El pedido también quedará registrado como \"Pendiente de recibir\" en Inventario.\n\n" +
-                    "¿Continuar?",
-                    "Confirmar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (confirmar != MessageBoxResult.Yes)
-                    return;
-
-                // ✅ Registra el pedido en BD como "Enviado", antes de abrir Gmail
-                GuardarPedidoEnBD(proveedor.Id, metodoPago);
-
-                CorreoHelper.AbrirCorreoPedido(
-                    proveedor.Correo,
-                    asunto,
-                    cuerpo.ToString());
-
-                MessageBox.Show(
-                    "✅ Se abrió Gmail en tu navegador y el pedido quedó registrado.\n" +
-                    "Revisa que el contenido sea correcto y presiona Enviar.",
-                    "Gmail abierto",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                EnviarPedidoDirecto(proveedor, itemsPedido.ToList(), metodoPago);
 
                 DialogResult = true;
                 Close();
@@ -272,8 +198,73 @@ namespace FarmaciaPOS.Views
             }
         }
 
-        // ✅ NUEVO — guarda el pedido y su detalle, con Estado = 'Enviado'
-        private void GuardarPedidoEnBD(int proveedorId, string metodoPago)
+        // ============================================================
+        // ✅ NUEVO: Envía el pedido (guarda en BD y abre el correo)
+        // SIN necesidad de mostrar la ventana PedirMercanciaWindow.
+        //
+        // Úsalo así desde cualquier parte de tu app, en vez de abrir
+        // la ventana con ShowDialog():
+        //
+        //   try
+        //   {
+        //       PedirMercanciaWindow.EnviarPedidoDirecto(proveedor, items, "Transferencia");
+        //       MessageBox.Show("Pedido enviado.", "Éxito");
+        //   }
+        //   catch (Exception ex)
+        //   {
+        //       MessageBox.Show(ex.Message, "Error");
+        //   }
+        // ============================================================
+        public static void EnviarPedidoDirecto(Proveedor proveedor, List<PedidoProveedorItem> items, string metodoPago = "Transferencia")
+        {
+            if (proveedor == null)
+                throw new ArgumentNullException(nameof(proveedor), "Debes indicar un proveedor.");
+
+            if (items == null || items.Count == 0)
+                throw new InvalidOperationException("Agrega al menos un producto al pedido.");
+
+            if (string.IsNullOrWhiteSpace(proveedor.Correo))
+                throw new InvalidOperationException(
+                    $"El proveedor \"{proveedor.Nombre}\" no tiene correo registrado.\n" +
+                    "Agrégalo desde el módulo de Proveedores.");
+
+            string asunto = $"Pedido de mercancía — FarmaClick Yatzil ({DateTime.Now:dd/MM/yyyy})";
+
+            var cuerpo = new StringBuilder();
+            cuerpo.AppendLine($"Estimado(a) {proveedor.Nombre},");
+            cuerpo.AppendLine();
+            cuerpo.AppendLine("Por medio del presente le solicitamos el siguiente pedido de mercancía:");
+            cuerpo.AppendLine();
+            cuerpo.AppendLine("--------------------------------------------------");
+            cuerpo.AppendLine("PRODUCTO              CANTIDAD    COSTO U.    SUBTOTAL");
+            cuerpo.AppendLine("--------------------------------------------------");
+
+            foreach (var item in items)
+            {
+                cuerpo.AppendLine(
+                    $"{item.Nombre,-22} {item.Cantidad,-11} " +
+                    $"{item.CostoUnitario:C,-11} {item.Subtotal:C}");
+            }
+
+            cuerpo.AppendLine("--------------------------------------------------");
+            cuerpo.AppendLine($"TOTAL ESTIMADO: {items.Sum(x => x.Subtotal):C}");
+            cuerpo.AppendLine();
+            cuerpo.AppendLine($"Forma de pago: {metodoPago}.");
+            cuerpo.AppendLine("Favor de confirmar disponibilidad, precios actualizados y tiempo de entrega.");
+            cuerpo.AppendLine();
+            cuerpo.AppendLine("Quedamos atentos a su respuesta.");
+            cuerpo.AppendLine();
+            cuerpo.AppendLine("Atentamente,");
+            cuerpo.AppendLine("FarmaClick Yatzil");
+
+            // Guarda el pedido en BD como "Enviado" antes de abrir el correo
+            GuardarPedidoEnBDEstatico(proveedor.Id, metodoPago, items);
+
+            CorreoHelper.AbrirCorreoPedido(proveedor.Correo, asunto, cuerpo.ToString());
+        }
+
+        // Versión estática (reutilizable sin instancia de ventana) del guardado en BD
+        private static void GuardarPedidoEnBDEstatico(int proveedorId, string metodoPago, List<PedidoProveedorItem> items)
         {
             using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
             conn.Open();
@@ -282,7 +273,7 @@ namespace FarmaciaPOS.Views
 
             try
             {
-                decimal total = itemsPedido.Sum(x => x.Subtotal);
+                decimal total = items.Sum(x => x.Subtotal);
 
                 string queryPedido =
                 @"INSERT INTO PedidosProveedor
@@ -300,7 +291,7 @@ namespace FarmaciaPOS.Views
 
                 int pedidoId = Convert.ToInt32(cmdPedido.ExecuteScalar());
 
-                foreach (var item in itemsPedido)
+                foreach (var item in items)
                 {
                     string queryDetalle =
                     @"INSERT INTO DetallePedidoProveedor

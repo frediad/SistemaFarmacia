@@ -1,8 +1,10 @@
 ﻿
+using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Navigation;
 using FarmaciaPOS.Helpers;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Windows;
 
 namespace FarmaciaPOS.Views
 {
@@ -69,6 +71,20 @@ namespace FarmaciaPOS.Views
                 }
             }
             return null;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo abrir el enlace:\n" + ex.Message);
+            }
+
+            e.Handled = true;
         }
 
         private void BtnCerrar_Click(object sender, RoutedEventArgs e)

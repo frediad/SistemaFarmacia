@@ -252,7 +252,8 @@ namespace FarmaciaPOS.Views
         // =========================================
         // PESTAÑA 2 — PEDIR A PROVEEDOR (antes "Compras")
         // Ya NO registra una compra ni toca stock/costo directamente.
-        // Solo arma la lista y abre PedirMercanciaWindow.
+        // Ya NO abre PedirMercanciaWindow: guarda el pedido en BD y
+        // abre el correo directamente (sin mostrar ventana intermedia).
         // =========================================
 
         private void CargarProveedores()
@@ -338,8 +339,9 @@ namespace FarmaciaPOS.Views
             txtTotalCompra.Text = total.ToString("C");
         }
 
-        // ✅ Ya no registra la compra directo: arma el pedido y abre
-        // PedirMercanciaWindow, sin tocar stock ni costo.
+        // ✅ MODIFICADO: ya no abre PedirMercanciaWindow. Como el proveedor y los
+        // productos ya están elegidos en esta misma pantalla, se envía el pedido
+        // directo (guarda en BD como "Enviado" y abre Gmail para redactar el correo).
         private void BtnConfirmarCompra_Click(object sender, RoutedEventArgs e)
         {
             if (cbProveedor.SelectedItem is not Proveedor proveedorSeleccionado)
@@ -371,21 +373,22 @@ namespace FarmaciaPOS.Views
                 CostoUnitario = x.CostoUnitario
             }).ToList();
 
-            var ventana = new PedirMercanciaWindow(proveedorSeleccionado, itemsPedido)
-            {
-                Owner = this
-            };
+            string metodoPago = "Transferencia"; // Ajusta aquí si agregas un combo de método de pago en esta pestaña
 
-            bool? resultado = ventana.ShowDialog();
-
-            if (resultado == true)
+            try
             {
+                PedirMercanciaWindow.EnviarPedidoDirecto(proveedorSeleccionado, itemsPedido, metodoPago);
+
                 itemsCompra.Clear();
                 cbProveedor.SelectedIndex = -1;
                 ActualizarTotalCompra();
 
                 // El pedido recién enviado ya quedó guardado en BD como "Enviado"
                 CargarPedidosPendientes();
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudo procesar el pedido: " + ex.Message, "Error", this);
             }
         }
 
@@ -653,6 +656,8 @@ namespace FarmaciaPOS.Views
 
         // =========================================
         // BOTÓN GENERAL DEL HEADER — PEDIDO LIBRE
+        // Este sí necesita la ventana: no hay proveedor ni productos
+        // elegidos todavía, así que aquí se sigue mostrando PedirMercanciaWindow.
         // =========================================
 
         private void BtnPedirMercanciaInventario_Click(object sender, RoutedEventArgs e)
@@ -672,6 +677,8 @@ namespace FarmaciaPOS.Views
 
         // =========================================
         // PEDIR POR CORREO DESDE SUGERENCIA DE COMPRA
+        // Aquí solo hay productos, todavía falta elegir proveedor,
+        // así que se sigue mostrando la ventana PedirMercanciaWindow.
         // =========================================
 
         private void BtnPedirSugerenciasPorCorreo_Click(object sender, RoutedEventArgs e)

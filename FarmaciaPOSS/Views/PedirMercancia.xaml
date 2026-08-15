@@ -2,9 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Pedir mercancía"
-        Height="680"
-        Width="800"
-        WindowStartupLocation="CenterOwner"
+        Height="650"
+        Width="900"
+        WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 
     <Window.Resources>
