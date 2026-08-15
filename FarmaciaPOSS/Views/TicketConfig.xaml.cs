@@ -173,7 +173,7 @@ namespace FarmaciaPOS.Views
 
                 cmd.ExecuteNonQuery();
 
-                MensajeHelper.Info(
+                MensajeHelper.Exito(
                     "Configuración guardada correctamente");
             }
             catch (Exception ex)

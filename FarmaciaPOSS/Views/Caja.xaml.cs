@@ -259,10 +259,12 @@ namespace FarmaciaPOS.Views
                     ISNULL(SUM(CASE WHEN MetodoPago = 'Transferencia' THEN Total ELSE 0 END), 0) AS Transferencia
                   FROM Ventas
                   WHERE Fecha >= @FechaApertura
-                  AND Estado = 'Completada'";
+                  AND Estado = 'Completada'
+                  AND UsuarioId = @UsuarioId";
 
                 SqlCommand cmdVentas = new SqlCommand(queryVentas, conn);
                 cmdVentas.Parameters.AddWithValue("@FechaApertura", fechaAperturaActual);
+                cmdVentas.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
 
                 using SqlDataReader readerVentas = cmdVentas.ExecuteReader();
                 if (readerVentas.Read())

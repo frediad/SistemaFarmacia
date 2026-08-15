@@ -112,6 +112,19 @@ namespace FarmaciaPOS.Views
             }
         }
 
+        // ✅ Cierra la app desde el botón "✕" propio (WindowStyle="None" quita el nativo)
+        private void BtnCerrarLogin_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        // ✅ Permite arrastrar la ventana (WindowStyle="None" quita el drag nativo)
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+                this.DragMove();
+        }
+
         private string HashPassword(string password)
         {
             using var sha256 = System.Security.Cryptography.SHA256.Create();

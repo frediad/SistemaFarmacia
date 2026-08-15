@@ -4,7 +4,7 @@
         Title="Pedidos Online"
         Height="700"
         Width="1100"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 
@@ -434,7 +434,7 @@
                                         Click="BtnCambiarEstado_Click"/>
 
                                 <Button x:Name="btnEstadoListoRecoger"
-                                        Content="🛍️ Listo para recoger"
+                                        Content="🛍️ Listo"
                                         Style="{StaticResource BtnEstado}"
                                         Background="#FEE2E2"
                                         Foreground="#999956"

@@ -1049,7 +1049,7 @@ namespace FarmaciaPOS.Views
 
         private void TxtCodigo_KeyDown(object sender, KeyEventArgs e)
         {
-            
+
             if (e.Key != Key.Enter)
                 return;
 

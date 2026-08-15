@@ -32,22 +32,22 @@ namespace FarmaciaPOS
         {
             InitializeComponent();
 
-                txtUsuarioSesion.Text = Sesion.NombreUsuario;
-                txtCargoSesion.Text = Sesion.Rol;
+            txtUsuarioSesion.Text = Sesion.NombreUsuario;
+            txtCargoSesion.Text = Sesion.Rol;
 
-                CargarProductos();
-                CargarVentasPorProducto();
+            CargarProductos();
+            CargarVentasPorProducto();
 
-                InicializarCarritoCentral();
+            InicializarCarritoCentral();
 
-                IniciarReloj();
+            IniciarReloj();
 
-                CargarCategoriasCatalogo();
-                CargarCatalogo();
+            CargarCategoriasCatalogo();
+            CargarCatalogo();
 
-                AplicarPermisosEnMenu();
+            AplicarPermisosEnMenu();
         }
-        
+
         private DispatcherTimer relojTimer;
 
         private bool cierreConfirmadoPorBoton = false;
@@ -140,16 +140,16 @@ namespace FarmaciaPOS
         // =========================================
 
         private void CargarProductos()
-        {      
-                productos.Clear();
+        {
+            productos.Clear();
 
-                using SqlConnection conn =
-                     new SqlConnection(DatabaseHelper.ConnectionString);
+            using SqlConnection conn =
+                 new SqlConnection(DatabaseHelper.ConnectionString);
 
-                conn.Open();
+            conn.Open();
 
-                string query =
-                @"SELECT p.*,
+            string query =
+            @"SELECT p.*,
                 (SELECT TOP 1 img.ImagenData
                 FROM ImagenesProducto img
                 WHERE img.ProductoId = p.Id
@@ -158,61 +158,61 @@ namespace FarmaciaPOS
                 WHERE p.Activo = 1
                 ORDER BY p.Nombre";
 
-                SqlCommand cmd =
-                    new SqlCommand(query, conn);
+            SqlCommand cmd =
+                new SqlCommand(query, conn);
 
-                SqlDataReader reader =
-                    cmd.ExecuteReader();
+            SqlDataReader reader =
+                cmd.ExecuteReader();
 
-                while (reader.Read())
+            while (reader.Read())
+            {
+                productos.Add(new Producto
                 {
-                    productos.Add(new Producto
-                    {
-                        Id =
-                            Convert.ToInt32(
-                                reader["Id"]),
+                    Id =
+                        Convert.ToInt32(
+                            reader["Id"]),
 
-                        CodigoBarras =
-                            reader["CodigoBarras"]
-                            .ToString(),
+                    CodigoBarras =
+                        reader["CodigoBarras"]
+                        .ToString(),
 
-                        Nombre =
-                            reader["Nombre"]
-                            .ToString(),
+                    Nombre =
+                        reader["Nombre"]
+                        .ToString(),
 
-                        Stock =
-                            Convert.ToInt32(
-                                reader["Stock"]),
+                    Stock =
+                        Convert.ToInt32(
+                            reader["Stock"]),
 
-                        PrecioVenta =
-                            Convert.ToDecimal(
-                                reader["PrecioVenta"]),
+                    PrecioVenta =
+                        Convert.ToDecimal(
+                            reader["PrecioVenta"]),
 
-                        Precio2 =
-                             Convert.ToDecimal(
-                                 reader["Precio2"]),
-                        Precio3 =
-                             Convert.ToDecimal(
-                                reader["Precio3"]),
+                    Precio2 =
+                         Convert.ToDecimal(
+                             reader["Precio2"]),
+                    Precio3 =
+                         Convert.ToDecimal(
+                            reader["Precio3"]),
 
-                        CantidadMayoreo2 =
-                             Convert.ToInt32(
-                                 reader["CantidadMayoreo2"]),
+                    CantidadMayoreo2 =
+                         Convert.ToInt32(
+                             reader["CantidadMayoreo2"]),
 
-                        CantidadMayoreo3 =
-                             Convert.ToInt32(
-                                 reader["CantidadMayoreo3"]),
+                    CantidadMayoreo3 =
+                         Convert.ToInt32(
+                             reader["CantidadMayoreo3"]),
 
-                        ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
-                            ? (byte[])reader["PrimeraImagenData"]
-                            : null,
+                    ImagenBytes = reader["PrimeraImagenData"] != DBNull.Value
+                        ? (byte[])reader["PrimeraImagenData"]
+                        : null,
 
-                        CategoriaId =
-                            reader["CategoriaId"] != DBNull.Value
-                            ? Convert.ToInt32(reader["CategoriaId"])
-                            : 0,
-                    });
-                }
+                    CategoriaId =
+                        reader["CategoriaId"] != DBNull.Value
+                        ? Convert.ToInt32(reader["CategoriaId"])
+                        : 0,
+                });
+            }
         }
 
         // =========================================
@@ -283,33 +283,84 @@ namespace FarmaciaPOS
         {
             if (e.Key == Key.Enter)
             {
-                string codigo =
-                    txtCodigoProducto.Text.Trim();
+                string texto = txtCodigoProducto.Text.Trim();
 
-                AgregarAlCarrito(codigo);
+                BuscarYAgregarProducto(texto);
 
                 txtCodigoProducto.Clear();
             }
         }
 
         // =========================================
+        // ✅ BUSCAR POR CÓDIGO DE BARRAS O NOMBRE
+        // =========================================
+
+        private void BuscarYAgregarProducto(string textoBusqueda)
+        {
+            if (string.IsNullOrEmpty(textoBusqueda))
+                return;
+
+            // 1) Coincidencia exacta por código de barras (uso típico del lector)
+            var producto = productos.FirstOrDefault(
+                p => p.CodigoBarras == textoBusqueda);
+
+            if (producto != null)
+            {
+                AgregarAlCarrito(producto);
+                return;
+            }
+
+            // 2) Coincidencia exacta por nombre (por si escriben el nombre completo)
+            producto = productos.FirstOrDefault(
+                p => p.Nombre.Equals(textoBusqueda, StringComparison.OrdinalIgnoreCase));
+
+            if (producto != null)
+            {
+                AgregarAlCarrito(producto);
+                return;
+            }
+
+            // 3) Coincidencias parciales por nombre
+            var coincidencias = productos
+                .Where(p => p.Nombre.Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (coincidencias.Count == 1)
+            {
+                AgregarAlCarrito(coincidencias[0]);
+                return;
+            }
+
+            if (coincidencias.Count > 1)
+            {
+                // Varias coincidencias — deja que el usuario elija en el buscador
+                var ventana = new BuscarProductoWindow(coincidencias)
+                {
+                    Owner = this
+                };
+
+                bool? resultado = ventana.ShowDialog();
+
+                if (resultado == true && ventana.ProductoSeleccionado != null)
+                {
+                    AgregarProductoDesdeCatalogo(ventana.ProductoSeleccionado);
+                }
+
+                return;
+            }
+
+            // 4) Nada encontrado
+            MensajeHelper.Advertencia("Producto no encontrado", "Aviso", this);
+        }
+
+        // =========================================
         // AGREGAR AL CARRITO
         // =========================================
 
-        private void AgregarAlCarrito(string codigo)
+        private void AgregarAlCarrito(Producto producto)
         {
-            if (string.IsNullOrEmpty(codigo))
-                return;
-
-            var producto =
-                productos.FirstOrDefault(
-                    p => p.CodigoBarras == codigo);
-
             if (producto == null)
-            {
-                MensajeHelper.Advertencia("Producto no encontrado", "Aviso", this);
                 return;
-            }
 
             txtNombreProductoActual.Text = producto.Nombre;
             CargarImagenProductoActual(producto.ImagenBytes);
@@ -1032,7 +1083,7 @@ namespace FarmaciaPOS
                 .ToList();
         }
 
-       
+
 
         // =========================================
         // ✅ AGREGAR PRODUCTO DESDE EL CATÁLOGO (CON CANTIDAD)

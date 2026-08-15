@@ -23,28 +23,23 @@ namespace FarmaciaPOS.Views
                 using SqlConnection conn = new SqlConnection(DatabaseHelper.ConnectionString);
                 conn.Open();
 
-                string query =
-                @"SELECT TOP 1 c.*, u.Nombre AS NombreUsuarioApertura
-                  FROM Caja c
-                  LEFT JOIN Usuarios u ON c.UsuarioId = u.Id
-                  WHERE c.Estado = 'ABIERTA'
-                  ORDER BY c.Id DESC";
+                // 1) ¿El usuario actual ya tiene una caja abierta a su nombre?
+                string queryPropia =
+                @"SELECT TOP 1 *
+                  FROM Caja
+                  WHERE Estado = 'ABIERTA' AND UsuarioId = @UsuarioId
+                  ORDER BY Id DESC";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-                SqlDataReader reader = cmd.ExecuteReader();
+                SqlCommand cmdPropia = new SqlCommand(queryPropia, conn);
+                cmdPropia.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
 
-                if (reader.Read())
+                using (SqlDataReader readerPropia = cmdPropia.ExecuteReader())
                 {
-                    DateTime apertura = Convert.ToDateTime(reader["FechaApertura"]);
-                    decimal montoInicial = Convert.ToDecimal(reader["MontoInicial"]);
-                    int usuarioIdApertura = Convert.ToInt32(reader["UsuarioId"]);
-                    string usuarioApertura = reader["NombreUsuarioApertura"]?.ToString() ?? "Desconocido";
-
-                    reader.Close();
-
-                    if (usuarioIdApertura == Sesion.UsuarioId)
+                    if (readerPropia.Read())
                     {
-                        // ✅ La caja abierta es del mismo usuario que acaba de iniciar sesión
+                        DateTime apertura = Convert.ToDateTime(readerPropia["FechaApertura"]);
+                        decimal montoInicial = Convert.ToDecimal(readerPropia["MontoInicial"]);
+
                         txtInfoCajaAbierta.Text =
                             $"Abierta el {apertura:dd/MM/yyyy HH:mm}\n" +
                             $"Monto inicial: {montoInicial:C}";
@@ -52,23 +47,41 @@ namespace FarmaciaPOS.Views
                         pnlCajaYaAbierta.Visibility = Visibility.Visible;
                         pnlAbrirNueva.Visibility = Visibility.Collapsed;
                         pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;
+                        return; // ya resuelto, no seguimos buscando
                     }
-                    else
-                    {
-                        // ✅ La caja abierta pertenece a OTRO usuario
-                        txtInfoCajaOtroUsuario.Text =
-                            $"\"{usuarioApertura}\" abrió una caja el {apertura:dd/MM/yyyy HH:mm} " +
-                            $"con un monto inicial de {montoInicial:C}.\n\n" +
-                            "Puedes abrir tu propia caja para trabajar de forma independiente, " +
-                            "o continuar usando esa misma si así lo prefieres.";
+                }
 
-                        pnlCajaDeOtroUsuario.Visibility = Visibility.Visible;
-                        pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
-                        pnlAbrirNueva.Visibility = Visibility.Collapsed;
-                    }
+                // 2) El usuario actual NO tiene caja propia abierta.
+                //    ¿Hay alguna caja abierta de OTRO usuario?
+                string queryOtro =
+                @"SELECT TOP 1 c.*, u.Nombre AS NombreUsuarioApertura
+                  FROM Caja c
+                  LEFT JOIN Usuarios u ON c.UsuarioId = u.Id
+                  WHERE c.Estado = 'ABIERTA'
+                  ORDER BY c.Id DESC";
+
+                SqlCommand cmdOtro = new SqlCommand(queryOtro, conn);
+                using SqlDataReader readerOtro = cmdOtro.ExecuteReader();
+
+                if (readerOtro.Read())
+                {
+                    DateTime apertura = Convert.ToDateTime(readerOtro["FechaApertura"]);
+                    decimal montoInicial = Convert.ToDecimal(readerOtro["MontoInicial"]);
+                    string usuarioApertura = readerOtro["NombreUsuarioApertura"]?.ToString() ?? "Desconocido";
+
+                    txtInfoCajaOtroUsuario.Text =
+                        $"\"{usuarioApertura}\" abrió una caja el {apertura:dd/MM/yyyy HH:mm} " +
+                        $"con un monto inicial de {montoInicial:C}.\n\n" +
+                        "Puedes abrir tu propia caja para trabajar de forma independiente, " +
+                        "o continuar usando esa misma si así lo prefieres.";
+
+                    pnlCajaDeOtroUsuario.Visibility = Visibility.Visible;
+                    pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
+                    pnlAbrirNueva.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
+                    // 3) No hay ninguna caja abierta en el sistema
                     pnlAbrirNueva.Visibility = Visibility.Visible;
                     pnlCajaYaAbierta.Visibility = Visibility.Collapsed;
                     pnlCajaDeOtroUsuario.Visibility = Visibility.Collapsed;

@@ -4,7 +4,7 @@
         Title="Inventario"
         Height="700"
         Width="1100"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 

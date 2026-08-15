@@ -358,13 +358,13 @@ namespace FarmaciaPOS.Views
         {
             if (ventaActual == null)
             {
-                MessageBox.Show("Selecciona una venta de la lista");
+                MensajeHelper.Advertencia("Selecciona una venta de la lista");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtMotivoDevolucion.Text))
             {
-                MessageBox.Show("Escribe el motivo de la devolución");
+                MensajeHelper.Advertencia("Escribe el motivo de la devolución");
                 return;
             }
 
@@ -374,8 +374,7 @@ namespace FarmaciaPOS.Views
 
             if (itemsADevolver.Count == 0)
             {
-                MessageBox.Show(
-                    "Indica cuántas piezas se devuelven de al menos un producto");
+                MensajeHelper.Advertencia("Indica cuántas piezas se devuelven de al menos un producto");
                 return;
             }
 
@@ -383,7 +382,7 @@ namespace FarmaciaPOS.Views
             {
                 if (item.CantidadADevolver > item.CantidadDisponibleDevolver)
                 {
-                    MessageBox.Show(
+                    MensajeHelper.Advertencia(
                         $"\"{item.Nombre}\": solo puedes devolver " +
                         $"hasta {item.CantidadDisponibleDevolver} pieza(s)");
                     return;
@@ -393,17 +392,15 @@ namespace FarmaciaPOS.Views
             decimal totalADevolver =
                 itemsADevolver.Sum(x => x.CantidadADevolver * x.PrecioUnitario);
 
-            var confirmar = MessageBox.Show(
+            bool confirmar = MensajeHelper.Confirmar(
                 $"Se devolverán {itemsADevolver.Sum(x => x.CantidadADevolver)} " +
                 $"pieza(s) por un total de {totalADevolver:C}.\n\n" +
                 "✅ Se regresará el stock al inventario\n" +
                 "✅ Se registrará la salida de efectivo en caja\n\n" +
                 "¿Confirmar devolución?",
-                "Confirmar devolución",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                "Confirmar devolución");
 
-            if (confirmar != MessageBoxResult.Yes)
+            if (confirmar != true)
                 return;
 
             try
@@ -453,8 +450,7 @@ namespace FarmaciaPOS.Views
                     SqlCommand cmdMov = new SqlCommand(queryMovimiento, conn);
                     cmdMov.Parameters.AddWithValue("@ProductoId", item.ProductoId);
                     cmdMov.Parameters.AddWithValue("@Cantidad", item.CantidadADevolver);
-                    cmdMov.Parameters.AddWithValue("@Motivo",
-                        $"Devolución venta #{ventaActual.Id} — {txtMotivoDevolucion.Text}");
+                    cmdMov.Parameters.AddWithValue("@Motivo", $"Devolución venta #{ventaActual.Id} — {txtMotivoDevolucion.Text}");
                     cmdMov.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
                     cmdMov.ExecuteNonQuery();
                 }
@@ -476,11 +472,9 @@ namespace FarmaciaPOS.Views
                     cmdEstado.ExecuteNonQuery();
                 }
 
-                MessageBox.Show(
+                MensajeHelper.Exito(
                     $"✅ Devolución procesada correctamente\n\nTotal devuelto: {totalADevolver:C}",
-                    "Éxito",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    "Éxito");
 
                 txtMotivoDevolucion.Clear();
                 txtBuscarVenta.Clear();
@@ -493,11 +487,9 @@ namespace FarmaciaPOS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MensajeHelper.Error(
                     "Error al procesar devolución: " + ex.Message,
-                    "ERROR",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    "ERROR");
             }
         }
 

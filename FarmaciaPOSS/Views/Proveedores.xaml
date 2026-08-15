@@ -4,7 +4,7 @@
         Title="Proveedores"
         Height="650"
         Width="1000"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
 

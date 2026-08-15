@@ -2,7 +2,7 @@
 {
     public class DetallePedidoView
     {
-        public string NombreProducto { get; set; } = string.Empty;
+        public string Nombre{ get; set; } = string.Empty;
 
         public int Cantidad { get; set; }
 

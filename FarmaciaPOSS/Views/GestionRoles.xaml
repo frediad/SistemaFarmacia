@@ -4,7 +4,7 @@
         Title="Gestionar Roles"
         Height="560"
         Width="560"
-        Icon="/logo-icono.ico"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F0F4F8">

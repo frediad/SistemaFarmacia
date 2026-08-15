@@ -4,6 +4,7 @@
         Title="Acerca del Sistema"
         Height="640"
         Width="480"
+        Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#F1F4F9"
