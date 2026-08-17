@@ -123,13 +123,17 @@
                           Grid.Column="2"
                           Height="38"
                           FontSize="14"
+                          Margin="10,0,10,0"
                           BorderThickness="0"
                           Background="White"
                           SelectionChanged="cbEstado_SelectionChanged">
 
-                    <ComboBoxItem Content="Todos"/>
+                    <ComboBoxItem Content="Todos los pedidos"/>
                     <ComboBoxItem Content="Pendiente"/>
+                    <ComboBoxItem Content="Confirmado"/>
                     <ComboBoxItem Content="Preparando"/>
+                    <ComboBoxItem Content="Listo para recoger"/>
+                    <ComboBoxItem Content="En camino"/>
                     <ComboBoxItem Content="Entregado"/>
                     <ComboBoxItem Content="Cancelado"/>
 
@@ -331,6 +335,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -424,6 +429,15 @@
                                         Foreground="#92400E"
                                         Tag="Pendiente"
                                         Click="BtnCambiarEstado_Click"/>
+                                
+                                <Button x:Name="btnEstadoConfirmado"
+                                        Content="👌 Confirmado"
+                                        Style="{StaticResource BtnEstado}"
+                                        Background="#D1FAE5"
+                                        Foreground="#166534"
+                                        Margin="4,4,4,0"
+                                        Tag="Confirmado"
+                                        Click="BtnCambiarEstado_Click"/>
 
                                 <Button x:Name="btnEstadoPreparando"
                                         Content="⚙️ Preparando"
@@ -440,6 +454,15 @@
                                         Foreground="#999956"
                                         Margin="4,4,4,0"
                                         Tag="Listo para recoger"
+                                        Click="BtnCambiarEstado_Click"/>
+                                
+                                <Button x:Name="btnEstadoEnCamino"
+                                        Content="🚚 En camino"
+                                        Style="{StaticResource BtnEstado}"
+                                        Background="#FDE68A"
+                                        Foreground="#92400E"
+                                        Margin="4,4,4,0"
+                                        Tag="En camino"
                                         Click="BtnCambiarEstado_Click"/>
 
                                 <Button x:Name="btnEstadoEntregado"
@@ -508,21 +531,25 @@
 
                         <DataGrid.Columns>
 
+                            <!-- Producto -->
                             <DataGridTextColumn Header="Producto"
-                                Binding="{Binding NombreProducto}"
-                                Width="*"/>
+                            Binding="{Binding Nombre}"
+                            Width="*"/>
 
+                            <!-- Cantidad -->
                             <DataGridTextColumn Header="Cant."
-                                Binding="{Binding Cantidad}"
-                                Width="60"/>
+                            Binding="{Binding Cantidad}"
+                            Width="60"/>
 
+                            <!-- Precio -->
                             <DataGridTextColumn Header="Precio"
-                                Binding="{Binding Precio, StringFormat=C}"
-                                Width="90"/>
+                            Binding="{Binding Precio, StringFormat={}{0:C2}}"
+                            Width="90"/>
 
+                            <!-- Subtotal -->
                             <DataGridTextColumn Header="Subtotal"
-                                Binding="{Binding Subtotal, StringFormat=C}"
-                                Width="90"/>
+                            Binding="{Binding Subtotal, StringFormat={}{0:C2}}"
+                            Width="90"/>
 
                         </DataGrid.Columns>
 
@@ -530,7 +557,7 @@
 
                     <!-- TOTAL PEDIDO -->
 
-                    <Border Grid.Row="4"
+                    <Border Grid.Row="5"
                             Background="#1E3A8A"
                             CornerRadius="8"
                             Padding="12"

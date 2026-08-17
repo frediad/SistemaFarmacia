@@ -613,9 +613,7 @@
                                            Foreground="#64748B"
                                            Margin="0,0,0,12"/>
 
-                                <!-- ===================== -->
-                                <!-- (el IVA ya no se muestra aquí: se controla arriba, junto a Precio Venta) -->
-                                <!-- ===================== -->
+                             
 
                                 <!-- ===================== -->
                                 <!-- Precio 2 (mayoreo) -->
@@ -1122,13 +1120,15 @@
                                        Margin="6,0"
                                        TextWrapping="Wrap"/>
 
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Grid.Row="1"
+                                          VerticalScrollBarVisibility="Auto">
 
                                 <ItemsControl x:Name="icCatalogoVista">
 
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal" Margin="8"/>
+                                            <UniformGrid Columns="4"
+                                                         Margin="8"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
 
@@ -1136,45 +1136,45 @@
                                         <DataTemplate>
 
                                             <!-- TARJETA — SOLO VISUAL, SIN INTERACCIÓN -->
-                                            <Border Width="120"
-                                                    Height="145"
-                                                    Margin="5"
+                                            <Border Width="170"
+                                                    Height="210"
+                                                    Margin="6"
                                                     Background="White"
                                                     BorderBrush="#E2E8F0"
                                                     BorderThickness="1"
-                                                    CornerRadius="12">
+                                                    CornerRadius="14">
 
                                                 <Grid>
 
                                                     <Grid.RowDefinitions>
-                                                        <RowDefinition Height="75"/>
+                                                        <RowDefinition Height="110"/>
                                                         <RowDefinition Height="*"/>
                                                     </Grid.RowDefinitions>
 
-                                                    <Border Background="#F1F5F9" CornerRadius="12,12,0,0">
+                                                    <Border Background="#F1F5F9" CornerRadius="14,14,0,0">
                                                         <Image Source="{Binding ImagenBytes, Converter={StaticResource ByteArrayToImageConverter}}"
                                                                Stretch="Uniform"
-                                                               Margin="8"/>
+                                                               Margin="12"/>
                                                     </Border>
 
-                                                    <StackPanel Grid.Row="1" Margin="8,4">
+                                                    <StackPanel Grid.Row="1" Margin="12,8">
 
                                                         <TextBlock Text="{Binding Nombre}"
-                                                                   FontSize="11"
+                                                                   FontSize="13"
                                                                    FontWeight="Bold"
                                                                    Foreground="#1E293B"
                                                                    TextWrapping="Wrap"
-                                                                   MaxHeight="30"
+                                                                   MaxHeight="38"
                                                                    TextTrimming="CharacterEllipsis"/>
 
                                                         <TextBlock Text="{Binding PrecioVenta, StringFormat=C}"
-                                                                   FontSize="13"
+                                                                   FontSize="16"
                                                                    FontWeight="Bold"
                                                                    Foreground="#2563EB"
-                                                                   Margin="0,3,0,0"/>
+                                                                   Margin="0,4,0,0"/>
 
                                                         <TextBlock Text="{Binding Stock, StringFormat='Stock: {0}'}"
-                                                                   FontSize="10"
+                                                                   FontSize="11"
                                                                    Foreground="#94A3B8"/>
 
                                                     </StackPanel>

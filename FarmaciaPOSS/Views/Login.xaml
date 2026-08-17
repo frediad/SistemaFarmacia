@@ -253,8 +253,8 @@
 
                     <Border Background="White"
                             CornerRadius="24"
-                            Width="110"
-                            Height="110"
+                            Width="160"
+                            Height="130"
                             HorizontalAlignment="Center">
 
                         <Border.Effect>
@@ -264,9 +264,9 @@
                                               ShadowDepth="4"/>
                         </Border.Effect>
 
-                        <Image Source="/Images/logo-click.png"
-                               Width="80"
-                               Height="86"
+                        <Image Source="/Images/logo-farmacia-yatzil.png"
+                               Width="150"
+                               Height="150"
                                Stretch="Uniform"/>
 
                     </Border>

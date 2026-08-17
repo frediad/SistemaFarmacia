@@ -37,9 +37,6 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
-            // ✅ Ahora filtra también por Usuario, para que cada quien vea
-            // únicamente la caja que él mismo abrió  y no la más reciente
-            // del sistema en general.
             string query =
             @"SELECT TOP 1 *
               FROM Caja
@@ -104,7 +101,25 @@ namespace FarmaciaPOS.Views
             cmd.Parameters.AddWithValue("@FechaApertura", DateTime.Now);
             cmd.Parameters.AddWithValue("@MontoInicial", monto);
 
-            cmd.ExecuteNonQuery();
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex) when (ex.Number == 2601 || ex.Number == 2627)
+            {
+                // ✅ El índice único UX_Caja_UnaAbiertaPorUsuario bloqueó el
+                // INSERT porque ya existe una caja abierta para este usuario
+                // (evita duplicados aunque la UI se haya desincronizado).
+                MessageBox.Show(
+                    "Ya tienes una caja abierta registrada en el sistema. " +
+                    "Cierra esta ventana y vuelve a abrirla para verla, o contacta al administrador si el problema persiste.",
+                    "Caja ya abierta",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                CargarCajaAbierta();
+                return;
+            }
 
             MessageBox.Show("Caja abierta correctamente");
 
@@ -281,11 +296,8 @@ namespace FarmaciaPOS.Views
                 ventasTransferencia = 0;
             }
 
-            // El efectivo esperado en el cajón incluye monto inicial + entradas/salidas manuales.
-            // Tarjeta y Transferencia no pasan físicamente por la caja, así que no suman aquí.
             decimal totalEsperado = montoInicialActual + ventasEfectivo + totalEntradas - totalSalidas;
 
-            // Guardamos los "calculados" para usarlos en el corte
             calculadoEfectivo = totalEsperado;
             calculadoTarjeta = ventasTarjeta;
             calculadoTransferencia = ventasTransferencia;
@@ -418,6 +430,10 @@ namespace FarmaciaPOS.Views
 
             conn.Open();
 
+            // ✅ Se cierran TODAS las cajas abiertas de este usuario, no solo
+            // cajaActualId — es una red de seguridad extra por si llegaran a
+            // quedar huérfanas de nuevo (ej. cierres forzados de la app),
+            // además del índice único que ya lo previene a nivel de BD.
             string query =
             @"UPDATE Caja
               SET
@@ -436,6 +452,19 @@ namespace FarmaciaPOS.Views
             cmd.Parameters.AddWithValue("@Diferencia", diferencia);
 
             cmd.ExecuteNonQuery();
+
+            // Cierre defensivo de cualquier otra caja huérfana del mismo
+            // usuario que pudiera haber quedado abierta por error.
+            string queryHuerfanas =
+            @"UPDATE Caja
+              SET FechaCierre = @FechaCierre, Estado = 'CERRADA'
+              WHERE UsuarioId = @UsuarioId AND Estado = 'ABIERTA' AND Id <> @Id";
+
+            SqlCommand cmdHuerfanas = new SqlCommand(queryHuerfanas, conn);
+            cmdHuerfanas.Parameters.AddWithValue("@FechaCierre", DateTime.Now);
+            cmdHuerfanas.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+            cmdHuerfanas.Parameters.AddWithValue("@Id", cajaActualId);
+            cmdHuerfanas.ExecuteNonQuery();
 
             overlayCorte.Visibility = Visibility.Collapsed;
 
@@ -488,6 +517,19 @@ namespace FarmaciaPOS.Views
             cmd.Parameters.AddWithValue("@FechaCierre", DateTime.Now);
 
             cmd.ExecuteNonQuery();
+
+            // ✅ Misma red de seguridad: cierra cualquier otra caja huérfana
+            // que hubiera quedado abierta para este usuario.
+            string queryHuerfanas =
+            @"UPDATE Caja
+              SET FechaCierre = @FechaCierre, Estado = 'CERRADA'
+              WHERE UsuarioId = @UsuarioId AND Estado = 'ABIERTA' AND Id <> @Id";
+
+            SqlCommand cmdHuerfanas = new SqlCommand(queryHuerfanas, conn);
+            cmdHuerfanas.Parameters.AddWithValue("@FechaCierre", DateTime.Now);
+            cmdHuerfanas.Parameters.AddWithValue("@UsuarioId", Sesion.UsuarioId);
+            cmdHuerfanas.Parameters.AddWithValue("@Id", cajaActualId);
+            cmdHuerfanas.ExecuteNonQuery();
 
             MessageBox.Show("Caja cerrada correctamente");
 

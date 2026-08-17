@@ -309,7 +309,8 @@ namespace FarmaciaPOS.Views
                     StockActual = producto.Stock,
                     CostoActual = producto.PrecioCompra,
                     Cantidad = 1,
-                    CostoUnitario = producto.PrecioCompra
+                    CostoUnitario = producto.PrecioCompra,
+   
                 });
             }
 

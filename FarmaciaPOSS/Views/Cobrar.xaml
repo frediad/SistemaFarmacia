@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Cobrar Venta"
-        Height="660"
+        Height="700"
         Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -80,6 +80,9 @@
             <Setter Property="BorderThickness" Value="1.5"/>
         </Style>
 
+        <!-- ✅ Mismo estilo que el combo de método de pago, para el cliente -->
+        <Style x:Key="CboCliente" TargetType="ComboBox" BasedOn="{StaticResource CboMetodoPago}"/>
+
     </Window.Resources>
 
     <Border Background="White" CornerRadius="16" Margin="14">
@@ -93,6 +96,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -146,8 +150,76 @@
 
             </DataGrid>
 
-            <!-- TOTAL -->
+            <!-- ✅ CLIENTE -->
             <StackPanel Grid.Row="2" Margin="20,0,20,10">
+
+                <TextBlock Text="VENDER A"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           Foreground="#94A3B8"
+                           Margin="2,0,0,6"/>
+
+                <ComboBox x:Name="cbCliente"
+                          Height="44"
+                          Style="{StaticResource CboCliente}"
+                          DisplayMemberPath="Nombre"
+                          SelectedValuePath="Id"
+                          SelectionChanged="cbCliente_SelectionChanged"/>
+
+                <!-- ✅ Estado de crédito del cliente seleccionado (oculto por
+                     defecto — aparece siempre que se elija un cliente
+                     específico, sea "Público en general" el único caso que
+                     lo oculta). -->
+                <Border x:Name="pnlCreditoCliente"
+                        Background="#F8FAFC"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1.5"
+                        CornerRadius="10"
+                        Padding="12,10"
+                        Margin="0,8,0,0"
+                        Visibility="Collapsed">
+
+                    <StackPanel>
+
+                        <!-- Línea de estado: siempre visible cuando el panel lo está -->
+                        <TextBlock x:Name="txtEstadoCredito"
+                                   Text=""
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Desglose numérico: solo si el cliente tiene crédito habilitado -->
+                        <Grid x:Name="pnlDetalleCredito" Margin="0,10,0,0" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="LÍMITE" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock x:Name="txtLimiteCredito" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#374151"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="USADO" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock x:Name="txtSaldoActual" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#374151"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="DISPONIBLE" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock x:Name="txtCreditoDisponible" Text="$0.00" FontSize="14" FontWeight="Bold" Foreground="#16A34A"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+
+                </Border>
+
+            </StackPanel>
+
+            <!-- TOTAL -->
+            <StackPanel Grid.Row="3" Margin="20,0,20,10">
 
                 <Grid Margin="0,2">
                     <TextBlock Text="TOTAL" FontSize="20" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Left"/>
@@ -157,7 +229,7 @@
             </StackPanel>
 
             <!-- MÉTODO DE PAGO -->
-            <StackPanel Grid.Row="3" Margin="20,0,20,10">
+            <StackPanel Grid.Row="4" Margin="20,0,20,10">
 
                 <TextBlock Text="MÉTODO DE PAGO"
                            FontSize="11"
@@ -172,12 +244,13 @@
                     <ComboBoxItem Content="Efectivo" IsSelected="True"/>
                     <ComboBoxItem Content="Tarjeta"/>
                     <ComboBoxItem Content="Transferencia"/>
+                    <ComboBoxItem x:Name="itemCredito" Content="Crédito" IsEnabled="False"/>
                 </ComboBox>
 
             </StackPanel>
 
             <!-- MONTO RECIBIDO / CAMBIO -->
-            <Grid Grid.Row="4" Margin="20,0,20,10">
+            <Grid Grid.Row="5" Margin="20,0,20,10">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -214,7 +287,7 @@
             </Grid>
 
             <!-- BOTONES -->
-            <Grid Grid.Row="5" Margin="20,0,20,16">
+            <Grid Grid.Row="6" Margin="20,0,20,16">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

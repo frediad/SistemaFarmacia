@@ -85,7 +85,7 @@ namespace FarmaciaPOS.Helpers
         {
             try
             {
-                string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "logo-click.png");
+                string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "logo-farmacia-yatzil.png");
 
                 if (!File.Exists(ruta))
                     return null;
@@ -211,7 +211,7 @@ namespace FarmaciaPOS.Helpers
                 y += font.Height + 4;
                 e.Graphics.DrawString($"Rollo configurado: {anchoMM}mm", font, Brushes.Black, x, y);
                 y += font.Height + 4;
-                e.Graphics.DrawString(logo != null ? "Logo cargado correctamente ✔" : "⚠ No se encontró el logo (Images/farma.png)", font, Brushes.Black, x, y);
+                e.Graphics.DrawString(logo != null ? "Logo cargado correctamente ✔" : "⚠ No se encontró el logo (Images/logo-farmacia-yatzil.png)", font, Brushes.Black, x, y);
                 y += font.Height + 4;
                 e.Graphics.DrawString("Impresora funcionando correctamente ✔", font, Brushes.Black, x, y);
                 y += font.Height + 4;

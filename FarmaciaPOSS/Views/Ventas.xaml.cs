@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FarmaciaPOS.Views
 {
@@ -15,6 +16,9 @@ namespace FarmaciaPOS.Views
     {
         private List<Producto> productos = new();
         private ObservableCollection<VentaItem> carrito = new();
+
+        // ✅ Filtro de periodo actualmente activo en el Historial
+        private string filtroPeriodoActivo = "Dia";
 
         public VentasWindow()
         {
@@ -26,6 +30,27 @@ namespace FarmaciaPOS.Views
             CargarCategoriasCatalogo();
             CargarCatalogo();
             ActualizarTotales();
+
+            // ✅ Historial y estadísticas se cargan cuando el usuario entra a esas
+            // pestañas (evita consultas innecesarias si solo va a vender).
+            tabPrincipal.SelectionChanged += TabPrincipal_SelectionChanged;
+        }
+
+        private bool historialCargadoAlMenosUnaVez = false;
+        private bool estadisticasCargadasAlMenosUnaVez = false;
+
+        private void TabPrincipal_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (tabPrincipal.SelectedIndex == 1 && !historialCargadoAlMenosUnaVez)
+            {
+                CargarHistorial();
+                historialCargadoAlMenosUnaVez = true;
+            }
+            else if (tabPrincipal.SelectedIndex == 2 && !estadisticasCargadasAlMenosUnaVez)
+            {
+                CargarEstadisticas();
+                estadisticasCargadasAlMenosUnaVez = true;
+            }
         }
 
         // =========================================
@@ -382,7 +407,7 @@ namespace FarmaciaPOS.Views
         }
 
         // =========================================
-        // ✅ COBRAR — ahora usa CobrarWindow, igual que el dashboard
+        // COBRAR
         // =========================================
 
         private void BtnCobrar_Click(object sender, RoutedEventArgs e)
@@ -405,6 +430,15 @@ namespace FarmaciaPOS.Views
                 carrito.Clear();
                 ActualizarTotales();
                 CargarProductos();
+
+                // ✅ Si el historial ya se había cargado antes, refrescarlo para
+                // que la venta recién hecha aparezca sin que el usuario tenga
+                // que darle "Actualizar" manualmente.
+                if (historialCargadoAlMenosUnaVez)
+                    CargarHistorial();
+
+                if (estadisticasCargadasAlMenosUnaVez)
+                    CargarEstadisticas();
             }
         }
 
@@ -427,6 +461,155 @@ namespace FarmaciaPOS.Views
             }
         }
 
+        // =========================================================
+        // ✅ TAB 2: HISTORIAL DE VENTAS
+        // =========================================================
+
+        private void CargarHistorial()
+        {
+            try
+            {
+                var lista = VentasReporteHelper.ObtenerHistorial(filtroPeriodoActivo);
+                dgHistorialVentas.ItemsSource = lista;
+
+                decimal totalPeriodo = lista.Sum(v => v.Total);
+                txtTotalHistorial.Text = $"Total del periodo: {totalPeriodo:C}  ({lista.Count} venta{(lista.Count == 1 ? "" : "s")})";
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudo cargar el historial: " + ex.Message, "Error", this);
+            }
+        }
+
+        private void BtnFiltroPeriodo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.Tag is not string tag)
+                return;
+
+            filtroPeriodoActivo = tag;
+
+            // Resalta el botón activo, regresa los demás a su estilo normal
+            foreach (var b in new[] { btnFiltroDia, btnFiltroSemana, btnFiltroMes, btnFiltroAño, btnFiltroTodo })
+                b.Style = (Style)FindResource("BtnFiltroPeriodo");
+
+            btn.Style = (Style)FindResource("BtnFiltroPeriodoActivo");
+
+            CargarHistorial();
+        }
+
+        private void BtnActualizarHistorial_Click(object sender, RoutedEventArgs e)
+        {
+            CargarHistorial();
+        }
+
+        // ✅ Reimprime el ticket de una venta ya realizada, reconstruyendo el
+        // detalle desde DetalleVentas. Como Pago/Cambio no se guardan en BD,
+        // se reimprime con Pago = Total y Cambio = $0.00 (venta ya liquidada).
+        private void BtnReimprimirTicket_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.DataContext is not VentaHistorialItem venta)
+                return;
+
+            try
+            {
+                var detalle = VentasReporteHelper.ObtenerDetalleVenta(venta.Id);
+
+                if (detalle.Count == 0)
+                {
+                    MensajeHelper.Advertencia("Esta venta no tiene productos registrados en el detalle.", "Aviso", this);
+                    return;
+                }
+
+                var config = ConfiguracionPosHelper.Cargar();
+
+                if (string.IsNullOrWhiteSpace(config.ImpresoraTicket))
+                {
+                    MensajeHelper.Error("No hay ninguna impresora de tickets configurada. Ve a Periféricos para asignar una.", "Error", this);
+                    return;
+                }
+
+                ImpresoraTicketHelper.ImprimirTicketVenta(
+                    config.ImpresoraTicket,
+                    venta.Folio,
+                    venta.Vendedor,
+                    detalle,
+                    venta.Subtotal,
+                    venta.Total,
+                    venta.Total,   // Pago: se reconstruye igual al total (venta ya liquidada)
+                    0m,            // Cambio: no se guarda en BD, se reimprime en $0.00
+                    config.AnchoTicketMM);
+
+                MensajeHelper.Exito($"Ticket del folio {venta.Folio} reimpreso correctamente.", "Reimpresión", this);
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudo reimprimir el ticket: " + ex.Message, "Error", this);
+            }
+        }
+
+        // =========================================================
+        // ✅ TAB 3: ESTADÍSTICAS
+        // =========================================================
+
+        private void CargarEstadisticas()
+        {
+            try
+            {
+                var mensual = VentasReporteHelper.ObtenerEstadisticaMensual();
+                var anual = VentasReporteHelper.ObtenerEstadisticaAnual();
+
+                LlenarTarjetaEstadistica(
+                    mensual,
+                    txtEtiquetaMesActual, txtMontoMesActual,
+                    txtEtiquetaMesAnterior, txtMontoMesAnterior,
+                    txtPorcentajeMes, iconoMes, txtDiferenciaMes);
+
+                LlenarTarjetaEstadistica(
+                    anual,
+                    txtEtiquetaAnioActual, txtMontoAnioActual,
+                    txtEtiquetaAnioAnterior, txtMontoAnioAnterior,
+                    txtPorcentajeAño, iconoAño, txtDiferenciaAnio);
+            }
+            catch (Exception ex)
+            {
+                MensajeHelper.Error("No se pudieron cargar las estadísticas: " + ex.Message, "Error", this);
+            }
+        }
+
+        private void LlenarTarjetaEstadistica(
+            EstadisticaVentas datos,
+            TextBlock txtEtiquetaActual, TextBlock txtMontoActual,
+            TextBlock txtEtiquetaAnterior, TextBlock txtMontoAnterior,
+            TextBlock txtPorcentaje, TextBlock icono, TextBlock txtDiferencia)
+        {
+            txtEtiquetaActual.Text = datos.EtiquetaActual;
+            txtMontoActual.Text = datos.MontoActual.ToString("C");
+
+            txtEtiquetaAnterior.Text = datos.EtiquetaAnterior;
+            txtMontoAnterior.Text = datos.MontoAnterior.ToString("C");
+
+            txtPorcentaje.Text = $" {Math.Abs(datos.PorcentajeCambio):F2}%";
+            txtDiferencia.Text = $"{(datos.EsPositivo ? "+" : "-")} {Math.Abs(datos.Diferencia):C}";
+
+            var colorPositivo = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
+            var colorNegativo = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
+
+            if (datos.EsPositivo)
+            {
+                txtPorcentaje.Foreground = colorPositivo;
+                txtDiferencia.Foreground = colorPositivo;
+                icono.Text = " ▲";
+                icono.Foreground = colorPositivo;
+            }
+            else
+            {
+                txtPorcentaje.Foreground = colorNegativo;
+                txtDiferencia.Foreground = colorNegativo;
+                icono.Text = " ▼";
+                icono.Foreground = colorNegativo;
+            }
+        }
+
         // =========================================
         // CERRAR
         // =========================================
@@ -443,6 +626,11 @@ namespace FarmaciaPOS.Views
         private void VentasWindow_PreviewKeyDown(
             object sender, KeyEventArgs e)
         {
+            // ✅ Los atajos de venta solo aplican en la pestaña de Punto de Venta,
+            // para no interferir con la navegación en Historial/Estadísticas.
+            if (tabPrincipal.SelectedIndex != 0)
+                return;
+
             switch (e.Key)
             {
                 case Key.F2:

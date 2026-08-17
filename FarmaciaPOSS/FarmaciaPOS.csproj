@@ -15,7 +15,9 @@
   <ItemGroup>
 	  <None Remove="appsettings.json" />
     <None Remove="farma.ico" />
+    <None Remove="Images\farma.png" />
     <None Remove="Images\logo-click.png" />
+    <None Remove="Images\logo-farmacia-yatzil.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +40,12 @@
     <Resource Include="farma.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\farma.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\logo-farmacia-yatzil.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="logo-icono.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -45,15 +53,6 @@
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	 </Resource>
     <Resource Include="Images\logo-sin-fondo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="icono\logito.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="icono\logo-mtc %281%29.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="icono\logo-sin-fondo.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -85,9 +84,6 @@
 
   <ItemGroup>
     <Resource Include="Images\Logo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="icono\logo.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

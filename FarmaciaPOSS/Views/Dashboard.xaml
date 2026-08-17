@@ -309,10 +309,10 @@
                 <!-- LOGO -->
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center">
-
-                    <Image Source="/Images/logo-click.png"
-                           Width="60"
-                           Height="60"
+                    
+                    <Image Source="/Images/logo-farmacia-yatzil.png"
+                           Width="130"
+                           Height="160"
                            Margin="0,0,12,0"/>
 
                     <StackPanel VerticalAlignment="Center">

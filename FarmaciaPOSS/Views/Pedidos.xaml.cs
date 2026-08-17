@@ -169,13 +169,14 @@ namespace FarmaciaPOS.Views
 
                 string query =
                 @"SELECT
-                    pr.Nombre AS NombreProducto,
-                    dp.Cantidad,
-                    dp.Precio,
-                    dp.Subtotal
-                  FROM DetallePedidos dp
-                  INNER JOIN Productos pr ON dp.ProductoId = pr.Id
-                  WHERE dp.PedidoId = @PedidoId";
+                pr.Nombre AS NombreProducto,
+                pr.CodigoBarras,
+                dp.Cantidad,
+                dp.Precio,
+                dp.Subtotal
+              FROM DetallePedidos dp
+              INNER JOIN Productos pr ON dp.ProductoId = pr.Id
+              WHERE dp.PedidoId = @PedidoId";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@PedidoId", idPedido);
@@ -186,7 +187,7 @@ namespace FarmaciaPOS.Views
                 {
                     lista.Add(new DetallePedidoView
                     {
-                        Nombre = reader["Nombre"].ToString() ?? "",
+                        Nombre = reader["NombreProducto"].ToString() ?? "",
                         Cantidad = Convert.ToInt32(reader["Cantidad"]),
                         Precio = Convert.ToDecimal(reader["Precio"]),
                         Subtotal = Convert.ToDecimal(reader["Subtotal"])
@@ -310,16 +311,21 @@ namespace FarmaciaPOS.Views
 
             btnEstadoPendiente.IsEnabled = !esEstadoFinal;
             btnEstadoPreparando.IsEnabled = !esEstadoFinal;
+            btnEstadoEnCamino.IsEnabled = !esEstadoFinal;
             btnEstadoListoRecoger.IsEnabled = !esEstadoFinal;
+            btnEstadoConfirmado.IsEnabled = !esEstadoFinal;
             btnEstadoEntregado.IsEnabled = !esEstadoFinal;
             btnEstadoCancelado.IsEnabled = !esEstadoFinal;
+           
 
             // Atenúa visualmente los botones deshabilitados
             double opacidad = esEstadoFinal ? 0.4 : 1.0;
 
             btnEstadoPendiente.Opacity = opacidad;
             btnEstadoPreparando.Opacity = opacidad;
+            btnEstadoEnCamino.Opacity = opacidad;
             btnEstadoListoRecoger.Opacity = opacidad;
+            btnEstadoConfirmado.Opacity = opacidad;
             btnEstadoEntregado.Opacity = opacidad;
             btnEstadoCancelado.Opacity = opacidad;
 
@@ -361,6 +367,20 @@ namespace FarmaciaPOS.Views
                         $"FarmaClick Yatzil";
                     break;
 
+                case "Confirmado":
+                    emoji = "👌";
+                    asunto = $"Tu pedido #{pedido.NumeroPedido} ha sido confirmado — FarmaClick Yatzil";
+                    cuerpo = $"Estimado(a) {pedido.ClienteNombre},\n\n" +
+                             $"{LINEA}\n" +
+                             $"  📋  ESTADO: CONFIRMADO\n" +
+                             $"{LINEA}\n\n" +
+                             $"Tu pedido #{pedido.NumeroPedido} ha sido confirmado.\n" +
+                             $"¡Gracias por tu preferencia!\n\n" +
+                             $"{LINEA}\n" +
+                             $"Atentamente,\n" +
+                             $"FarmaClick Yatzil";
+                    break;
+
                 case "Preparando":
                     emoji = "⚙️";
                     asunto =
@@ -376,6 +396,25 @@ namespace FarmaciaPOS.Views
                         $"Te avisaremos en cuanto esté listo para que\n" +
                         $"puedas pasar a recogerlo.\n\n" +
                         $"Gracias por tu paciencia.\n\n" +
+                        $"{LINEA}\n" +
+                        $"Atentamente,\n" +
+                        $"FarmaClick Yatzil";
+                    break;
+                
+                case "En camino":
+                    emoji = "🚚";
+                    asunto =
+                        $"Tu pedido #{pedido.NumeroPedido} está en camino — FarmaClick Yatzil";
+                    cuerpo =
+                        $"Estimado(a) {pedido.ClienteNombre},\n\n" +
+                        $"{LINEA}\n" +
+                        $"  📋  ESTADO: EN CAMINO\n" +
+                        $"{LINEA}\n\n" +
+                        $"¡Tu pedido #{pedido.NumeroPedido} ya está en camino!\n" +
+                        $"Nuestro equipo de entrega lo llevará a la dirección proporcionada.\n\n" +
+                        $"    💰  Total: {pedido.Total:C}\n\n" +
+                        $"Te pedimos que estés atento(a) a la llegada de tu pedido.\n\n" +
+                        $"Gracias por elegirnos.\n\n" +
                         $"{LINEA}\n" +
                         $"Atentamente,\n" +
                         $"FarmaClick Yatzil";

@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Clientes"
-        Height="700"
-        Width="1000"
+        Height="720"
+        Width="1050"
         Icon="/farma.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8">
@@ -55,6 +55,104 @@
             </Setter>
         </Style>
 
+        <!-- ✅ Pestañas principales, mismo criterio visual que Ventas -->
+        <Style x:Key="TabPrincipalClientes" TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="border"
+                                Background="Transparent"
+                                BorderBrush="#2563EB"
+                                BorderThickness="0,0,0,3"
+                                Padding="{TemplateBinding Padding}"
+                                Margin="0,0,4,0">
+                            <ContentPresenter ContentSource="Header"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="#94A3B8"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#EFF6FF"/>
+                                <Setter Property="Foreground" Value="#2563EB"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="border" Property="BorderThickness" Value="0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ✅ Botones de filtro de periodo para el historial -->
+        <Style x:Key="BtnFiltroHistorial" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="15"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#2563EB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnFiltroHistorialActivo" TargetType="Button" BasedOn="{StaticResource BtnFiltroHistorial}">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#2563EB"/>
+        </Style>
+
+        <!-- Botón chico de acción dentro de una fila del listado de clientes -->
+        <Style x:Key="BtnFilaCliente" TargetType="Button">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,4"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CboClienteHistorial" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -72,7 +170,6 @@
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="280"/>
                     <ColumnDefinition Width="110"/>
                 </Grid.ColumnDefinitions>
 
@@ -82,44 +179,7 @@
                            FontWeight="Bold"
                            VerticalAlignment="Center"/>
 
-                <Border Grid.Column="1"
-                        Background="White"
-                        CornerRadius="8"
-                        Margin="10,0"
-                        VerticalAlignment="Center">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="🔍"
-                                   FontSize="16"
-                                   Margin="10,0,5,0"
-                                   VerticalAlignment="Center"/>
-
-                        <TextBox x:Name="txtBuscarCliente"
-                                 Grid.Column="1"
-                                 Height="40"
-                                 FontSize="14"
-                                 BorderThickness="0"
-                                 VerticalContentAlignment="Center"
-                                 TextChanged="txtBuscarCliente_TextChanged">
-                            <TextBox.Template>
-                                <ControlTemplate TargetType="TextBox">
-                                    <Border Background="Transparent">
-                                        <ScrollViewer x:Name="PART_ContentHost" Margin="4,0"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </TextBox.Template>
-                        </TextBox>
-
-                    </Grid>
-
-                </Border>
-
-                <Button Grid.Column="2"
+                <Button Grid.Column="1"
                         Content="✕ Cerrar"
                         Width="100"
                         Height="40"
@@ -143,272 +203,470 @@
         </Border>
 
         <!-- ===================================== -->
-        <!-- CONTENIDO                             -->
+        <!-- PESTAÑAS PRINCIPALES                  -->
         <!-- ===================================== -->
 
-        <Grid Grid.Row="1" Margin="15">
+        <TabControl Grid.Row="1"
+                    x:Name="tabPrincipalClientes"
+                    Background="#F0F4F8"
+                    BorderThickness="0"
+                    Padding="0">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="380"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource TabPrincipalClientes}"/>
+            </TabControl.Resources>
 
-            <!-- ===================================== -->
-            <!-- FORMULARIO                            -->
-            <!-- ===================================== -->
+            <!-- ===================================================== -->
+            <!-- PESTAÑA 1: NUEVO / EDITAR CLIENTE                     -->
+            <!-- ===================================================== -->
 
-            <Border Grid.Column="0"
-                    Background="White"
-                    CornerRadius="12"
-                    Padding="20"
-                    Margin="0,0,15,0">
+            <TabItem Header="📝 Nuevo / Editar">
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid Margin="15">
 
-                    <StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="420"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="txtTituloForm"
-                                   Text="Nuevo Cliente"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Foreground="#1E293B"
-                                   Margin="0,0,0,15"/>
+                    <Border Grid.Column="0"
+                            Background="White"
+                            CornerRadius="12"
+                            Padding="20">
 
-                        <TextBlock Text="NOMBRE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtNombre" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
-
-                        <TextBlock Text="TELÉFONO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtTelefono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
-
-                        <TextBlock Text="CORREO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtCorreo" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
-
-                        <TextBlock Text="DIRECCIÓN" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtDireccion" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
-
-                        <TextBlock Text="RFC (OPCIONAL)" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtRFC" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
-
-                        <Border Background="#EFF6FF"
-                                BorderBrush="#BFDBFE"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="12"
-                                Margin="0,0,0,14">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
 
                             <StackPanel>
-                                <TextBlock Text="💳 Crédito / Fiado"
-                                           FontSize="13" FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="LÍMITE DE CRÉDITO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                                <TextBox x:Name="txtLimiteCredito" Height="38" Style="{StaticResource TxtCliente}" Text="0"/>
+                                <TextBlock x:Name="txtTituloForm"
+                                           Text="Nuevo Cliente"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Foreground="#1E293B"
+                                           Margin="0,0,0,15"/>
 
-                                <TextBlock x:Name="txtSaldoInfo"
-                                           Text="Saldo actual: $0.00"
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Foreground="#DC2626"
-                                           Margin="0,10,0,0"/>
+                                <TextBlock Text="NOMBRE" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtNombre" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="TELÉFONO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtTelefono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="CORREO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtCorreo" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="DIRECCIÓN" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtDireccion" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="RFC (OPCIONAL)" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtRFC" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <Border Background="#EFF6FF"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12"
+                                        Margin="0,0,0,14">
+
+                                    <StackPanel>
+                                        <TextBlock Text="💳 Crédito / Fiado"
+                                                   FontSize="13" FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,0,8"/>
+
+                                        <TextBlock Text="LÍMITE DE CRÉDITO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                        <TextBox x:Name="txtLimiteCredito" Height="38" Style="{StaticResource TxtCliente}" Text="0"/>
+
+                                        <TextBlock x:Name="txtSaldoInfo"
+                                                   Text="Saldo actual: $0.00"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#DC2626"
+                                                   Margin="0,10,0,0"/>
+                                    </StackPanel>
+
+                                </Border>
+
+                                <CheckBox x:Name="chkActivo"
+                                          Content="Cliente Activo"
+                                          FontSize="14"
+                                          IsChecked="True"
+                                          Margin="0,0,0,20"/>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Content="🆕 Nuevo"
+                                            Height="46"
+                                            Background="#9CA3AF"
+                                            Style="{StaticResource BtnAccionCliente}"
+                                            Click="BtnNuevo_Click"/>
+
+                                    <Button Grid.Column="2"
+                                            Content="💾 Guardar"
+                                            Height="46"
+                                            Background="#2563EB"
+                                            Style="{StaticResource BtnAccionCliente}"
+                                            Click="BtnGuardar_Click"/>
+                                </Grid>
+
+                                <Button Content="🗑️ Eliminar Cliente"
+                                        Height="42"
+                                        Background="#DC2626"
+                                        Style="{StaticResource BtnAccionCliente}"
+                                        Click="BtnEliminar_Click"/>
+
+                                <Separator Margin="0,20,0,15"/>
+
+                                <TextBlock Text="Registrar abono / pago"
+                                           FontSize="15" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="MONTO DEL ABONO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtMontoAbono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="MOTIVO / NOTA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
+                                <TextBox x:Name="txtMotivoAbono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+
+                                <Button Content="💰 Registrar Abono"
+                                        Height="44"
+                                        Background="#16A34A"
+                                        Style="{StaticResource BtnAccionCliente}"
+                                        Click="BtnRegistrarAbono_Click"/>
+
                             </StackPanel>
 
-                        </Border>
+                        </ScrollViewer>
 
-                        <CheckBox x:Name="chkActivo"
-                                  Content="Cliente Activo"
-                                  FontSize="14"
-                                  IsChecked="True"
-                                  Margin="0,0,0,20"/>
+                    </Border>
 
-                        <Grid Margin="0,0,0,10">
+                    <!-- Panel de ayuda visual a la derecha -->
+                    <Border Grid.Column="1"
+                            Background="White"
+                            CornerRadius="12"
+                            Padding="30"
+                            Margin="15,0,0,0">
+
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="💡"
+                                       FontSize="48"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,16"/>
+                            <TextBlock Text="Da de alta un cliente nuevo aquí,"
+                                       FontSize="15" FontWeight="SemiBold" Foreground="#475569"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="o edítalo desde la pestaña"
+                                       FontSize="15" FontWeight="SemiBold" Foreground="#475569"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="'👥 Clientes Registrados'"
+                                       FontSize="15" FontWeight="Bold" Foreground="#2563EB"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                    </Border>
+
+                </Grid>
+
+            </TabItem>
+
+            <!-- ===================================================== -->
+            <!-- PESTAÑA 2: CLIENTES REGISTRADOS                       -->
+            <!-- ===================================================== -->
+
+            <TabItem Header="👥 Clientes Registrados">
+
+                <Grid Margin="15">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White" CornerRadius="12" Padding="12" Margin="0,0,0,12">
+
+                        <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Content="🆕 Nuevo"
-                                    Height="46"
-                                    Background="#9CA3AF"
-                                    Style="{StaticResource BtnAccionCliente}"
-                                    Click="BtnNuevo_Click"/>
+                            <TextBlock Text="🔍" FontSize="16" VerticalAlignment="Center" Margin="4,0,8,0"/>
 
-                            <Button Grid.Column="2"
-                                    Content="💾 Guardar"
-                                    Height="46"
-                                    Background="#2563EB"
-                                    Style="{StaticResource BtnAccionCliente}"
-                                    Click="BtnGuardar_Click"/>
+                            <TextBox x:Name="txtBuscarClientesRegistrados"
+                                     Grid.Column="1"
+                                     Height="40"
+                                     Style="{StaticResource TxtCliente}"
+                                     TextChanged="txtBuscarClientesRegistrados_TextChanged"/>
                         </Grid>
 
-                        <Button Content="🗑️ Eliminar Cliente"
-                                Height="42"
-                                Background="#DC2626"
-                                Style="{StaticResource BtnAccionCliente}"
-                                Click="BtnEliminar_Click"/>
+                    </Border>
 
-                        <Separator Margin="0,20,0,15"/>
+                    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="12">
 
-                        <TextBlock Text="Registrar abono / pago"
-                                   FontSize="15" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,10"/>
+                        <DataGrid x:Name="dgClientesRegistrados"
+                                  AutoGenerateColumns="False"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="True"
+                                  BorderThickness="0"
+                                  RowHeight="42"
+                                  FontSize="14"
+                                  CanUserAddRows="False"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#F1F5F9">
 
-                        <TextBlock Text="MONTO DEL ABONO" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtMontoAbono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,10"/>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
 
-                        <TextBlock Text="MOTIVO / NOTA" FontSize="11" FontWeight="Bold" Foreground="#94A3B8" Margin="2,0,0,6"/>
-                        <TextBox x:Name="txtMotivoAbono" Height="40" Style="{StaticResource TxtCliente}" Margin="0,0,0,14"/>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="120"/>
+                                <DataGridTextColumn Header="Correo" Binding="{Binding Correo}" Width="180"/>
+                                <DataGridTextColumn Header="Límite Crédito" Binding="{Binding LimiteCredito, StringFormat=C}" Width="120"/>
+                                <DataGridTextColumn Header="Saldo Actual" Binding="{Binding SaldoActual, StringFormat=C}" Width="120"/>
+                                <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Activo}" Width="70"/>
 
-                        <Button Content="💰 Registrar Abono"
-                                Height="44"
-                                Background="#16A34A"
-                                Style="{StaticResource BtnAccionCliente}"
-                                Click="BtnRegistrarAbono_Click"/>
+                                <DataGridTemplateColumn Header="" Width="180">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="✏️ Editar"
+                                                        Background="#2563EB"
+                                                        Foreground="White"
+                                                        Style="{StaticResource BtnFilaCliente}"
+                                                        Click="BtnEditarClienteRegistrado_Click"/>
+                                                <Button Content="📜 Historial"
+                                                        Background="#0EA5E9"
+                                                        Foreground="White"
+                                                        Style="{StaticResource BtnFilaCliente}"
+                                                        Click="BtnVerHistorialClienteRegistrado_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                    </StackPanel>
+                            </DataGrid.Columns>
 
-                </ScrollViewer>
+                        </DataGrid>
 
-            </Border>
+                    </Border>
 
-            <!-- ===================================== -->
-            <!-- LISTA + PESTAÑAS DE DETALLE            -->
-            <!-- ===================================== -->
+                </Grid>
 
-            <Grid Grid.Column="1">
+            </TabItem>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="3*"/>
-                </Grid.RowDefinitions>
+            <!-- ===================================================== -->
+            <!-- PESTAÑA 3: HISTORIAL DE CLIENTE                       -->
+            <!-- ===================================================== -->
 
-                <!-- LISTA DE CLIENTES -->
-                <Border Background="White"
-                        CornerRadius="12"
-                        Padding="12"
-                        Margin="0,0,0,12">
+            <TabItem Header="📜 Historial de Cliente">
 
-                    <DataGrid x:Name="dgClientes"
-                              AutoGenerateColumns="False"
-                              HeadersVisibility="Column"
-                              IsReadOnly="True"
-                              BorderThickness="0"
-                              RowHeight="38"
-                              FontSize="14"
-                              CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="#F1F5F9"
-                              SelectionChanged="dgClientes_SelectionChanged">
+                <Grid Margin="15">
 
-                        <DataGrid.ColumnHeaderStyle>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="#F8FAFC"/>
-                                <Setter Property="Foreground" Value="#64748B"/>
-                                <Setter Property="FontSize" Value="12"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="Padding" Value="10,8"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Style>
-                        </DataGrid.ColumnHeaderStyle>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        
+                    <!-- Selector de cliente -->
+                    <Border Background="White" CornerRadius="12" Padding="16" Margin="0,0,0,12">
 
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
-                            <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="130"/>
-                            <DataGridTextColumn Header="Límite Crédito" Binding="{Binding LimiteCredito, StringFormat=C}" Width="130"/>
-                            <DataGridTextColumn Header="Saldo Actual" Binding="{Binding SaldoActual, StringFormat=C}" Width="130"/>
-                            <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Activo}" Width="80"/>
-                        </DataGrid.Columns>
+                        <StackPanel>
 
-                    </DataGrid>
+                            <TextBlock Text="Selecciona un cliente"
+                                       FontSize="16" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,10"/>
 
-                </Border>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="280"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                <!-- PESTAÑAS DE DETALLE DEL CLIENTE SELECCIONADO -->
-                <Border Background="White"
-                        CornerRadius="12"
-                        Padding="12">
+                                <TextBox x:Name="txtBuscarClienteHistorial"
+                                         Height="40"
+                                         Style="{StaticResource TxtCliente}"
+                                         TextChanged="txtBuscarClienteHistorial_TextChanged"/>
 
-                    <TabControl BorderThickness="0" Background="Transparent">
+                                <ComboBox x:Name="cbClienteHistorial"
+                                          Grid.Column="2"
+                                          Height="40"
+                                          Style="{StaticResource CboClienteHistorial}"
+                                          DisplayMemberPath="Nombre"
+                                          SelectedValuePath="Id"
+                                          SelectionChanged="cbClienteHistorial_SelectionChanged"/>
 
-                        <TabItem Header="🧾 Historial de Compras">
+                            </Grid>
 
-                            <DataGrid x:Name="dgHistorialCompras"
-                                      AutoGenerateColumns="False"
-                                      HeadersVisibility="Column"
-                                      IsReadOnly="True"
-                                      BorderThickness="0"
-                                      RowHeight="36"
-                                      FontSize="13"
-                                      CanUserAddRows="False"
-                                      GridLinesVisibility="Horizontal"
-                                      HorizontalGridLinesBrush="#F1F5F9"
-                                      Margin="0,10,0,0">
+                            <!-- Info del cliente elegido -->
+                            <Border x:Name="pnlInfoClienteHistorial"
+                                    Background="#F8FAFC"
+                                    CornerRadius="10"
+                                    Padding="14,10"
+                                    Margin="0,14,0,0"
+                                    Visibility="Collapsed">
 
-                                <DataGrid.ColumnHeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="Background" Value="#F8FAFC"/>
-                                        <Setter Property="Foreground" Value="#64748B"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Padding" Value="10,8"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                    </Style>
-                                </DataGrid.ColumnHeaderStyle>
+                                <StackPanel>
+                                    <TextBlock x:Name="txtNombreClienteHistorial"
+                                               Text=""
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="#1E293B"/>
+                                    <TextBlock x:Name="txtInfoClienteHistorial"
+                                               Text=""
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
 
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Venta #" Binding="{Binding VentaId}" Width="90"/>
-                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" Width="160"/>
-                                    <DataGridTextColumn Header="Tipo de Pago" Binding="{Binding TipoPago}" Width="130"/>
-                                    <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=C}" Width="120"/>
-                                </DataGrid.Columns>
+                            </Border>
 
-                            </DataGrid>
+                            <!-- Filtro de periodo -->
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
 
-                        </TabItem>
+                                <TextBlock Text="Periodo:"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="#64748B"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
 
-                        <TabItem Header="💰 Historial de Abonos">
+                                <Button x:Name="btnFiltroHoy" Content="Hoy"
+                                        Style="{StaticResource BtnFiltroHistorial}"
+                                        Click="BtnFiltroHistorial_Click" Tag="Dia"/>
 
-                            <DataGrid x:Name="dgHistorialAbonos"
-                                      AutoGenerateColumns="False"
-                                      HeadersVisibility="Column"
-                                      IsReadOnly="True"
-                                      BorderThickness="0"
-                                      RowHeight="36"
-                                      FontSize="13"
-                                      CanUserAddRows="False"
-                                      GridLinesVisibility="Horizontal"
-                                      HorizontalGridLinesBrush="#F1F5F9"
-                                      Margin="0,10,0,0">
+                                <Button x:Name="btnFiltroSemana" Content="Semana"
+                                        Style="{StaticResource BtnFiltroHistorial}"
+                                        Click="BtnFiltroHistorial_Click" Tag="Semana"/>
 
-                                <DataGrid.ColumnHeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="Background" Value="#F8FAFC"/>
-                                        <Setter Property="Foreground" Value="#64748B"/>
-                                        <Setter Property="FontSize" Value="12"/>
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Padding" Value="10,8"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                    </Style>
-                                </DataGrid.ColumnHeaderStyle>
+                                <Button x:Name="btnFiltroMes" Content="Mes"
+                                        Style="{StaticResource BtnFiltroHistorial}"
+                                        Click="BtnFiltroHistorial_Click" Tag="Mes"/>
 
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" Width="160"/>
-                                    <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat=C}" Width="120"/>
-                                    <DataGridTextColumn Header="Saldo después" Binding="{Binding SaldoDespues, StringFormat=C}" Width="130"/>
-                                    <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*"/>
-                                </DataGrid.Columns>
+                                <Button x:Name="btnFiltroAnio" Content="Año"
+                                        Style="{StaticResource BtnFiltroHistorial}"
+                                        Click="BtnFiltroHistorial_Click" Tag="Anio"/>
 
-                            </DataGrid>
+                                <Button x:Name="btnFiltroTodoHistorial" Content="Todo"
+                                        Style="{StaticResource BtnFiltroHistorialActivo}"
+                                        Click="BtnFiltroHistorial_Click" Tag="Todo"/>
 
-                        </TabItem>
+                            </StackPanel>
 
-                    </TabControl>
+                        </StackPanel>
 
-                </Border>
+                    </Border>
 
-            </Grid>
+                    <!-- Compras / Abonos del cliente elegido -->
+                    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="12">
 
-        </Grid>
+                        <TabControl BorderThickness="0" Background="Transparent">
+
+                            <TabItem Header="🧾 Historial de Compras">
+
+                                <Grid>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock x:Name="txtTotalHistorialCompras"
+                                               Text="Selecciona un cliente para ver su historial"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="#1E3A8A"
+                                               Margin="4,10,0,6"/>
+
+                                    <DataGrid x:Name="dgHistorialCompras"
+                                              Grid.Row="1"
+                                              AutoGenerateColumns="False"
+                                              HeadersVisibility="Column"
+                                              IsReadOnly="True"
+                                              BorderThickness="0"
+                                              RowHeight="36"
+                                              FontSize="13"
+                                              CanUserAddRows="False"
+                                              GridLinesVisibility="Horizontal"
+                                              HorizontalGridLinesBrush="#F1F5F9">
+
+                                        <DataGrid.ColumnHeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="Background" Value="#F8FAFC"/>
+                                                <Setter Property="Foreground" Value="#64748B"/>
+                                                <Setter Property="FontSize" Value="12"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Padding" Value="10,8"/>
+                                                <Setter Property="BorderThickness" Value="0"/>
+                                            </Style>
+                                        </DataGrid.ColumnHeaderStyle>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Venta #" Binding="{Binding VentaId}" Width="90"/>
+                                            <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" Width="160"/>
+                                            <DataGridTextColumn Header="Tipo de Pago" Binding="{Binding TipoPago}" Width="130"/>
+                                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=C}" Width="120"/>
+                                        </DataGrid.Columns>
+
+                                    </DataGrid>
+
+                                </Grid>
+
+                            </TabItem>
+
+                            <TabItem Header="💰 Historial de Abonos">
+
+                                <DataGrid x:Name="dgHistorialAbonos"
+                                          AutoGenerateColumns="False"
+                                          HeadersVisibility="Column"
+                                          IsReadOnly="True"
+                                          BorderThickness="0"
+                                          RowHeight="36"
+                                          FontSize="13"
+                                          CanUserAddRows="False"
+                                          GridLinesVisibility="Horizontal"
+                                          HorizontalGridLinesBrush="#F1F5F9"
+                                          Margin="0,10,0,0">
+
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Background" Value="#F8FAFC"/>
+                                            <Setter Property="Foreground" Value="#64748B"/>
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Padding" Value="10,8"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=dd/MM/yyyy HH:mm}" Width="160"/>
+                                        <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat=C}" Width="120"/>
+                                        <DataGridTextColumn Header="Saldo después" Binding="{Binding SaldoDespues, StringFormat=C}" Width="130"/>
+                                        <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*"/>
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
+                            </TabItem>
+
+                        </TabControl>
+
+                    </Border>
+
+                </Grid>
+
+            </TabItem>
+
+        </TabControl>
 
     </Grid>
 

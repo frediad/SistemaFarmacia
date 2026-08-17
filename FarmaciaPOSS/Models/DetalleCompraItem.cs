@@ -9,6 +9,7 @@ namespace FarmaciaPOS.Models
         public int StockActual { get; set; }
         public decimal CostoActual { get; set; }
 
+
         private int _cantidad = 1;
         public int Cantidad
         {
