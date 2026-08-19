@@ -66,5 +66,6 @@ namespace FarmaciaPOS.Models
                 return "Normal";
             }
         }
+        public int TotalVendido { get; set; } = 0;
     }
 }

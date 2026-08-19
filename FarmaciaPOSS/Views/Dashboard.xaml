@@ -1096,6 +1096,21 @@
 
                                                 </Border>
 
+                                                <!-- ✅ Cantidad de productos vendidos -->
+                                                <Border Background="#1E3A8A"
+                                                        CornerRadius="10"
+                                                        Padding="6,2"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Margin="0,6,6,0">
+
+                                                    <TextBlock Text="{Binding TotalVendido, StringFormat='📉 {0} vendidos'}"
+                                                               FontSize="10"
+                                                               FontWeight="Bold"
+                                                               Foreground="White"/>
+
+                                                </Border>
+
                                                 <!-- INFO -->
                                                 <StackPanel Grid.Row="1"
                                                             Margin="10,6">

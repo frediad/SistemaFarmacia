@@ -37,6 +37,7 @@ namespace FarmaciaPOS
 
             CargarProductos();
             CargarVentasPorProducto();
+            SincronizarVentasEnProductos();
 
             InicializarCarritoCentral();
 
@@ -92,6 +93,7 @@ namespace FarmaciaPOS
 
                 CargarProductos();
                 CargarVentasPorProducto();
+                SincronizarVentasEnProductos();
                 CargarCategoriasCatalogo();
 
                 AplicarFiltroCatalogo();
@@ -250,6 +252,14 @@ namespace FarmaciaPOS
         private int VentasDe(Producto p) =>
             ventasPorProducto.TryGetValue(p.Id, out int total) ? total : 0;
 
+        
+        private void SincronizarVentasEnProductos()
+        {
+            foreach (var p in productos)
+            {
+                p.TotalVendido = VentasDe(p);
+            }
+        }
 
         // =========================================
         // ✅ CARGAR CATÁLOGO DE PRODUCTOS (ordenado por más vendidos)
